@@ -11,7 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WTGWizard.Shared\WTGWizard.Shared.Services.csproj" />
+		<ProjectReference Include="..\WTGWizard.Shared.Services\WTGWizard.Shared.Services.csproj" />
 		<ProjectReference Include="..\WTGWizard.Shared.Common\WTGWizard.Shared.Common.csproj" />
 	</ItemGroup>
 
