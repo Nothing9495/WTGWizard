@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Serilog;
-using Serilog.Events;
 
 namespace WTGWizard.Shared.Services.Logger;
 
@@ -39,20 +38,20 @@ public sealed class LoggerService : ILoggerService, IDisposable
             .CreateLogger();
     }
 
-    public void Debug(string category, string message)
-        => _logger.ForContext("Category", category).Debug("{Message}", message);
+    public void Debug(string category, string message, params object?[] args)
+        => _logger.ForContext("Category", category).Debug(message, args);
 
-    public void Info(string category, string message)
-        => _logger.ForContext("Category", category).Information("{Message}", message);
+    public void Info(string category, string message, params object?[] args)
+        => _logger.ForContext("Category", category).Information(message, args);
 
-    public void Warn(string category, string message)
-        => _logger.ForContext("Category", category).Warning("{Message}", message);
+    public void Warn(string category, string message, params object?[] args)
+        => _logger.ForContext("Category", category).Warning(message, args);
 
-    public void Error(string category, string message)
-        => _logger.ForContext("Category", category).Error("{Message}", message);
+    public void Error(string category, string message, params object?[] args)
+        => _logger.ForContext("Category", category).Error(message, args);
 
-    public void Fatal(string category, string message)
-        => _logger.ForContext("Category", category).Fatal("{Message}", message);
+    public void Fatal(string category, string message, params object?[] args)
+        => _logger.ForContext("Category", category).Fatal(message, args);
 
     public void Shutdown()
     {
