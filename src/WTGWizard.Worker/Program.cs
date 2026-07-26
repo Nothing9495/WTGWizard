@@ -30,7 +30,7 @@ static class Program
         var tee = new TeeWriter(stdoutWriter, logFileStream);
         Console.SetOut(tee);
 
-        logService.Info("Program", $"Worker started, PID: {Environment.ProcessId}");
+        logService.Info("Worker", "Worker started, PID: {Pid}", Environment.ProcessId);
 
         if (args.Length < 2)
         {
@@ -58,7 +58,7 @@ static class Program
         }
         catch (Exception ex)
         {
-            logService.Error("Program", $"Unhandled exception: {ex.Message}");
+            logService.Error("Worker", "Unhandled exception: {ErrorMessage}", ex.Message);
             Console.Error.WriteLine(ex.Message);
             return 1;
         }
