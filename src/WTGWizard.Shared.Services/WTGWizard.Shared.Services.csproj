@@ -3,7 +3,7 @@
 		<TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<LangVersion>preview</LangVersion>
-		<RootNamespace>WTGWizard.Shared</RootNamespace>
+		<RootNamespace>WTGWizard.Shared.Services</RootNamespace>
 		<Nullable>enable</Nullable>
 		<Platforms>x64</Platforms>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>

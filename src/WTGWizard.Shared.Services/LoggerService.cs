@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WTGWizard.Shared
+namespace WTGWizard.Shared.Services
 {
-    internal class Shared
+    internal class LoggerService
     {
     }
 }
