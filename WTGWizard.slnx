@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="src/WTGWizard.Main/WTGWizard.Main.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="src/WTGWizard.Worker/WTGWizard.Worker.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+</Solution>
