@@ -37,3 +37,6 @@ Desktop.ini
 
 ## OS
 .DS_Store
+
+## AI Agent
+docs/.oc
