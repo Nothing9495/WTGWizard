@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<LangVersion>preview</LangVersion>
+		<RootNamespace>WTGWizard.Shared</RootNamespace>
+		<Nullable>enable</Nullable>
+		<Platforms>x64</Platforms>
+		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="ManagedWimLib" Version="2.6.0" />
+	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+	  <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+	  <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+	  <PackageReference Include="Vanara.PInvoke.CfgMgr32" Version="5.0.5" />
+	  <PackageReference Include="Vanara.PInvoke.Kernel32" Version="5.0.5" />
+	  <PackageReference Include="Vanara.PInvoke.SetupAPI" Version="5.0.5" />
+	</ItemGroup>
+</Project>
