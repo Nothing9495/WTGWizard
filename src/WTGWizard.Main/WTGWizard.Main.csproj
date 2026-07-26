@@ -29,7 +29,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WTGWizard.Worker\WTGWizard.Worker.csproj" />
+		<ProjectReference Include="..\WTGWizard.Main.Language\WTGWizard.Main.Language.csproj" />
 	</ItemGroup>
+
+	<Target Name="CopyWorkerOutput" AfterTargets="Build">
+		<PropertyGroup>
+			<WorkerOutputPath>$(MSBuildProjectDirectory)\..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)</WorkerOutputPath>
+		</PropertyGroup>
+		<ItemGroup>
+			<WorkerOutputFiles Include="$(WorkerOutputPath)\WTGWizard.Worker*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(WorkerOutputFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+	</Target>
 
 </Project>
