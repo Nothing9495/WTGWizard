@@ -32,7 +32,7 @@ public partial class App : Application
     private void OnMainWindowClosed(object sender, WindowEventArgs args)
     {
         // 应用关闭时的清理逻辑
-        // WimService.Cleanup();导致Access violation问题，等待后续排查。
+        // TODO: WimService.Cleanup();导致Access violation问题，等待后续排查。
         //WimService.Cleanup();
 
         var logger = Services.GetService<ILoggerService>();
