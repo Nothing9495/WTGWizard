@@ -61,6 +61,18 @@ public sealed partial class MainWindow : Window
         WindowHelper.SetWindowMinSize(this, 1100, 680);
     }
 
+    public void NavigateToTag(string tag)
+    {
+        foreach (var item in NavView.MenuItems)
+        {
+            if (item is NavigationViewItem navItem && navItem.Tag is string t && t == tag)
+            {
+                NavView.SelectedItem = navItem;
+                break;
+            }
+        }
+    }
+
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
         // 获取推荐的过渡动画

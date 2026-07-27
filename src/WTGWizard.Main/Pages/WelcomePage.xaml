@@ -24,6 +24,7 @@
             <Button Content="{x:Bind lang:Lang.WelcomePage_GoWizard_Content}"
                     Style="{ThemeResource AccentButtonStyle}"
                     HorizontalAlignment="Center"
+                    Click="GoWizard_Button_Click"
                     Margin="0,16,0,0" />
         </StackPanel>
   </Grid>

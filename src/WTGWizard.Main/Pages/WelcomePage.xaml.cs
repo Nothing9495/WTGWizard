@@ -28,5 +28,13 @@ namespace WTGWizard.Pages
         {
             InitializeComponent();
         }
+
+        private void GoWizard_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (App.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.NavigateToTag("WizardPage");
+            }
+        }
     }
 }
