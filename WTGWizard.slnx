@@ -6,18 +6,18 @@
     <File Path=".editorconfig" />
   </Folder>
   <Project Path="src/WTGWizard.Main/WTGWizard.Main.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-  </Project>
-  <Project Path="src/WTGWizard.Worker/WTGWizard.Worker.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-  </Project>
-  <Project Path="src/WTGWizard.Shared.Services/WTGWizard.Shared.Services.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-  </Project>
-  <Project Path="src/WTGWizard.Shared.Common/WTGWizard.Shared.Common.csproj">
-    <Platform Solution="*|x64" Project="x64" />
+    <Platform Project="x64" />
   </Project>
   <Project Path="src/WTGWizard.Main.Language/WTGWizard.Main.Language.csproj">
-    <Platform Solution="*|x64" Project="x64" />
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/WTGWizard.Shared.Common/WTGWizard.Shared.Common.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/WTGWizard.Shared.Services/WTGWizard.Shared.Services.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/WTGWizard.Worker/WTGWizard.Worker.csproj">
+    <Platform Project="x64" />
   </Project>
 </Solution>

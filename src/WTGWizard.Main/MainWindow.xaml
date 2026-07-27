@@ -1,15 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Window
-    x:Class="WTGWizard.MainWindow"
+    x:Class="WTGWizard.Main.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:WTGWizard"
-    Title="WTGWizard">
+    xmlns:local="using:WTGWizard.Main"
+    xmlns:lang="using:WTGWizard.Main.Language"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="WTGWizard.Main">
+  
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
 
-    <Grid>
-        <TextBlock Text="WTGWizard"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Style="{StaticResource SubtitleTextBlockStyle}" />
-    </Grid>
+  <Grid x:Name="RootGrid" Loaded="RootGrid_Loaded">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
 
+    <TitleBar x:Name="AppTitleBar"
+              Title="WTGWizard"
+              MinHeight="48"
+              IsBackButtonVisible="False">
+      <TitleBar.IconSource>
+        <ImageIconSource ImageSource="pack://application:,,,/WTGWizard.Main;component/Assets/AppLogo.ico" />
+      </TitleBar.IconSource>
+    </TitleBar>
+
+    <NavigationView x:Name="NavView" Grid.Row="1"
+                    PaneDisplayMode="Top"
+                    IsBackButtonVisible="Collapsed"
+                    IsPaneToggleButtonVisible="False"
+                    IsSettingsVisible="True"
+                    SelectionChanged="NavView_SelectionChanged">
+      <NavigationView.MenuItems>
+        <NavigationViewItem Tag="WelcomePage">
+          <NavigationViewItem.Content>
+            <TextBlock Text="{x:Bind lang:Lang.App_NavTabWelcome_Content}" />
+          </NavigationViewItem.Content>
+          <NavigationViewItem.Icon>
+            <FontIcon Glyph="&#xE80F;" />
+          </NavigationViewItem.Icon>
+        </NavigationViewItem>
+        <NavigationViewItem Tag="WizardPage">
+          <NavigationViewItem.Content>
+            <TextBlock Text="{x:Bind lang:Lang.App_NavTabWizard_Content}" />
+          </NavigationViewItem.Content>
+          <NavigationViewItem.Icon>
+            <FontIcon Glyph="&#xE977;" />
+          </NavigationViewItem.Icon>
+        </NavigationViewItem>
+        <NavigationViewItem Tag="TaskPage">
+          <NavigationViewItem.Content>
+            <TextBlock Text="{x:Bind lang:Lang.App_NavTabTask_Content}" />
+          </NavigationViewItem.Content>
+          <NavigationViewItem.Icon>
+            <FontIcon Glyph="&#xE9D9;" />
+          </NavigationViewItem.Icon>
+        </NavigationViewItem>
+      </NavigationView.MenuItems>
+
+      <Frame x:Name="RootFrame" />
+    </NavigationView>
+  </Grid>
 </Window>
