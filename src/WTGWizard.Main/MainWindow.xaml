@@ -25,11 +25,7 @@
               MinHeight="48"
               IsBackButtonVisible="False">
       <TitleBar.IconSource>
-        <ImageIconSource>
-          <ImageIconSource.ImageSource>
-            <BitmapImage UriSource="pack://application:,,,/WTGWizard.Main;component/Assets/AppLogo.ico" />
-          </ImageIconSource.ImageSource>
-        </ImageIconSource>
+        <ImageIconSource ImageSource="ms-appx:///Assets/AppLogo.ico" />
       </TitleBar.IconSource>
     </TitleBar>
 

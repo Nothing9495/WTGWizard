@@ -39,35 +39,7 @@
 
   <ItemGroup>
     <Content Include="Assets\WinLogo\*.png" />
-    <None Remove="Pages\SettingsPage.xaml" />
-    <None Remove="Pages\TaskPage.xaml" />
-    <None Remove="Pages\WelcomePage.xaml" />
-    <None Remove="Pages\WizardPage.xaml" />
     <None Include="Native\x64\libwim-15.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\SettingsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\TaskPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\WizardPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\WelcomePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
 
 	<Target Name="CopyWorkerOutput" AfterTargets="Build">
