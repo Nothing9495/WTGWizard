@@ -38,8 +38,11 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <!-- <Resource Include="Assets\AppLogo.ico" /> -->
-    <Resource Include="Assets\WinLogo\*.png" />
+    <Content Include="Assets\WinLogo\*.png" />
+    <None Remove="Pages\SettingsPage.xaml" />
+    <None Remove="Pages\TaskPage.xaml" />
+    <None Remove="Pages\WelcomePage.xaml" />
+    <None Remove="Pages\WizardPage.xaml" />
     <None Include="Native\x64\libwim-15.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
   </ItemGroup>
 
