@@ -1,40 +1,21 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using WTGWizard.Main;
+using WTGWizard.Messages;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace WTGWizard.Pages;
 
-namespace WTGWizard.Pages
+public sealed partial class WelcomePage : Page
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class WelcomePage : Page
+    public WelcomePage()
     {
-        public WelcomePage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        private void GoWizard_Button_Click(object sender, RoutedEventArgs e)
-        {
-            if (App.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.NavigateToTag("WizardPage");
-            }
-        }
+    private void GoWizard_Button_Click(object sender, RoutedEventArgs e)
+    {
+        // 发送导航消息到 MainWindow
+        WeakReferenceMessenger.Default.Send(new NavigateToPageMessage("WizardPage"));
     }
 }
