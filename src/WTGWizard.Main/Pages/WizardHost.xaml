@@ -4,6 +4,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:WTGWizard.Pages"
+             xmlns:lang="using:WTGWizard.Main.Language"
              mc:Ignorable="d">
 
   <Grid>
@@ -31,18 +33,19 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock x:Name="StepIndicator"
+                   Text="{x:Bind local:WizardHost.FormatStepIndicator(VM.CurrentStepTitle, VM.CurrentStep, VM.TotalSteps), Mode=OneWay}"
                    VerticalAlignment="Center"
                    Style="{ThemeResource BodyStrongTextBlockStyle}" />
 
         <StackPanel Grid.Column="1"
                     Orientation="Horizontal"
                     Spacing="8">
-          <Button x:Uid="BackButton"
-                  x:Name="BackButton"
+          <Button x:Name="BackButton"
+                  Content="{x:Bind lang:Lang.Page_WizHost_BackButton_Content}"
                   Click="BackButton_Click" />
-          <Button x:Uid="ForwardButton"
-                  x:Name="ForwardButton"
+          <Button x:Name="ForwardButton"
                   Click="ForwardButton_Click"
+                  Content="{x:Bind lang:Lang.Page_WizHost_ForwardButton_Content}"
                   Style="{ThemeResource AccentButtonStyle}" />
         </StackPanel>
       </Grid>

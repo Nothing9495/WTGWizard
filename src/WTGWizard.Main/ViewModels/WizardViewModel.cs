@@ -1,6 +1,7 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WTGWizard.Main.Language;
 using WTGWizard.Messages;
 
 namespace WTGWizard.ViewModels;
@@ -14,10 +15,12 @@ public sealed partial class WizardViewModel : ObservableObject
 
     [ObservableProperty] public partial int CurrentStep { get; set; }
     [ObservableProperty] public partial bool IsDeploying { get; set; }
+    [ObservableProperty] public partial string CurrentStepTitle { get; set; } = string.Empty;
 
     public bool CanGoBack => CurrentStep > 0 && !IsDeploying;
     public bool CanGoForward => CurrentStep < MaxStep && IsCurrentStepValid;
     public int MaxStep => 4; // 0-4, 共 5 步
+    public int TotalSteps => 5;
 
     // ═══ 状态子对象 ═══
 
@@ -87,5 +90,18 @@ public sealed partial class WizardViewModel : ObservableObject
         // TODO: 创建 DeploymentOrchestrator
         IsDeploying = true;
         NavigateToTaskRequested?.Invoke();
+    }
+
+    // ═══ 步骤指示器 ═══
+
+    /// <summary>
+    /// 更新当前步骤标题（由 WizardHost 调用）。
+    /// </summary>
+    public void UpdateStepTitle(string[] stepResourceKeys)
+    {
+        if (CurrentStep >= 0 && CurrentStep < stepResourceKeys.Length)
+        {
+            CurrentStepTitle = Localization.GetString(stepResourceKeys[CurrentStep]);
+        }
     }
 }

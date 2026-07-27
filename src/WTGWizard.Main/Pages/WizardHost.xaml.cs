@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using WTGWizard.Main.Language;
 using WTGWizard.ViewModels;
 
 namespace WTGWizard.Pages;
@@ -15,7 +14,7 @@ public sealed partial class WizardHost : UserControl
 {
     private static readonly Type[] StepTypes =
     [
-        typeof(Steps.Step1_ImageConfig),
+        typeof(Steps.ImageConfigPage),
         // typeof(Steps.Step2_DeployMethod),
         // typeof(Steps.Step3_DeploySettings),
         // typeof(Steps.Step4_AdvancedSettings),
@@ -24,11 +23,11 @@ public sealed partial class WizardHost : UserControl
 
     private static readonly string[] StepResourceKeys =
     [
-        "Step1_Title",
-        // "Step2_Title",
-        // "Step3_Title",
-        // "Step4_Title",
-        // "Step5_Title",
+        "Page.WizStep.ImageConfig.Title",
+        // "Page.WizStep.DeployMethod.Title",
+        // "Page.WizStep.DeploySettings.Title",
+        // "Page.WizStep.AdvancedSettings.Title",
+        // "Page.WizStep.Confirm.Title",
     ];
 
     private int _lastStep = -1;
@@ -41,7 +40,7 @@ public sealed partial class WizardHost : UserControl
         VM = vm;
         InitializeComponent();
         VM.PropertyChanged += OnVmPropertyChanged;
-        NavigateToStep(0);
+        NavigateToStep(VM.CurrentStep);
         UpdateButtons();
     }
 
@@ -96,10 +95,8 @@ public sealed partial class WizardHost : UserControl
         StepFrame.BackStack.Clear();
         _lastStep = step;
 
-        // 更新指示器
-        var stepTitle = Localization.GetString(StepResourceKeys[step]);
-        var format = Localization.GetString("StepIndicator_Format");
-        StepIndicator.Text = string.Format(format, step + 1, stepTitle);
+        // 更新步骤标题（ViewModel 提供原始数据）
+        VM.UpdateStepTitle(StepResourceKeys);
     }
 
     /// <summary>Tab 切入时调用，转发给当前步骤页面。</summary>
@@ -116,5 +113,13 @@ public sealed partial class WizardHost : UserControl
     {
         if (StepFrame.Content is ITabActivatable page)
             page.OnTabDeactivated();
+    }
+
+    /// <summary>
+    /// 格式化指示器文本：StepTitle (current/total)
+    /// </summary>
+    public static string FormatStepIndicator(string stepTitle, int currentStep, int totalSteps)
+    {
+        return $"{stepTitle} ({currentStep + 1}/{totalSteps})";
     }
 }
