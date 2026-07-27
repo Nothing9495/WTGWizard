@@ -1,9 +1,13 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using WTGWizard.Helpers;
+using WTGWizard.Messages;
 using WTGWizard.Pages;
+using WTGWizard.ViewModels;
 
 namespace WTGWizard.Main;
 
@@ -11,12 +15,18 @@ public sealed partial class MainWindow : Window
 {
     private OverlappedPresenter? _windowPresenter;
     private OverlappedPresenterState _currentWindowState;
+    private readonly WizardViewModel _vm;
+    private ITabActivatable? _currentPage;
     private string _currentTag = string.Empty;
 
     public MainWindow()
     {
         InitializeComponent();
         SetWindowProperties();
+        _vm = App.Services.GetRequiredService<WizardViewModel>();
+
+        // 注册消息
+        WeakReferenceMessenger.Default.Register<NavigateToPageMessage>(this, (_, msg) => NavigateToTag(msg.Tag));
 
         // 标题栏按钮主题适配
         RootGrid.ActualThemeChanged += (_, _) =>
@@ -37,6 +47,7 @@ public sealed partial class MainWindow : Window
 
     private void SetWindowProperties()
     {
+        //TitleBar样式及高度设置
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(AppTitleBar);
         this.AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
@@ -57,8 +68,53 @@ public sealed partial class MainWindow : Window
     private void RootGrid_Loaded(object sender, RoutedEventArgs e)
     {
         TitleBarHelper.ApplySystemThemeToCaptionButtons(this, RootGrid.ActualTheme);
+        // Window 样式控制
         WindowHelper.SetWindowSize(this, 1100, 740);
         WindowHelper.SetWindowMinSize(this, 1100, 680);
+    }
+
+    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        // 通知当前页面 Tab 切出
+        _currentPage?.OnTabDeactivated();
+
+        var transition = args.RecommendedNavigationTransitionInfo;
+
+        // 处理设置页（齿轮图标）
+        if (args.IsSettingsSelected)
+        {
+            if (_currentTag == "settings") return;
+            _currentTag = "settings";
+            RootFrame.Navigate(typeof(SettingsPage), null, transition);
+            _currentPage = null;
+            return;
+        }
+
+        // 处理菜单项
+        if (args.SelectedItemContainer is NavigationViewItem item && item.Tag is string tag)
+        {
+            if (tag == _currentTag) return;
+            _currentTag = tag;
+
+            switch (tag)
+            {
+                case "WelcomePage":
+                    RootFrame.Navigate(typeof(WelcomePage), null, transition);
+                    _currentPage = null;
+                    break;
+                case "WizardPage":
+                    RootFrame.Navigate(typeof(WizardPage), _vm, transition);
+                    _currentPage = RootFrame.Content as ITabActivatable;
+                    break;
+                case "TaskPage":
+                    RootFrame.Navigate(typeof(TaskPage), _vm, transition);
+                    _currentPage = RootFrame.Content as ITabActivatable;
+                    break;
+            }
+
+            // 通知新页面 Tab 切入
+            _currentPage?.OnTabActivated();
+        }
     }
 
     public void NavigateToTag(string tag)
@@ -69,42 +125,6 @@ public sealed partial class MainWindow : Window
             {
                 NavView.SelectedItem = navItem;
                 break;
-            }
-        }
-    }
-
-    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
-    {
-        // 获取推荐的过渡动画
-        var transition = args.RecommendedNavigationTransitionInfo;
-
-        // 处理设置页（齿轮图标）
-        if (args.IsSettingsSelected)
-        {
-            if (_currentTag == "settings") return;
-            _currentTag = "settings";
-            RootFrame.Navigate(typeof(SettingsPage), null, transition);
-            return;
-        }
-
-        // 处理菜单项
-        if (args.SelectedItemContainer is NavigationViewItem item && item.Tag is string tag)
-        {
-            if (tag == _currentTag) return;
-
-            _currentTag = tag;
-
-            switch (tag)
-            {
-                case "WelcomePage":
-                    RootFrame.Navigate(typeof(WelcomePage), null, transition);
-                    break;
-                case "WizardPage":
-                    RootFrame.Navigate(typeof(WizardPage), null, transition);
-                    break;
-                case "TaskPage":
-                    RootFrame.Navigate(typeof(TaskPage), null, transition);
-                    break;
             }
         }
     }
