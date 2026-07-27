@@ -26,7 +26,7 @@ public static class DiskConstants
     public const uint CleanInstallOsPartNum = 3;
 
     // ═══ 盘符回退链 ═══
-
+    // Maybe removed in the future.
     public static readonly char[] EspFallbackChain = { 'Z', 'Y', 'W', 'V', 'U', 'T', 'S' };
     public static readonly char[] OsFallbackChain = { 'X', 'W', 'V', 'U', 'T', 'S', 'R' };
     public static readonly char[] ReservedFallbackChain = { 'R', 'Q', 'P', 'O', 'N', 'V', 'U', 'T', 'S' };
