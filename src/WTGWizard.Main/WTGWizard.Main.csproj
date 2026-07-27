@@ -42,6 +42,10 @@
     <None Include="Native\x64\libwim-15.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Steps\" />
+  </ItemGroup>
+
 	<Target Name="CopyWorkerOutput" AfterTargets="Build">
 		<PropertyGroup>
 			<WorkerOutputPath>$(MSBuildProjectDirectory)\..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)</WorkerOutputPath>
