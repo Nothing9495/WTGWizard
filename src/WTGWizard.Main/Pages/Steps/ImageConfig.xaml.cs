@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,6 @@ namespace WTGWizard.Pages.Steps;
 public sealed partial class ImageConfigPage : Page
 {
     private readonly IWimService _wimService = App.Services.GetRequiredService<IWimService>();
-    private bool _syncingSelection;
     public WizardViewModel VM { get; private set; } = null!;
 
     public ImageConfigPage()
@@ -32,49 +32,12 @@ public sealed partial class ImageConfigPage : Page
         if (e.Parameter is WizardViewModel vm)
             VM = vm;
 
-        VM.Image.PropertyChanged += OnImagePropertyChanged;
-        SyncItemsSource();
-        SyncSelectedIndex();
         await RefreshImageStateAsync();
     }
 
     protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
     {
         base.OnNavigatingFrom(e);
-        VM.Image.PropertyChanged -= OnImagePropertyChanged;
-    }
-
-    private void OnImagePropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(ImageConfigVM.Indices))
-            SyncItemsSource();
-        else if (e.PropertyName is nameof(ImageConfigVM.SelectedIndex))
-            SyncSelectedIndex();
-    }
-
-    private void SyncItemsSource()
-    {
-        var savedIndex = ImageIndexComboBox.SelectedIndex;
-        _syncingSelection = true;
-        ImageIndexComboBox.Items.Clear();
-        foreach (var item in VM.Image.Indices)
-            ImageIndexComboBox.Items.Add(item);
-        // 恢复选中：优先用索引（兜底 SelectedItem 引用可能不匹配）
-        var targetIndex = VM.Image.SelectedIndex >= 0 ? VM.Image.SelectedIndex : savedIndex;
-        if (targetIndex >= 0 && targetIndex < ImageIndexComboBox.Items.Count)
-            ImageIndexComboBox.SelectedIndex = targetIndex;
-        _syncingSelection = false;
-    }
-
-    private void SyncSelectedIndex()
-    {
-        if (_syncingSelection) return;
-        var idx = VM.Image.SelectedIndex;
-        if (idx == ImageIndexComboBox.SelectedIndex) return;
-        _syncingSelection = true;
-        if (idx >= 0 && idx < ImageIndexComboBox.Items.Count)
-            ImageIndexComboBox.SelectedIndex = idx;
-        _syncingSelection = false;
     }
 
     private async void ImageFilePicker_FileSelected(object sender, string path)
@@ -85,7 +48,7 @@ public sealed partial class ImageConfigPage : Page
         try
         {
             var indices = await _wimService.EnumerateIndicesAsync(path);
-            VM.Image.Indices = indices.Select(i => i.ToString()).ToArray();
+            VM.Image.Indices = new ObservableCollection<string>(indices.Select(i => i.ToString()));
 
             if (indices.Count > 0)
                 VM.Image.SelectedIndex = 0;
@@ -100,19 +63,12 @@ public sealed partial class ImageConfigPage : Page
 
     private async void ImageIndexComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_syncingSelection) return;
-
-        var pos = ImageIndexComboBox.SelectedIndex;
-        _syncingSelection = true;
-        VM.Image.SelectedIndex = pos;
-        _syncingSelection = false;
-
+        // SelectedIndex 已通过 TwoWay 绑定自动更新
         await RefreshImageStateAsync();
     }
 
     /// <summary>
     /// 统一镜像信息加载入口 — 更新 UI + 加载元数据。
-    /// 对标 Step2 的 RefreshDiskStateAsync 模式：显式调用，不依赖事件。
     /// </summary>
     private async System.Threading.Tasks.Task RefreshImageStateAsync()
     {
@@ -120,7 +76,7 @@ public sealed partial class ImageConfigPage : Page
 
         var indices = VM.Image.Indices;
         var pos = VM.Image.SelectedIndex;
-        if (pos < 0 || pos >= indices.Length) return;
+        if (pos < 0 || pos >= indices.Count) return;
         if (!int.TryParse(indices[pos], out var index)) return;
 
         VM.Image.IsLoading = true;
@@ -135,7 +91,6 @@ public sealed partial class ImageConfigPage : Page
         }
         catch (Exception)
         {
-            
         }
         finally
         {
@@ -152,7 +107,7 @@ public sealed partial class ImageConfigPage : Page
         try
         {
             await _wimService.VerifyAsync(path);
-        VM.Image.ShowVerifyError = false;
+            VM.Image.ShowVerifyError = false;
         }
         catch (Exception ex)
         {

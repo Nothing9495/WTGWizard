@@ -59,6 +59,8 @@
                          Description="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelIdx_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xF2C7;}">
           <ComboBox x:Name="ImageIndexComboBox"
+                    ItemsSource="{x:Bind VM.Image.Indices, Mode=OneWay}"
+                    SelectedIndex="{x:Bind VM.Image.SelectedIndex, Mode=TwoWay}"
                     PlaceholderText="{x:Bind lang:Lang.Page_WizStep_ImageConfig_IdxCombo_Placeholder}"
                     MinWidth="150"
                     VerticalAlignment="Center"

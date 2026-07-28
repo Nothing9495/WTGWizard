@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using WTGWizard.Shared.Services.Wim;
 
@@ -11,13 +12,7 @@ public sealed partial class ImageConfigVM : ObservableObject
 {
     [ObservableProperty] public partial string FilePath { get; set; } = string.Empty;
     [ObservableProperty] public partial int SelectedIndex { get; set; }
-    private string[] _indices = [];
-
-    public string[] Indices
-    {
-        get => _indices;
-        set { _indices = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty] public partial ObservableCollection<string> Indices { get; set; } = [];
 
     [ObservableProperty] public partial ImageInfo? ImageInfo { get; set; }
     [ObservableProperty] public partial bool IsLoading { get; set; }
