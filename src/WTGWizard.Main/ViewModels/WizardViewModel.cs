@@ -13,8 +13,16 @@ public sealed partial class WizardViewModel : ObservableObject
 {
     // ═══ 步骤导航 ═══
 
-    [ObservableProperty] public partial int CurrentStep { get; set; }
-    [ObservableProperty] public partial bool IsDeploying { get; set; }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanGoBack))]
+    [NotifyPropertyChangedFor(nameof(CanGoForward))]
+    [NotifyPropertyChangedFor(nameof(IsCurrentStepValid))]
+    public partial int CurrentStep { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanGoBack))]
+    [NotifyPropertyChangedFor(nameof(CanGoForward))]
+    public partial bool IsDeploying { get; set; }
     [ObservableProperty] public partial string CurrentStepTitle { get; set; } = string.Empty;
 
     public bool CanGoBack => CurrentStep > 0 && !IsDeploying;
@@ -42,7 +50,10 @@ public sealed partial class WizardViewModel : ObservableObject
     private void OnSubPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName is "IsValid")
+        {
             OnPropertyChanged(nameof(IsCurrentStepValid));
+            OnPropertyChanged(nameof(CanGoForward));
+        }
     }
 
     // ═══ 派生属性 ═══
