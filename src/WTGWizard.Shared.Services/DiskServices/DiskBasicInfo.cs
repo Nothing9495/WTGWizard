@@ -1,4 +1,4 @@
-namespace WTGWizard.Shared.Services.Disk;
+namespace WTGWizard.Shared.Services.DiskServices;
 
 /// <summary>
 /// 磁盘基本信息 — 简化数据模型，供服务层使用。

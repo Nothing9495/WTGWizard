@@ -5,17 +5,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using WTGWizard.Shared.Services.Logger;
 
-namespace WTGWizard.Shared.Services.Disk;
+namespace WTGWizard.Shared.Services.DiskServices;
 
 /// <summary>
 /// 盘符分配服务实现。
 /// </summary>
 public sealed class DriveLetterService : IDriveLetterService
 {
-    private readonly IDiskService _diskService;
+    private readonly IDiskIOService _diskService;
     private readonly ILoggerService _logger;
 
-    public DriveLetterService(IDiskService diskService, ILoggerService logger)
+    public DriveLetterService(IDiskIOService diskService, ILoggerService logger)
     {
         _diskService = diskService;
         _logger = logger;

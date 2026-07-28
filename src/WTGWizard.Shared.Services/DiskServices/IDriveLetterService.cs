@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace WTGWizard.Shared.Services.Disk;
+namespace WTGWizard.Shared.Services.DiskServices;
 
 /// <summary>
 /// 盘符分配服务 — 两阶段模型：预留（脚本生成前）+ 实际查询（分区完成后）。

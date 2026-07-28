@@ -1,6 +1,6 @@
 using System;
 
-namespace WTGWizard.Shared.Services.Disk;
+namespace WTGWizard.Shared.Services.DiskServices;
 
 /// <summary>
 /// 磁盘相关常量。

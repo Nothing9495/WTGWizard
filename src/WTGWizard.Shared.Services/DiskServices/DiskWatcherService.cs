@@ -10,7 +10,7 @@ using WTGWizard.Shared.Services.Logger;
 using static Vanara.PInvoke.CfgMgr32;
 using static Vanara.PInvoke.SetupAPI;
 
-namespace WTGWizard.Shared.Services.Disk;
+namespace WTGWizard.Shared.Services.DiskServices;
 
 /// <summary>
 /// 磁盘/分区/卷设备变更监视器。

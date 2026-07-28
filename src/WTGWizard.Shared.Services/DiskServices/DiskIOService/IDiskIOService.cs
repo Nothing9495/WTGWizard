@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WTGWizard.Shared.Services.Disk;
+namespace WTGWizard.Shared.Services.DiskServices;
 
 /// <summary>
-/// 磁盘服务接口 — 提供磁盘枚举、安全检测、分区查询等功能。
+/// 磁盘 I/O 服务接口 — 提供磁盘枚举、安全检测、分区查询等功能。
 /// </summary>
-public interface IDiskService
+public interface IDiskIOService
 {
     /// <summary>枚举外部磁盘。</summary>
     Task<IReadOnlyList<DiskBasicInfo>> EnumerateExternalDisksAsync(CancellationToken ct = default);

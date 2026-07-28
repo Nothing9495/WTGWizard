@@ -53,7 +53,7 @@ public partial class App : Application
         services.AddSingleton<ILoggerService>(sp => new LoggerService());
 
         // 2. 磁盘服务
-        services.AddSingleton<IDiskService, DiskService>();
+        services.AddSingleton<IDiskIOService, DiskIOService>();
 
         // 3. WIM 服务
         services.AddSingleton<IWimService, WimService>();

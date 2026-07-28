@@ -5,7 +5,7 @@ using Vanara.PInvoke;
 using WTGWizard.Shared.Services.Logger;
 using static Vanara.PInvoke.Kernel32;
 
-namespace WTGWizard.Shared.Services.Disk;
+namespace WTGWizard.Shared.Services.DiskServices;
 
 /// <summary>
 /// 磁盘性能快照 — 读写速率与活动时间。
