@@ -27,8 +27,15 @@ public sealed class LoggerService : ILoggerService, IDisposable
             "WTGWizard", "logs");
         Directory.CreateDirectory(_logDir);
 
-        _logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
+        var config = new LoggerConfiguration();
+
+#if DEBUG
+        config.MinimumLevel.Debug();
+#else
+        config.MinimumLevel.Information();
+#endif
+
+        _logger = config
             .WriteTo.File(
                 path: Path.Combine(_logDir, $"WTGWizard-{DateTime.Now:yyyyMMdd-HHmmss}.log"),
                 rollingInterval: RollingInterval.Infinite,
