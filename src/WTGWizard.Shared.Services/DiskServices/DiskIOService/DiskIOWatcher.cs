@@ -17,7 +17,7 @@ namespace WTGWizard.Shared.Services.DiskServices;
 /// - CM_Register_Notification：磁盘+卷设备接口（即时，USB 插拔/分区创建删除）
 /// - 轮询盘符映射：检测挂载点变更（2.5s 间隔，盘符分配/删除）
 /// </summary>
-public sealed class DiskWatcherService : IDisposable
+internal sealed class DiskIOWatcher : IDisposable
 {
     private readonly ILoggerService _logger;
 
@@ -31,15 +31,15 @@ public sealed class DiskWatcherService : IDisposable
     private int _debounceGen;
 
     /// <summary>磁盘或盘符发生变化时触发。</summary>
-    public event Action? DisksChanged;
+    internal event Action? DisksChanged;
 
-    public DiskWatcherService(ILoggerService logger)
+    internal DiskIOWatcher(ILoggerService logger)
     {
         _logger = logger;
     }
 
     /// <summary>启动监视。</summary>
-    public void Start()
+    internal void Start()
     {
         if (_diskNotifyHandle is not null) return;
 
@@ -55,13 +55,13 @@ public sealed class DiskWatcherService : IDisposable
         _lastDriveLetters = GetCurrentDriveLetters();
         _mountPointPoller = new Timer(_ => PollMountPoints(), null, TimeSpan.FromSeconds(2.5), TimeSpan.FromSeconds(2.5));
 
-        _logger.Debug("DiskWatcherService", "Start");
+        _logger.Debug("DiskIOWatcher", "Start");
     }
 
     /// <summary>停止监视。</summary>
-    public void Stop()
+    internal void Stop()
     {
-        _logger.Debug("DiskWatcherService", "Stop");
+        _logger.Debug("DiskIOWatcher", "Stop");
         Interlocked.Increment(ref _debounceGen);
 
         _mountPointPoller?.Dispose();
@@ -92,7 +92,7 @@ public sealed class DiskWatcherService : IDisposable
 
         if (cr != CONFIGRET.CR_SUCCESS)
         {
-            _logger.Error("DiskWatcherService", "CM_Register_Notification({Label}) failed: CR_{Error}", label, cr);
+            _logger.Error("DiskIOWatcher", "CM_Register_Notification({Label}) failed: CR_{Error}", label, cr);
             handle = null;
         }
         else
@@ -116,7 +116,7 @@ public sealed class DiskWatcherService : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskWatcherService", "Notification callback failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOWatcher", "Notification callback failed: {Error}", ex.Message);
         }
         return Win32Error.ERROR_SUCCESS;
     }
@@ -134,14 +134,14 @@ public sealed class DiskWatcherService : IDisposable
 
             if (previous is not null && !current.SetEquals(previous))
             {
-                _logger.Debug("DiskWatcherService", "Drive letters changed: [{Previous}] → [{Current}]",
+                _logger.Debug("DiskIOWatcher", "Drive letters changed: [{Previous}] → [{Current}]",
                     string.Join(",", previous.Order()), string.Join(",", current.Order()));
                 TriggerDebounced();
             }
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskWatcherService", "PollMountPoints failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOWatcher", "PollMountPoints failed: {Error}", ex.Message);
         }
     }
 
@@ -177,7 +177,7 @@ public sealed class DiskWatcherService : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskWatcherService", "TriggerDebounced failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOWatcher", "TriggerDebounced failed: {Error}", ex.Message);
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using System;
-using WTGWizard.Shared.Services.Disk;
+using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
 using WTGWizard.Shared.Services.Wim;
 using WTGWizard.ViewModels;
@@ -58,13 +58,10 @@ public partial class App : Application
         // 3. WIM 服务
         services.AddSingleton<IWimService, WimService>();
 
-        // 4. 盘符分配服务 (依赖 IDiskService + ILoggerService)
+        // 4. 盘符分配服务 (依赖 IDiskIOService + ILoggerService)
         services.AddSingleton<IDriveLetterService, DriveLetterService>();
 
-        // 5. 磁盘监视器
-        services.AddSingleton<DiskWatcherService>();
-
-        // 6. ViewModel
+        // 5. ViewModel
         services.AddSingleton<WizardViewModel>();
 
         return services.BuildServiceProvider();
