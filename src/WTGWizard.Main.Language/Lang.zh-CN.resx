@@ -126,13 +126,88 @@
   <data name="App.NavTabTask.Content" xml:space="preserve">
     <value>任务</value>
   </data>
-  <data name="WelcomePage.WelcomeTitle.Text" xml:space="preserve">
+  <data name="Page.Welcome.WelcomeTitle.Text" xml:space="preserve">
     <value>欢迎使用 WTGWizard👋</value>
   </data>
-  <data name="WelcomePage.WelcomeMsg.Text" xml:space="preserve">
+  <data name="Page.Welcome.WelcomeMsg.Text" xml:space="preserve">
     <value>WTGWizard 将帮助您逐步创建个性化的 Windows To Go 工作站！</value>
   </data>
-  <data name="WelcomePage.GoWizard.Content" xml:space="preserve">
+  <data name="Page.Welcome.GoWizard.Content" xml:space="preserve">
     <value>即刻开始！</value>
+  </data>
+  <data name="ImageVerify_Failed" xml:space="preserve">
+    <value>映像校验失败</value>
+  </data>
+  <data name="Page.WizHost.BackButton.Content" xml:space="preserve">
+    <value>上一步</value>
+  </data>
+  <data name="Page.WizHost.ForwardButton.Content" xml:space="preserve">
+    <value>下一步</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.Logo" xml:space="preserve">
+    <value>Windows 徽标</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.Loading" xml:space="preserve">
+    <value>正在加载镜像信息...</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.NameLabel" xml:space="preserve">
+    <value>名称：</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.DescLabel" xml:space="preserve">
+    <value>描述：</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.IndexLabel" xml:space="preserve">
+    <value>索引：</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.VersionLabel" xml:space="preserve">
+    <value>版本：</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.FeatureLabel" xml:space="preserve">
+    <value>功能更新：</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.ArchLabel" xml:space="preserve">
+    <value>架构：</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.BuildLabel" xml:space="preserve">
+    <value>构建号：</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.SizeLabel" xml:space="preserve">
+    <value>展开大小：</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.DateLabel" xml:space="preserve">
+    <value>创建日期：</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.Title" xml:space="preserve">
+    <value>映像配置</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.Desc" xml:space="preserve">
+    <value>选择 WIM/ESD 映像文件并选择要部署的映像索引</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.InfoCardHeader" xml:space="preserve">
+    <value>映像信息</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelImgGroup" xml:space="preserve">
+    <value>映像配置</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelImg.Header" xml:space="preserve">
+    <value>选择映像文件</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelImg.Desc" xml:space="preserve">
+    <value>支持 .wim 和 .esd 格式；使用文件选择器选择映像</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelIdx.Header" xml:space="preserve">
+    <value>选择映像索引</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelIdx.Desc" xml:space="preserve">
+    <value>选择要部署的映像索引</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.IdxCombo.Placeholder" xml:space="preserve">
+    <value>选择索引</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.FilePathPlaceholder" xml:space="preserve">
+    <value>尚未选择镜像文件</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.DispDescLabel" xml:space="preserve">
+    <value>显示描述：</value>
   </data>
 </root>

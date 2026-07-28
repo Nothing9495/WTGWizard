@@ -88,29 +88,254 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Image verification failed 的本地化字符串。
+        /// </summary>
+        public static string ImageVerify_Failed {
+            get {
+                return ResourceManager.GetString("ImageVerify_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Try it now! 的本地化字符串。
         /// </summary>
-        public static string WelcomePage_GoWizard_Content {
+        public static string Page_Welcome_GoWizard_Content {
             get {
-                return ResourceManager.GetString("WelcomePage.GoWizard.Content", resourceCulture);
+                return ResourceManager.GetString("Page.Welcome.GoWizard.Content", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 WTGWizard will guide you step by step through the process of creating your Windows To Go workstation! 的本地化字符串。
         /// </summary>
-        public static string WelcomePage_WelcomeMsg_Text {
+        public static string Page_Welcome_WelcomeMsg_Text {
             get {
-                return ResourceManager.GetString("WelcomePage.WelcomeMsg.Text", resourceCulture);
+                return ResourceManager.GetString("Page.Welcome.WelcomeMsg.Text", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Welcome to WTGWizard👋 的本地化字符串。
         /// </summary>
-        public static string WelcomePage_WelcomeTitle_Text {
+        public static string Page_Welcome_WelcomeTitle_Text {
             get {
-                return ResourceManager.GetString("WelcomePage.WelcomeTitle.Text", resourceCulture);
+                return ResourceManager.GetString("Page.Welcome.WelcomeTitle.Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Back 的本地化字符串。
+        /// </summary>
+        public static string Page_WizHost_BackButton_Content {
+            get {
+                return ResourceManager.GetString("Page.WizHost.BackButton.Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Next 的本地化字符串。
+        /// </summary>
+        public static string Page_WizHost_ForwardButton_Content {
+            get {
+                return ResourceManager.GetString("Page.WizHost.ForwardButton.Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select a WIM/ESD image file and choose the image index to deploy. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No image file has been selected. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_FilePathPlaceholder {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.FilePathPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select a index 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_IdxCombo_Placeholder {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.IdxCombo.Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image Information 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_InfoCardHeader {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.InfoCardHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select the image index to deploy. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_SelIdx_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.SelIdx.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select Image Index 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_SelIdx_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.SelIdx.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Supports .wim and .esd; use the file picker to choose an image 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_SelImg_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.SelImg.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select Image File 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_SelImg_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.SelImg.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image Configuration 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_SelImgGroup {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.SelImgGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image Config 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_Title {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Architecture: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_ArchLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.ArchLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Build: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_BuildLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.BuildLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Date Created: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_DateLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.DateLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Description: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_DescLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.DescLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Display Description: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_DispDescLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.DispDescLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Feature Update: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_FeatureLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.FeatureLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Index: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_IndexLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.IndexLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Loading image info... 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_Loading {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Windows Logo 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_Logo {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.Logo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Name: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_NameLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.NameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Expanded Size: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_SizeLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.SizeLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Version: 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_VersionLabel {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.VersionLabel", resourceCulture);
             }
         }
     }

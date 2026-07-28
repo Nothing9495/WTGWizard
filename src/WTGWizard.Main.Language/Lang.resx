@@ -126,13 +126,88 @@
   <data name="App.NavTabTask.Content" xml:space="preserve">
     <value>Tasks</value>
   </data>
-  <data name="WelcomePage.WelcomeTitle.Text" xml:space="preserve">
+  <data name="Page.Welcome.WelcomeTitle.Text" xml:space="preserve">
     <value>Welcome to WTGWizard👋</value>
   </data>
-  <data name="WelcomePage.WelcomeMsg.Text" xml:space="preserve">
+  <data name="Page.Welcome.WelcomeMsg.Text" xml:space="preserve">
     <value>WTGWizard will guide you step by step through the process of creating your Windows To Go workstation!</value>
   </data>
-  <data name="WelcomePage.GoWizard.Content" xml:space="preserve">
+  <data name="Page.Welcome.GoWizard.Content" xml:space="preserve">
     <value>Try it now!</value>
+  </data>
+  <data name="ImageVerify_Failed" xml:space="preserve">
+    <value>Image verification failed</value>
+  </data>
+  <data name="Page.WizHost.BackButton.Content" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Page.WizHost.ForwardButton.Content" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.Logo" xml:space="preserve">
+    <value>Windows Logo</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.Loading" xml:space="preserve">
+    <value>Loading image info...</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.NameLabel" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.DescLabel" xml:space="preserve">
+    <value>Description:</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.IndexLabel" xml:space="preserve">
+    <value>Index:</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.VersionLabel" xml:space="preserve">
+    <value>Version:</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.FeatureLabel" xml:space="preserve">
+    <value>Feature Update:</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.ArchLabel" xml:space="preserve">
+    <value>Architecture:</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.BuildLabel" xml:space="preserve">
+    <value>Build:</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.SizeLabel" xml:space="preserve">
+    <value>Expanded Size:</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.DateLabel" xml:space="preserve">
+    <value>Date Created:</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.Title" xml:space="preserve">
+    <value>Image Config</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.Desc" xml:space="preserve">
+    <value>Select a WIM/ESD image file and choose the image index to deploy.</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.InfoCardHeader" xml:space="preserve">
+    <value>Image Information</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelImgGroup" xml:space="preserve">
+    <value>Image Configuration</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelImg.Header" xml:space="preserve">
+    <value>Select Image File</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelImg.Desc" xml:space="preserve">
+    <value>Supports .wim and .esd; use the file picker to choose an image</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelIdx.Header" xml:space="preserve">
+    <value>Select Image Index</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.SelIdx.Desc" xml:space="preserve">
+    <value>Select the image index to deploy.</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.IdxCombo.Placeholder" xml:space="preserve">
+    <value>Select a index</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.FilePathPlaceholder" xml:space="preserve">
+    <value>No image file has been selected.</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.DispDescLabel" xml:space="preserve">
+    <value>Display Description:</value>
   </data>
 </root>
