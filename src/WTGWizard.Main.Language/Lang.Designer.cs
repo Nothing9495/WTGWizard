@@ -88,15 +88,6 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Image verification failed 的本地化字符串。
-        /// </summary>
-        public static string ImageVerify_Failed {
-            get {
-                return ResourceManager.GetString("ImageVerify_Failed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Make sure you select the correct disk for deployment to avoid accidental data loss! 的本地化字符串。
         /// </summary>
         public static string InfoBar_DataSecurity_Message {
@@ -507,6 +498,141 @@ namespace WTGWizard.Main.Language {
         public static string Page_WizStep_DeployMethod_Title {
             get {
                 return ResourceManager.GetString("Page.WizStep.DeployMethod.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Deployment Settings 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_DeployGroup {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.DeployGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Configure Windows To Go deployment options and disk settings. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Disk Settings 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_DiskGroup {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.DiskGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 After Windows To Go has booted, keep the internal hard drives offline to prevent data loss. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_HideLocalDisks_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.HideLocalDisks_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Keep internal hard drives offline 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_HideLocalDisks_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.HideLocalDisks_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Prevent Windows from assigning a drive letter to the OS partition to avoid accidentally damaging Windows To Go. This setting is only available for external hard disks. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_NoDefaultDriveLetter_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.NoDefaultDriveLetter_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Don&apos;t assign drive letter for OS partition 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_NoDefaultDriveLetter_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.NoDefaultDriveLetter_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Prevent BitLocker device encryption from running automatically after Windows To Go is initialized on eligible devices. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_PreventDeviceEncryption_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.PreventDeviceEncryption_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Prevent device encryption 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_PreventDeviceEncryption_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.PreventDeviceEncryption_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Once deployment is complete, remove the drive letter for the OS partition. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_RemoveOsDriveLetter_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.RemoveOsDriveLetter_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Remove OS partition drive letter 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_RemoveOsDriveLetter_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.RemoveOsDriveLetter_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Deploy Options 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_Title {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Deploy Windows using DISM instead of wimlib. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_UseDism_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.UseDism_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Deploy Windows using DISM 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_UseDism_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.UseDism_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Windows To Go Settings 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployOptions_WTGGroup {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.WTGGroup", resourceCulture);
             }
         }
         

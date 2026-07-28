@@ -135,9 +135,6 @@
   <data name="Page.Welcome.GoWizard.Content" xml:space="preserve">
     <value>Try it now!</value>
   </data>
-  <data name="ImageVerify_Failed" xml:space="preserve">
-    <value>Image verification failed</value>
-  </data>
   <data name="Page.WizHost.BackButton.Content" xml:space="preserve">
     <value>Back</value>
   </data>
@@ -332,5 +329,50 @@
   </data>
   <data name="InfoBar.PartNoLetter.ActionBtn" xml:space="preserve">
     <value>Open diskmgmt.msc</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.Title" xml:space="preserve">
+    <value>Deploy Options</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.Desc" xml:space="preserve">
+    <value>Configure Windows To Go deployment options and disk settings.</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.WTGGroup" xml:space="preserve">
+    <value>Windows To Go Settings</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.HideLocalDisks_Header" xml:space="preserve">
+    <value>Keep internal hard drives offline</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.HideLocalDisks_Desc" xml:space="preserve">
+    <value>After Windows To Go has booted, keep the internal hard drives offline to prevent data loss.</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption_Header" xml:space="preserve">
+    <value>Prevent device encryption</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption_Desc" xml:space="preserve">
+    <value>Prevent BitLocker device encryption from running automatically after Windows To Go is initialized on eligible devices.</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.DiskGroup" xml:space="preserve">
+    <value>Disk Settings</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter_Header" xml:space="preserve">
+    <value>Don't assign drive letter for OS partition</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter_Desc" xml:space="preserve">
+    <value>Prevent Windows from assigning a drive letter to the OS partition to avoid accidentally damaging Windows To Go. This setting is only available for external hard disks.</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter_Header" xml:space="preserve">
+    <value>Remove OS partition drive letter</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter_Desc" xml:space="preserve">
+    <value>Once deployment is complete, remove the drive letter for the OS partition.</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.DeployGroup" xml:space="preserve">
+    <value>Deployment Settings</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.UseDism_Header" xml:space="preserve">
+    <value>Deploy Windows using DISM</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.UseDism_Desc" xml:space="preserve">
+    <value>Deploy Windows using DISM instead of wimlib.</value>
   </data>
 </root>

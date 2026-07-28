@@ -33,7 +33,7 @@ public sealed partial class WizardViewModel : ObservableObject
     // ═══ 状态子对象 ═══
 
     public ImageConfigVM Image { get; } = new();
-    public DeployOptions Options { get; } = new();
+    public DeployOptionsVM Options { get; } = new();
     public DeployMethodVM Method { get; }
     public AdvancedOptions Advanced { get; } = new();
 

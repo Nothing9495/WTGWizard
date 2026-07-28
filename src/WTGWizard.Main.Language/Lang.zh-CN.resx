@@ -135,9 +135,6 @@
   <data name="Page.Welcome.GoWizard.Content" xml:space="preserve">
     <value>即刻开始！</value>
   </data>
-  <data name="ImageVerify_Failed" xml:space="preserve">
-    <value>映像校验失败</value>
-  </data>
   <data name="Page.WizHost.BackButton.Content" xml:space="preserve">
     <value>上一步</value>
   </data>
@@ -332,5 +329,50 @@
   </data>
   <data name="InfoBar.PartNoLetter.ActionBtn" xml:space="preserve">
     <value>打开磁盘管理</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.Title" xml:space="preserve">
+    <value>部署选项</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.Desc" xml:space="preserve">
+    <value>配置 Windows To Go 部署选项和磁盘设置。</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.WTGGroup" xml:space="preserve">
+    <value>Windows To Go 设置</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.HideLocalDisks_Header" xml:space="preserve">
+    <value>隐藏本地磁盘</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.HideLocalDisks_Desc" xml:space="preserve">
+    <value>Windows To Go 启动后使本机硬盘保持脱机，避免损坏硬盘数据</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption_Header" xml:space="preserve">
+    <value>阻止设备加密</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption_Desc" xml:space="preserve">
+    <value>阻止 Windows To Go 在符合条件的设备上初始化后，自动运行 BitLocker 设备加密</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.DiskGroup" xml:space="preserve">
+    <value>磁盘设置</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter_Header" xml:space="preserve">
+    <value>系统分区不分配默认盘符</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter_Desc" xml:space="preserve">
+    <value>阻止 Windows 为系统分区分配盘符，避免意外损坏 Windows To Go。该设置仅对移动硬盘可用</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter_Header" xml:space="preserve">
+    <value>移除系统分区盘符</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter_Desc" xml:space="preserve">
+    <value>部署完成后，移除系统分区的盘符</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.DeployGroup" xml:space="preserve">
+    <value>部署设置</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.UseDism_Header" xml:space="preserve">
+    <value>使用 DISM 部署 Windows</value>
+  </data>
+  <data name="Page.WizStep.DeployOptions.UseDism_Desc" xml:space="preserve">
+    <value>使用 DISM 部署 Windows 而非 wimlib</value>
   </data>
 </root>
