@@ -210,4 +210,7 @@
   <data name="UsrCtrl.ImageInfoCard.DispDescLabel" xml:space="preserve">
     <value>Display Description:</value>
   </data>
+  <data name="InfoBar.ImageVerificationFailed.Title" xml:space="preserve">
+    <value>Image Verification Failed!</value>
+  </data>
 </root>

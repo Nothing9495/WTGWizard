@@ -97,6 +97,15 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Image Verification Failed! 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationFailed_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationFailed.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Try it now! 的本地化字符串。
         /// </summary>
         public static string Page_Welcome_GoWizard_Content {
