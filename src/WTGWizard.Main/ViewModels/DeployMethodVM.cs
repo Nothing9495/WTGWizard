@@ -7,7 +7,7 @@ namespace WTGWizard.ViewModels;
 /// <summary>
 /// Step 2 状态：部署方式选择 + 磁盘/分区。
 /// </summary>
-public sealed partial class DeployMethod : ObservableObject
+public sealed partial class DeployMethodVM : ObservableObject
 {
     // ═══ 磁盘/分区选择 ═══
 

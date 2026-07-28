@@ -46,9 +46,9 @@ public sealed partial class ImageConfigPage : Page
 
     private void OnImagePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(ImageConfig.Indices))
+        if (e.PropertyName is nameof(ImageConfigVM.Indices))
             SyncItemsSource();
-        else if (e.PropertyName is nameof(ImageConfig.SelectedIndex))
+        else if (e.PropertyName is nameof(ImageConfigVM.SelectedIndex))
             SyncSelectedIndex();
     }
 

@@ -7,7 +7,7 @@ namespace WTGWizard.ViewModels;
 /// <summary>
 /// Step 1 状态：映像选择 + 元数据。
 /// </summary>
-public sealed partial class ImageConfig : ObservableObject
+public sealed partial class ImageConfigVM : ObservableObject
 {
     [ObservableProperty] public partial string FilePath { get; set; } = string.Empty;
     [ObservableProperty] public partial int SelectedIndex { get; set; }

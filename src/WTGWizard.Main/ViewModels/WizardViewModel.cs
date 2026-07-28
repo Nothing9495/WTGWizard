@@ -24,16 +24,16 @@ public sealed partial class WizardViewModel : ObservableObject
 
     // ═══ 状态子对象 ═══
 
-    public ImageConfig Image { get; } = new();
+    public ImageConfigVM Image { get; } = new();
     public DeployOptions Options { get; } = new();
-    public DeployMethod Method { get; }
+    public DeployMethodVM Method { get; }
     public AdvancedOptions Advanced { get; } = new();
 
     // ═══ 构造函数 ═══
 
     public WizardViewModel()
     {
-        Method = new DeployMethod();
+        Method = new DeployMethodVM();
         Image.PropertyChanged += OnSubPropertyChanged;
         Method.PropertyChanged += OnSubPropertyChanged;
         Advanced.PropertyChanged += OnSubPropertyChanged;
