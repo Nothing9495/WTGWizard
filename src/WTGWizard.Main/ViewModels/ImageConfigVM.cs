@@ -31,6 +31,9 @@ public sealed partial class ImageConfigVM : ObservableObject
     public bool HasImage => !string.IsNullOrEmpty(FilePath);
     public bool HasUnattend => AnsFileFoundPaths.Count > 0;
 
+    /// <summary>映像展开大小（GB），用作 OS 分区最小值。</summary>
+    public double ImageExpandedSizeGB => ImageInfo?.ExpandedSizeGB ?? 0;
+
     partial void OnFilePathChanged(string value)
     {
         AnsFileFoundPaths = [];
@@ -38,7 +41,11 @@ public sealed partial class ImageConfigVM : ObservableObject
         OnPropertyChanged(nameof(IsValid));
     }
 
-    partial void OnImageInfoChanged(ImageInfo? value) => OnPropertyChanged(nameof(IsValid));
+    partial void OnImageInfoChanged(ImageInfo? value)
+    {
+        OnPropertyChanged(nameof(IsValid));
+        OnPropertyChanged(nameof(ImageExpandedSizeGB));
+    }
     partial void OnIsLoadingChanged(bool value) => OnPropertyChanged(nameof(IsValid));
     partial void OnAnsFileFoundPathsChanged(IReadOnlyList<string> value) => OnPropertyChanged(nameof(HasUnattend));
 }
