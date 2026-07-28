@@ -12,6 +12,7 @@
 	  <PackageReference Include="ManagedWimLib" Version="2.6.0" />
 	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
 	  <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+	  <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
 	  <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
 	  <PackageReference Include="Vanara.PInvoke.CfgMgr32" Version="5.0.5" />
 	  <PackageReference Include="Vanara.PInvoke.Kernel32" Version="5.0.5" />

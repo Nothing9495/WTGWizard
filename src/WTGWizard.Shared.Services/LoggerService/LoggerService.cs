@@ -36,12 +36,14 @@ public sealed class LoggerService : ILoggerService, IDisposable
 #endif
 
         _logger = config
+            .WriteTo.Debug(
+                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{Category}] {Message:lj}{NewLine}{Exception}")
             .WriteTo.File(
                 path: Path.Combine(_logDir, $"WTGWizard-{DateTime.Now:yyyyMMdd-HHmmss}.log"),
                 rollingInterval: RollingInterval.Infinite,
                 retainedFileCountLimit: 7,
                 fileSizeLimitBytes: 10 * 1024 * 1024,
-                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{Category}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
     }
 
