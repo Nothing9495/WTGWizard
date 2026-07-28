@@ -15,7 +15,7 @@ public sealed partial class WizardHost : UserControl
     private static readonly Type[] StepTypes =
     [
         typeof(Steps.ImageConfigPage),
-        // typeof(Steps.Step2_DeployMethod),
+        typeof(Steps.DeployMethodPage),
         // typeof(Steps.Step3_DeploySettings),
         // typeof(Steps.Step4_AdvancedSettings),
         // typeof(Steps.Step5_Confirm),
@@ -24,7 +24,7 @@ public sealed partial class WizardHost : UserControl
     private static readonly string[] StepResourceKeys =
     [
         "Page.WizStep.ImageConfig.Title",
-        // "Page.WizStep.DeployMethod.Title",
+        "Page.WizStep.DeployMethod.Title",
         // "Page.WizStep.DeploySettings.Title",
         // "Page.WizStep.AdvancedSettings.Title",
         // "Page.WizStep.Confirm.Title",

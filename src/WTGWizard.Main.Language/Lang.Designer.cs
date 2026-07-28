@@ -97,11 +97,92 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Make sure you select the correct disk for deployment to avoid accidental data loss! 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_DataSecurity_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.DataSecurity.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Data Security Warning 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_DataSecurity_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.DataSecurity.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Image Verification Failed! 的本地化字符串。
         /// </summary>
         public static string InfoBar_ImageVerificationFailed_Title {
             get {
                 return ResourceManager.GetString("InfoBar.ImageVerificationFailed.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Selected disk has no ESP partition. Only Clean Install available. 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_NoEsp_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.NoEsp.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No ESP Partition 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_NoEsp_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.NoEsp.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Open diskmgmt.msc 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_PartNoLetter_ActionBtn {
+            get {
+                return ResourceManager.GetString("InfoBar.PartNoLetter.ActionBtn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Selected partition has no drive letter assigned, deployment cannot proceed. Please assign a drive letter in Disk Management. 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_PartNoLetter_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.PartNoLetter.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No Drive Letter 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_PartNoLetter_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.PartNoLetter.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reserved partition is enabled but capacity is 0. Please adjust partition size. 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ReservedSizeZero_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.ReservedSizeZero.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reserved Partition Size is 0 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ReservedSizeZero_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.ReservedSizeZero.Title", resourceCulture);
             }
         }
         
@@ -147,6 +228,285 @@ namespace WTGWizard.Main.Language {
         public static string Page_WizHost_ForwardButton_Content {
             get {
                 return ResourceManager.GetString("Page.WizHost.ForwardButton.Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Clean Install 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_CleanInstall {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.CleanInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select disk and deployment method. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the capacity of the ESP partition. It should be between 300MB and 500MB. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_EspSize_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.EspSize.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ESP Partition Capacity 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_EspSize_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.EspSize.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Choose whether to perform a clean installation or install to a specific partition. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_Method_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.Method.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Deployment Method 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_Method_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.Method.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the volume label for the OS partition. If left blank, &apos;OS&apos; will be used as the volume label. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_OsLabel_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.OsLabel.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 OS Partition Label 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_OsLabel_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.OsLabel.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the capacity of the system partition; the minimum value is the size of the expanded image. If no reserved partition is specified, use all remaining space. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_OsSize_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.OsSize.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 OS Partition Capacity 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_OsSize_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.OsSize.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Configure the disk layout and partition sizes for clean installation. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_PartConfig_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.PartConfig.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Configure Disk Layout 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_PartConfig_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.PartConfig.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Partition Install 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_PartInstall {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.PartInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the volume label for the OS partition. If left blank, &apos;OS&apos; will be used as the volume label. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_PartOsLabel_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.PartOsLabel.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 OS Partition Label 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_PartOsLabel_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.PartOsLabel.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Create an additional reserved volume after the OS partition for other purposes. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_Reserved_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.Reserved.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Create Reserved Partition 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_Reserved_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.Reserved.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the file system for the reserved partition. NTFS is recommended for external hard drives. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_ReservedFs_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.ReservedFs.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reserved Partition File System 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_ReservedFs_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.ReservedFs.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the volume label for the Reserved partition. If left blank, &apos;Reserved&apos; will be used as the volume label. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_ReservedLabel_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.ReservedLabel.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reserved Partition Label 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_ReservedLabel_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.ReservedLabel.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 e.g. Reserved 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_ReservedLabel_Placeholder {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.ReservedLabel.Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the capacity of the reserved partition. It is automatically calculated based on the remaining space. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_ReservedSize_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.ReservedSize.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reserved Partition Capacity 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_ReservedSize_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.ReservedSize.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select the external hard drive or removable drive on which you want to install Windows To Go. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_SelDisk_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.SelDisk.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select Disk 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_SelDisk_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.SelDisk.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select a disk 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_SelDisk_Placeholder {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.SelDisk.Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select the partition to deploy Windows To Go. All the data on the selected partition will be erased. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_SelPart_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.SelPart.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Install to Partition 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_SelPart_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.SelPart.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select a partition 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_SelPart_Placeholder {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.SelPart.Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Deploy Method 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_Title {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.Title", resourceCulture);
             }
         }
         

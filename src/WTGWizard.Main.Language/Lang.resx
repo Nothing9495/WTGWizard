@@ -213,4 +213,124 @@
   <data name="InfoBar.ImageVerificationFailed.Title" xml:space="preserve">
     <value>Image Verification Failed!</value>
   </data>
+  <data name="Page.WizStep.DeployMethod.Title" xml:space="preserve">
+    <value>Deploy Method</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Desc" xml:space="preserve">
+    <value>Select disk and deployment method.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelDisk.Header" xml:space="preserve">
+    <value>Select Disk</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelDisk.Desc" xml:space="preserve">
+    <value>Select the external hard drive or removable drive on which you want to install Windows To Go.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelDisk.Placeholder" xml:space="preserve">
+    <value>Select a disk</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Method.Header" xml:space="preserve">
+    <value>Deployment Method</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Method.Desc" xml:space="preserve">
+    <value>Choose whether to perform a clean installation or install to a specific partition.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.CleanInstall" xml:space="preserve">
+    <value>Clean Install</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartInstall" xml:space="preserve">
+    <value>Partition Install</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartConfig.Header" xml:space="preserve">
+    <value>Configure Disk Layout</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartConfig.Desc" xml:space="preserve">
+    <value>Configure the disk layout and partition sizes for clean installation.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.EspSize.Header" xml:space="preserve">
+    <value>ESP Partition Capacity</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.OsSize.Header" xml:space="preserve">
+    <value>OS Partition Capacity</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.OsLabel.Header" xml:space="preserve">
+    <value>OS Partition Label</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Reserved.Header" xml:space="preserve">
+    <value>Create Reserved Partition</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedSize.Header" xml:space="preserve">
+    <value>Reserved Partition Capacity</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedFs.Header" xml:space="preserve">
+    <value>Reserved Partition File System</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedLabel.Header" xml:space="preserve">
+    <value>Reserved Partition Label</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelPart.Header" xml:space="preserve">
+    <value>Install to Partition</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelPart.Desc" xml:space="preserve">
+    <value>Select the partition to deploy Windows To Go. All the data on the selected partition will be erased.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelPart.Placeholder" xml:space="preserve">
+    <value>Select a partition</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartOsLabel.Header" xml:space="preserve">
+    <value>OS Partition Label</value>
+  </data>
+  <data name="InfoBar.DataSecurity.Title" xml:space="preserve">
+    <value>Data Security Warning</value>
+  </data>
+  <data name="InfoBar.DataSecurity.Message" xml:space="preserve">
+    <value>Make sure you select the correct disk for deployment to avoid accidental data loss!</value>
+  </data>
+  <data name="InfoBar.NoEsp.Title" xml:space="preserve">
+    <value>No ESP Partition</value>
+  </data>
+  <data name="InfoBar.NoEsp.Message" xml:space="preserve">
+    <value>Selected disk has no ESP partition. Only Clean Install available.</value>
+  </data>
+  <data name="InfoBar.PartNoLetter.Title" xml:space="preserve">
+    <value>No Drive Letter</value>
+  </data>
+  <data name="InfoBar.PartNoLetter.Message" xml:space="preserve">
+    <value>Selected partition has no drive letter assigned, deployment cannot proceed. Please assign a drive letter in Disk Management.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.EspSize.Desc" xml:space="preserve">
+    <value>Set the capacity of the ESP partition. It should be between 300MB and 500MB.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.OsSize.Desc" xml:space="preserve">
+    <value>Set the capacity of the system partition; the minimum value is the size of the expanded image. If no reserved partition is specified, use all remaining space.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.OsLabel.Desc" xml:space="preserve">
+    <value>Set the volume label for the OS partition. If left blank, 'OS' will be used as the volume label.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Reserved.Desc" xml:space="preserve">
+    <value>Create an additional reserved volume after the OS partition for other purposes.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedSize.Desc" xml:space="preserve">
+    <value>Set the capacity of the reserved partition. It is automatically calculated based on the remaining space.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedFs.Desc" xml:space="preserve">
+    <value>Set the file system for the reserved partition. NTFS is recommended for external hard drives.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedLabel.Desc" xml:space="preserve">
+    <value>Set the volume label for the Reserved partition. If left blank, 'Reserved' will be used as the volume label.</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedLabel.Placeholder" xml:space="preserve">
+    <value>e.g. Reserved</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartOsLabel.Desc" xml:space="preserve">
+    <value>Set the volume label for the OS partition. If left blank, 'OS' will be used as the volume label.</value>
+  </data>
+  <data name="InfoBar.ReservedSizeZero.Title" xml:space="preserve">
+    <value>Reserved Partition Size is 0</value>
+  </data>
+  <data name="InfoBar.ReservedSizeZero.Message" xml:space="preserve">
+    <value>Reserved partition is enabled but capacity is 0. Please adjust partition size.</value>
+  </data>
+  <data name="InfoBar.PartNoLetter.ActionBtn" xml:space="preserve">
+    <value>Open diskmgmt.msc</value>
+  </data>
 </root>

@@ -205,12 +205,132 @@
     <value>选择索引</value>
   </data>
   <data name="Page.WizStep.ImageConfig.FilePathPlaceholder" xml:space="preserve">
-    <value>尚未选择镜像文件</value>
+    <value>尚未选择映像文件</value>
   </data>
   <data name="UsrCtrl.ImageInfoCard.DispDescLabel" xml:space="preserve">
     <value>显示描述：</value>
   </data>
   <data name="InfoBar.ImageVerificationFailed.Title" xml:space="preserve">
     <value>映像校验失败！</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Title" xml:space="preserve">
+    <value>部署方式</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Desc" xml:space="preserve">
+    <value>选择目标磁盘和部署方式</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelDisk.Header" xml:space="preserve">
+    <value>选择磁盘</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelDisk.Desc" xml:space="preserve">
+    <value>选择要安装 Windows To Go 的移动硬盘或可移动驱动器</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelDisk.Placeholder" xml:space="preserve">
+    <value>选择磁盘</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Method.Header" xml:space="preserve">
+    <value>部署方式</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Method.Desc" xml:space="preserve">
+    <value>选择要使用全新安装还是安装到指定分区</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.CleanInstall" xml:space="preserve">
+    <value>全新安装</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartInstall" xml:space="preserve">
+    <value>分区安装</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartConfig.Header" xml:space="preserve">
+    <value>配置磁盘分区</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartConfig.Desc" xml:space="preserve">
+    <value>配置全新安装时的分区大小及布局</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.EspSize.Header" xml:space="preserve">
+    <value>引导分区容量</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.OsSize.Header" xml:space="preserve">
+    <value>系统分区容量</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.OsLabel.Header" xml:space="preserve">
+    <value>系统分区卷标</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Reserved.Header" xml:space="preserve">
+    <value>创建保留分区</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedSize.Header" xml:space="preserve">
+    <value>保留分区容量</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedFs.Header" xml:space="preserve">
+    <value>保留分区文件系统</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedLabel.Header" xml:space="preserve">
+    <value>保留分区卷标</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelPart.Header" xml:space="preserve">
+    <value>安装到分区</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelPart.Desc" xml:space="preserve">
+    <value>选择要部署 Windows To Go 的磁盘分区，所选分区数据将被清空</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.SelPart.Placeholder" xml:space="preserve">
+    <value>选择分区</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartOsLabel.Header" xml:space="preserve">
+    <value>系统分区卷标</value>
+  </data>
+  <data name="InfoBar.DataSecurity.Title" xml:space="preserve">
+    <value>数据安全警告</value>
+  </data>
+  <data name="InfoBar.DataSecurity.Message" xml:space="preserve">
+    <value>请确保你选择了正确的待部署磁盘，避免以外的数据丢失！</value>
+  </data>
+  <data name="InfoBar.NoEsp.Title" xml:space="preserve">
+    <value>无 ESP 分区</value>
+  </data>
+  <data name="InfoBar.NoEsp.Message" xml:space="preserve">
+    <value>选中磁盘无 ESP 分区，仅全新安装可用。</value>
+  </data>
+  <data name="InfoBar.PartNoLetter.Title" xml:space="preserve">
+    <value>所选分区无盘符！</value>
+  </data>
+  <data name="InfoBar.PartNoLetter.Message" xml:space="preserve">
+    <value>所选分区未分配盘符，无法部署。请在磁盘管理中分配盘符。</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.EspSize.Desc" xml:space="preserve">
+    <value>设置引导分区的容量，大小在300MB~500MB之间</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.OsSize.Desc" xml:space="preserve">
+    <value>设置系统分区的容量，最小值为映像展开大小。未设置保留分区时，使用剩余全部空间</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.OsLabel.Desc" xml:space="preserve">
+    <value>设置系统分区的卷标，留空则使用"OS"作为卷标</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.Reserved.Desc" xml:space="preserve">
+    <value>在系统分区之后创建一个额外的保留分区，用于其他用途</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedSize.Desc" xml:space="preserve">
+    <value>设置保留分区容量，容量大小由剩余空间自动计算</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedFs.Desc" xml:space="preserve">
+    <value>设置保留分区的文件系统，推荐对移动硬盘使用 NTFS</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedLabel.Desc" xml:space="preserve">
+    <value>设置保留分区的卷标，留空则使用"Reserved"作为卷标</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ReservedLabel.Placeholder" xml:space="preserve">
+    <value>例如：Reserved</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.PartOsLabel.Desc" xml:space="preserve">
+    <value>设置系统分区的卷标，留空则使用“OS”作为卷标</value>
+  </data>
+  <data name="InfoBar.ReservedSizeZero.Title" xml:space="preserve">
+    <value>保留分区大小为 0</value>
+  </data>
+  <data name="InfoBar.ReservedSizeZero.Message" xml:space="preserve">
+    <value>已启用保留分区但容量为 0，请调整分区大小。</value>
+  </data>
+  <data name="InfoBar.PartNoLetter.ActionBtn" xml:space="preserve">
+    <value>打开磁盘管理</value>
   </data>
 </root>
