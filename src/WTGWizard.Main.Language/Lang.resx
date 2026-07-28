@@ -479,4 +479,124 @@ Found path: {0}</value>
   <data name="Page.WizStep.AdvOptions.BootEx.Desc" xml:space="preserve">
     <value>Use the CA 2023-signed boot binaries for boot creation. This setting is available only on Windows 11 version 26100.8037 and later.</value>
   </data>
+  <data name="Page.WizStep.Confirm.Title" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="Page.WizStep.Confirm.Desc" xml:space="preserve">
+    <value>Review deployment configuration summary, then start deployment.</value>
+  </data>
+  <data name="Page.WizStep.Confirm.StartDeployGroup" xml:space="preserve">
+    <value>Start Deployment</value>
+  </data>
+  <data name="Page.WizStep.Confirm.StartDeploy.Header" xml:space="preserve">
+    <value>Start Deployment</value>
+  </data>
+  <data name="Page.WizStep.Confirm.StartDeploy.Desc" xml:space="preserve">
+    <value>After confirming that all settings are correct, click the "Start Deployment" button to begin deployment.</value>
+  </data>
+  <data name="Page.WizStep.Confirm.StartDeployButton" xml:space="preserve">
+    <value>Start Deployment</value>
+  </data>
+  <data name="Page.WizStep.Confirm.ImageInfoGroup" xml:space="preserve">
+    <value>Image Information</value>
+  </data>
+  <data name="Page.WizStep.Confirm.DeployMethodGroup" xml:space="preserve">
+    <value>Deployment Method</value>
+  </data>
+  <data name="Page.WizStep.Confirm.MethodType.Header" xml:space="preserve">
+    <value>Deployment method</value>
+  </data>
+  <data name="Page.WizStep.Confirm.TargetDisk.Header" xml:space="preserve">
+    <value>Target Disk</value>
+  </data>
+  <data name="Page.WizStep.Confirm.TargetPartition.Header" xml:space="preserve">
+    <value>Target Partition</value>
+  </data>
+  <data name="Page.WizStep.Confirm.PartitionConfig.Header" xml:space="preserve">
+    <value>Partition Layout</value>
+  </data>
+  <data name="Page.WizStep.Confirm.EspSize.Header" xml:space="preserve">
+    <value>ESP partition size</value>
+  </data>
+  <data name="Page.WizStep.Confirm.OsSize.Header" xml:space="preserve">
+    <value>OS partition size</value>
+  </data>
+  <data name="Page.WizStep.Confirm.OsLabel.Header" xml:space="preserve">
+    <value>OS volume label</value>
+  </data>
+  <data name="Page.WizStep.Confirm.ReservedVolSize.Header" xml:space="preserve">
+    <value>Reserved partition size</value>
+  </data>
+  <data name="Page.WizStep.Confirm.ReservedVolFs.Header" xml:space="preserve">
+    <value>Reserved partition file system</value>
+  </data>
+  <data name="Page.WizStep.Confirm.ReservedVolLabel.Header" xml:space="preserve">
+    <value>Reserved partition label</value>
+  </data>
+  <data name="Page.WizStep.Confirm.DeployOptionsGroup" xml:space="preserve">
+    <value>Deployment Options</value>
+  </data>
+  <data name="Page.WizStep.Confirm.HideLocalDisks.Header" xml:space="preserve">
+    <value>Hide Local Disks</value>
+  </data>
+  <data name="Page.WizStep.Confirm.PreventEncryption.Header" xml:space="preserve">
+    <value>Prevent Device Encryption</value>
+  </data>
+  <data name="Page.WizStep.Confirm.NoDefaultDriveLetter.Header" xml:space="preserve">
+    <value>No Default Drive Letter</value>
+  </data>
+  <data name="Page.WizStep.Confirm.RemoveOsDriveLetter.Header" xml:space="preserve">
+    <value>Remove OS Drive Letter</value>
+  </data>
+  <data name="Page.WizStep.Confirm.UseDismToDeploy.Header" xml:space="preserve">
+    <value>Deploy Windows using DISM</value>
+  </data>
+  <data name="Page.WizStep.Confirm.AdvancedGroup" xml:space="preserve">
+    <value>Advanced Settings</value>
+  </data>
+  <data name="Page.WizStep.Confirm.DriversIntegration.Header" xml:space="preserve">
+    <value>Integrate Drivers</value>
+  </data>
+  <data name="Page.WizStep.Confirm.DriversPath.Header" xml:space="preserve">
+    <value>Driver Path</value>
+  </data>
+  <data name="Page.WizStep.Confirm.UnsignedDrivers.Header" xml:space="preserve">
+    <value>Import Unsigned Drivers</value>
+  </data>
+  <data name="Page.WizStep.Confirm.ImportAnswerFile.Header" xml:space="preserve">
+    <value>Import Answer File</value>
+  </data>
+  <data name="Page.WizStep.Confirm.AnswerFilePath.Header" xml:space="preserve">
+    <value>Answer File Location</value>
+  </data>
+  <data name="Page.WizStep.Confirm.CleanAnsFile.Header" xml:space="preserve">
+    <value>Clean Up Answer File in Image</value>
+  </data>
+  <data name="Page.WizStep.Confirm.BootVerbose.Header" xml:space="preserve">
+    <value>bcdboot Verbose Output</value>
+  </data>
+  <data name="Page.WizStep.Confirm.BootEx.Header" xml:space="preserve">
+    <value>Use Updated Boot File Binaries</value>
+  </data>
+  <data name="Page.WizStep.Confirm.DeployDialog.Title" xml:space="preserve">
+    <value>Start deployment now?</value>
+  </data>
+  <data name="Page.WizStep.Confirm.DeployDialog.ContentText" xml:space="preserve">
+    <value>Once started, the task cannot be actively terminated!</value>
+  </data>
+  <data name="Page.WizStep.Confirm.DeployDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="Page.WizStep.Confirm.DeployDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Page.WizStep.Confirm.MethodType.Clean" xml:space="preserve">
+    <value>Clean Install</value>
+  </data>
+  <data name="Page.WizStep.Confirm.MethodType.Partition" xml:space="preserve">
+    <value>Install to Partition</value>
+  </data>
+  <data name="Page.WizStep.Confirm.OsSize.Auto" xml:space="preserve">
+    <value>Auto (Use All Space)</value>
+  </data>
 </root>

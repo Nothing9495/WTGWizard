@@ -18,7 +18,7 @@ public sealed partial class WizardHost : UserControl
         typeof(Steps.DeployMethodPage),
         typeof(Steps.DeployOptionsPage),
         typeof(Steps.AdvancedOptionsPage),
-        // typeof(Steps.Step5_Confirm),
+        typeof(Steps.ConfirmPage),
     ];
 
     private static readonly string[] StepResourceKeys =
@@ -27,7 +27,7 @@ public sealed partial class WizardHost : UserControl
         "Page.WizStep.DeployMethod.Title",
         "Page.WizStep.DeployOptions.Title",
         "Page.WizStep.AdvOptions.Title",
-        // "Page.WizStep.Confirm.Title",
+        "Page.WizStep.Confirm.Title",
     ];
 
     private int _lastStep = -1;
