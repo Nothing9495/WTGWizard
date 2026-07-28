@@ -25,7 +25,11 @@
                   Margin="0,12,0,6"
                   FontWeight="SemiBold"/>
         <uc:ImageInfoCard x:Name="ImageInfoCard" />
-        <uc:InfoBarPresenter x:Name="VerifyInfoBar" />
+        <InfoBar Title="{x:Bind lang:Lang.InfoBar_VerifyFailed_Title}"
+                 Message="{x:Bind VM.Image.VerifyMessage, Mode=OneWay}"
+                 Severity="Warning"
+                 IsOpen="{x:Bind VM.Image.ShowVerifyError, Mode=OneWay}"
+                 IsClosable="False" />
 
         <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelImgGroup}"
                           FontSize="14"

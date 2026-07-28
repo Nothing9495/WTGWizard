@@ -23,6 +23,10 @@ public sealed partial class ImageConfig : ObservableObject
     [ObservableProperty] public partial bool IsLoading { get; set; }
     [ObservableProperty] public partial IReadOnlyList<string> AnsFileFoundPaths { get; set; } = [];
 
+    // ═══ InfoBar 状态 ═══
+    [ObservableProperty] public partial bool ShowVerifyError { get; set; }
+    [ObservableProperty] public partial string? VerifyMessage { get; set; }
+
     public bool IsValid => !string.IsNullOrEmpty(FilePath) && ImageInfo is not null && !IsLoading;
     public bool HasImage => !string.IsNullOrEmpty(FilePath);
     public bool HasUnattend => AnsFileFoundPaths.Count > 0;

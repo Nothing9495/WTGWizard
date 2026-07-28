@@ -79,7 +79,7 @@ public sealed partial class ImageConfigPage : Page
 
     private async void ImageFilePicker_FileSelected(object sender, string path)
     {
-        VerifyInfoBar.Info = null;
+        VM.Image.ShowVerifyError = false;
         VM.Image.FilePath = path;
 
         try
@@ -152,18 +152,12 @@ public sealed partial class ImageConfigPage : Page
         try
         {
             await _wimService.VerifyAsync(path);
-            VerifyInfoBar.Info = null;
+        VM.Image.ShowVerifyError = false;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[Step1] 映像校验失败: {ex.Message}");
-            VerifyInfoBar.Info = new InfoBarState(
-                Id: "verify",
-                Title: "Image Verification Failed",
-                Message: ex.Message,
-                Severity: Microsoft.UI.Xaml.Controls.InfoBarSeverity.Warning,
-                IsOpen: true,
-                IsClosable: false);
+            VM.Image.VerifyMessage = ex.Message;
+            VM.Image.ShowVerifyError = true;
         }
     }
 
