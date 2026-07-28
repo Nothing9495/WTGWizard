@@ -35,7 +35,7 @@ public sealed partial class WizardViewModel : ObservableObject
     public ImageConfigVM Image { get; } = new();
     public DeployOptionsVM Options { get; } = new();
     public DeployMethodVM Method { get; }
-    public AdvancedOptions Advanced { get; } = new();
+    public AdvancedOptionsVM Advanced { get; } = new();
 
     // ═══ 构造函数 ═══
 
@@ -43,8 +43,10 @@ public sealed partial class WizardViewModel : ObservableObject
     {
         Method = new DeployMethodVM();
         Image.PropertyChanged += OnSubPropertyChanged;
+        Image.PropertyChanged += OnImagePropertyChanged;
         Method.PropertyChanged += OnSubPropertyChanged;
         Advanced.PropertyChanged += OnSubPropertyChanged;
+        Advanced.UpdateAnsFileIndicator(Image);
     }
 
     private void OnSubPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -53,6 +55,17 @@ public sealed partial class WizardViewModel : ObservableObject
         {
             OnPropertyChanged(nameof(IsCurrentStepValid));
             OnPropertyChanged(nameof(CanGoForward));
+        }
+    }
+
+    private void OnImagePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(ImageConfigVM.FilePath)
+            or nameof(ImageConfigVM.AnsFileFoundPaths)
+            or nameof(ImageConfigVM.HasImage)
+            or nameof(ImageConfigVM.SelectedIndex))
+        {
+            Advanced.UpdateAnsFileIndicator(Image);
         }
     }
 

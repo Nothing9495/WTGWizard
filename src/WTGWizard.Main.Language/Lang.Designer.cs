@@ -88,6 +88,24 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Current image already contains an answer file. Importing a new answer file will overwrite the existing configuration. Enable &quot;Clear in-image answer files&quot; option. 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_AnsFileExists_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.AnsFileExists.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Answer File Exists 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_AnsFileExists_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.AnsFileExists.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Make sure you select the correct disk for deployment to avoid accidental data loss! 的本地化字符串。
         /// </summary>
         public static string InfoBar_DataSecurity_Message {
@@ -219,6 +237,314 @@ namespace WTGWizard.Main.Language {
         public static string Page_WizHost_ForwardButton_Content {
             get {
                 return ResourceManager.GetString("Page.WizHost.ForwardButton.Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Found {0} answer file(s) in the image 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_AnsFile_Found {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFile.Found", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Indicates whether the current image contains an answer file.
+        ///Found path: {0} 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_AnsFile_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFile.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Answer File Indicator 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_AnsFile_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFile.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Answer File InfoBar 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_AnsFile_InfoBar {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFile.InfoBar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No image file selected 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_AnsFile_NoImage {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFile.NoImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 None 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_AnsFile_None {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFile.None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No answer file found in the image 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_AnsFile_NotFound {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFile.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 bcdboot Settings 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_BCDBootGroup {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.BCDBootGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Use the CA 2023-signed boot binaries for boot creation. This setting is available only on Windows 11 version 26100.8037 and later. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_BootEx_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.BootEx.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Use updated boot binaries 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_BootEx_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.BootEx.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Enable verbose logging for bcdboot. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_BootVerbose_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.BootVerbose.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Use verbose logging 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_BootVerbose_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.BootVerbose.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Clear in-image answer files before importing. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_CleanAnsFile_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.CleanAnsFile.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Clear in-image answer files 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_CleanAnsFile_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.CleanAnsFile.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Import a new unattend file to apply. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_CustomAnsFile_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.CustomAnsFile.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Use a new answer file 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_CustomAnsFile_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.CustomAnsFile.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Configure driver integration, answer file, and boot options. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Integrate drivers into Windows To Go. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_DriverEnabled_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.DriverEnabled.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Integrate drivers 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_DriverEnabled_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.DriverEnabled.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Drivers Integration 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_DriverGroup {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.DriverGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select the location of the driver. You can choose it using the Folder Picker or enter it manually. 
+        ///Incorrect drivers path will lead to a failure of deployment. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_DriverPath_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.DriverPath.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Drivers location 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_DriverPath_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.DriverPath.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No drivers path has been selected. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_DriverPath_Placeholder {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.DriverPath.Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Extract 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_Extract_CommitText {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.Extract.CommitText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Extract 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_ExtractAnsFile_Button {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.ExtractAnsFile.Button", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Extract the answer file from the current image index. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_ExtractAnsFile_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.ExtractAnsFile.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Extract answer file 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_ExtractAnsFile_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.ExtractAnsFile.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Allow the integration of unsigned drivers 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_ForceUnsigned_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.ForceUnsigned.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Allow unsigned drivers 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_ForceUnsigned_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.ForceUnsigned.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select an answer file to apply. Using an incorrect answer file will cause Windows To Go to fail during initialization. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_SelectAnsFile_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.SelectAnsFile.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select an answer file 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_SelectAnsFile_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.SelectAnsFile.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Advanced Options 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_Title {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Answer File Settings 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_AnsFileGroup {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFileGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No answer file has been selected. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_AdvOptions_AnsFilePath_Placeholder {
+            get {
+                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFilePath.Placeholder", resourceCulture);
             }
         }
         
@@ -511,7 +837,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Configure Windows To Go deployment options and disk settings. 的本地化字符串。
+        ///   查找类似 Configure Windows To Go settings and deploy. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployOptions_Desc {
             get {
@@ -533,7 +859,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_HideLocalDisks_Desc {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.HideLocalDisks_Desc", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.HideLocalDisks.Desc", resourceCulture);
             }
         }
         
@@ -542,7 +868,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_HideLocalDisks_Header {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.HideLocalDisks_Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.HideLocalDisks.Header", resourceCulture);
             }
         }
         
@@ -551,7 +877,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_NoDefaultDriveLetter_Desc {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.NoDefaultDriveLetter_Desc", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.NoDefaultDriveLetter.Desc", resourceCulture);
             }
         }
         
@@ -560,7 +886,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_NoDefaultDriveLetter_Header {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.NoDefaultDriveLetter_Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.NoDefaultDriveLetter.Header", resourceCulture);
             }
         }
         
@@ -569,7 +895,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_PreventDeviceEncryption_Desc {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.PreventDeviceEncryption_Desc", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.PreventDeviceEncryption.Desc", resourceCulture);
             }
         }
         
@@ -578,7 +904,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_PreventDeviceEncryption_Header {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.PreventDeviceEncryption_Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.PreventDeviceEncryption.Header", resourceCulture);
             }
         }
         
@@ -587,7 +913,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_RemoveOsDriveLetter_Desc {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.RemoveOsDriveLetter_Desc", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.RemoveOsDriveLetter.Desc", resourceCulture);
             }
         }
         
@@ -596,7 +922,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_RemoveOsDriveLetter_Header {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.RemoveOsDriveLetter_Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.RemoveOsDriveLetter.Header", resourceCulture);
             }
         }
         
@@ -614,7 +940,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_UseDism_Desc {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.UseDism_Desc", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.UseDism.Desc", resourceCulture);
             }
         }
         
@@ -623,7 +949,7 @@ namespace WTGWizard.Main.Language {
         /// </summary>
         public static string Page_WizStep_DeployOptions_UseDism_Header {
             get {
-                return ResourceManager.GetString("Page.WizStep.DeployOptions.UseDism_Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.DeployOptions.UseDism.Header", resourceCulture);
             }
         }
         

@@ -17,7 +17,7 @@ public sealed partial class WizardHost : UserControl
         typeof(Steps.ImageConfigPage),
         typeof(Steps.DeployMethodPage),
         typeof(Steps.DeployOptionsPage),
-        // typeof(Steps.Step4_AdvancedSettings),
+        typeof(Steps.AdvancedOptionsPage),
         // typeof(Steps.Step5_Confirm),
     ];
 
@@ -26,7 +26,7 @@ public sealed partial class WizardHost : UserControl
         "Page.WizStep.ImageConfig.Title",
         "Page.WizStep.DeployMethod.Title",
         "Page.WizStep.DeployOptions.Title",
-        // "Page.WizStep.AdvancedSettings.Title",
+        "Page.WizStep.AdvOptions.Title",
         // "Page.WizStep.Confirm.Title",
     ];
 

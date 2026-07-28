@@ -334,45 +334,149 @@
     <value>Deploy Options</value>
   </data>
   <data name="Page.WizStep.DeployOptions.Desc" xml:space="preserve">
-    <value>Configure Windows To Go deployment options and disk settings.</value>
+    <value>Configure Windows To Go settings and deploy.</value>
   </data>
   <data name="Page.WizStep.DeployOptions.WTGGroup" xml:space="preserve">
     <value>Windows To Go Settings</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.HideLocalDisks_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.HideLocalDisks.Header" xml:space="preserve">
     <value>Keep internal hard drives offline</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.HideLocalDisks_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.HideLocalDisks.Desc" xml:space="preserve">
     <value>After Windows To Go has booted, keep the internal hard drives offline to prevent data loss.</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption.Header" xml:space="preserve">
     <value>Prevent device encryption</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption.Desc" xml:space="preserve">
     <value>Prevent BitLocker device encryption from running automatically after Windows To Go is initialized on eligible devices.</value>
   </data>
   <data name="Page.WizStep.DeployOptions.DiskGroup" xml:space="preserve">
     <value>Disk Settings</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter.Header" xml:space="preserve">
     <value>Don't assign drive letter for OS partition</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter.Desc" xml:space="preserve">
     <value>Prevent Windows from assigning a drive letter to the OS partition to avoid accidentally damaging Windows To Go. This setting is only available for external hard disks.</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter.Header" xml:space="preserve">
     <value>Remove OS partition drive letter</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter.Desc" xml:space="preserve">
     <value>Once deployment is complete, remove the drive letter for the OS partition.</value>
   </data>
   <data name="Page.WizStep.DeployOptions.DeployGroup" xml:space="preserve">
     <value>Deployment Settings</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.UseDism_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.UseDism.Header" xml:space="preserve">
     <value>Deploy Windows using DISM</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.UseDism_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.UseDism.Desc" xml:space="preserve">
     <value>Deploy Windows using DISM instead of wimlib.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.Title" xml:space="preserve">
+    <value>Advanced Options</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.Desc" xml:space="preserve">
+    <value>Configure driver integration, answer file, and boot options.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverGroup" xml:space="preserve">
+    <value>Drivers Integration</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverEnabled.Header" xml:space="preserve">
+    <value>Integrate drivers</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverEnabled.Desc" xml:space="preserve">
+    <value>Integrate drivers into Windows To Go.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverPath.Header" xml:space="preserve">
+    <value>Drivers location</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverPath.Desc" xml:space="preserve">
+    <value>Select the location of the driver. You can choose it using the Folder Picker or enter it manually. 
+Incorrect drivers path will lead to a failure of deployment.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverPath.Placeholder" xml:space="preserve">
+    <value>No drivers path has been selected.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ForceUnsigned.Header" xml:space="preserve">
+    <value>Allow unsigned drivers</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ForceUnsigned.Desc" xml:space="preserve">
+    <value>Allow the integration of unsigned drivers</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFileGroup" xml:space="preserve">
+    <value>Answer File Settings</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.Header" xml:space="preserve">
+    <value>Answer File Indicator</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.Desc" xml:space="preserve">
+    <value>Indicates whether the current image contains an answer file.
+Found path: {0}</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.InfoBar" xml:space="preserve">
+    <value>Current image already contains an answer file. Importing a new answer file will overwrite the existing configuration. Enable "Clear in-image answer files" option.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.NoImage" xml:space="preserve">
+    <value>No image file selected</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.NotFound" xml:space="preserve">
+    <value>No answer file found in the image</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.Found" xml:space="preserve">
+    <value>Found {0} answer file(s) in the image</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ExtractAnsFile.Header" xml:space="preserve">
+    <value>Extract answer file</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ExtractAnsFile.Desc" xml:space="preserve">
+    <value>Extract the answer file from the current image index.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ExtractAnsFile.Button" xml:space="preserve">
+    <value>Extract</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.Extract.CommitText" xml:space="preserve">
+    <value>Extract</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.CustomAnsFile.Header" xml:space="preserve">
+    <value>Use a new answer file</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.CustomAnsFile.Desc" xml:space="preserve">
+    <value>Import a new unattend file to apply.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.SelectAnsFile.Header" xml:space="preserve">
+    <value>Select an answer file</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.SelectAnsFile.Desc" xml:space="preserve">
+    <value>Select an answer file to apply. Using an incorrect answer file will cause Windows To Go to fail during initialization.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFilePath.Placeholder" xml:space="preserve">
+    <value>No answer file has been selected.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.CleanAnsFile.Header" xml:space="preserve">
+    <value>Clear in-image answer files</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.CleanAnsFile.Desc" xml:space="preserve">
+    <value>Clear in-image answer files before importing.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BCDBootGroup" xml:space="preserve">
+    <value>bcdboot Settings</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BootVerbose.Header" xml:space="preserve">
+    <value>Use verbose logging</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BootVerbose.Desc" xml:space="preserve">
+    <value>Enable verbose logging for bcdboot.</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BootEx.Header" xml:space="preserve">
+    <value>Use updated boot binaries</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BootEx.Desc" xml:space="preserve">
+    <value>Use the CA 2023-signed boot binaries for boot creation. This setting is available only on Windows 11 version 26100.8037 and later.</value>
   </data>
 </root>

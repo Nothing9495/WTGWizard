@@ -334,45 +334,149 @@
     <value>部署选项</value>
   </data>
   <data name="Page.WizStep.DeployOptions.Desc" xml:space="preserve">
-    <value>配置 Windows To Go 部署选项和磁盘设置。</value>
+    <value>调整 Windows To Go 设置和部署选项</value>
   </data>
   <data name="Page.WizStep.DeployOptions.WTGGroup" xml:space="preserve">
     <value>Windows To Go 设置</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.HideLocalDisks_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.HideLocalDisks.Header" xml:space="preserve">
     <value>隐藏本地磁盘</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.HideLocalDisks_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.HideLocalDisks.Desc" xml:space="preserve">
     <value>Windows To Go 启动后使本机硬盘保持脱机，避免损坏硬盘数据</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption.Header" xml:space="preserve">
     <value>阻止设备加密</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption.Desc" xml:space="preserve">
     <value>阻止 Windows To Go 在符合条件的设备上初始化后，自动运行 BitLocker 设备加密</value>
   </data>
   <data name="Page.WizStep.DeployOptions.DiskGroup" xml:space="preserve">
     <value>磁盘设置</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter.Header" xml:space="preserve">
     <value>系统分区不分配默认盘符</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter.Desc" xml:space="preserve">
     <value>阻止 Windows 为系统分区分配盘符，避免意外损坏 Windows To Go。该设置仅对移动硬盘可用</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter.Header" xml:space="preserve">
     <value>移除系统分区盘符</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter.Desc" xml:space="preserve">
     <value>部署完成后，移除系统分区的盘符</value>
   </data>
   <data name="Page.WizStep.DeployOptions.DeployGroup" xml:space="preserve">
     <value>部署设置</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.UseDism_Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.UseDism.Header" xml:space="preserve">
     <value>使用 DISM 部署 Windows</value>
   </data>
-  <data name="Page.WizStep.DeployOptions.UseDism_Desc" xml:space="preserve">
+  <data name="Page.WizStep.DeployOptions.UseDism.Desc" xml:space="preserve">
     <value>使用 DISM 部署 Windows 而非 wimlib</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.Title" xml:space="preserve">
+    <value>高级选项</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.Desc" xml:space="preserve">
+    <value>配置驱动集成、应答文件和启动选项。</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverGroup" xml:space="preserve">
+    <value>驱动集成设置</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverEnabled.Header" xml:space="preserve">
+    <value>集成驱动程序</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverEnabled.Desc" xml:space="preserve">
+    <value>将驱动程序导入到 Windows To Go</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverPath.Header" xml:space="preserve">
+    <value>驱动程序位置</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverPath.Desc" xml:space="preserve">
+    <value>选择驱动程序所在位置，你可以选择一个文件夹或者手动输入
+不正确的驱动程序位置将导致部署失败！</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.DriverPath.Placeholder" xml:space="preserve">
+    <value>未选择驱动程序路径</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ForceUnsigned.Header" xml:space="preserve">
+    <value>导入未签名的驱动程序</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ForceUnsigned.Desc" xml:space="preserve">
+    <value>允许导入未签名的驱动程序</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFileGroup" xml:space="preserve">
+    <value>应答文件设置</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.Header" xml:space="preserve">
+    <value>应答文件指示器</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.Desc" xml:space="preserve">
+    <value>指示当前映像中是否包含了应答文件。
+找到的路径：{0}</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.InfoBar" xml:space="preserve">
+    <value>当前映像中已包含应答文件，导入应答文件将覆盖映像中的配置。需开启清理映像中的应答文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.NoImage" xml:space="preserve">
+    <value>未选择映像文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.NotFound" xml:space="preserve">
+    <value>映像中未找到应答文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.Found" xml:space="preserve">
+    <value>在映像中找到 {0} 个应答文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFile.None" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ExtractAnsFile.Header" xml:space="preserve">
+    <value>提取应答文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ExtractAnsFile.Desc" xml:space="preserve">
+    <value>从当前映像文件中提取应答文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.ExtractAnsFile.Button" xml:space="preserve">
+    <value>提取文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.Extract.CommitText" xml:space="preserve">
+    <value>提取</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.CustomAnsFile.Header" xml:space="preserve">
+    <value>导入应答文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.CustomAnsFile.Desc" xml:space="preserve">
+    <value>导入一个新应答文件到 Windows To Go</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.SelectAnsFile.Header" xml:space="preserve">
+    <value>选择应答文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.SelectAnsFile.Desc" xml:space="preserve">
+    <value>选择要使用的应答文件。不正确的应答文件可能导致Windows To Go 初始化失败！</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.AnsFilePath.Placeholder" xml:space="preserve">
+    <value>未选择应答文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.CleanAnsFile.Header" xml:space="preserve">
+    <value>清理映像中的应答文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.CleanAnsFile.Desc" xml:space="preserve">
+    <value>清理映像中的应答文件，确保导入的应答文件能够生效</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BCDBootGroup" xml:space="preserve">
+    <value>bcdboot 设置</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BootVerbose.Header" xml:space="preserve">
+    <value>启用详细输出</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BootVerbose.Desc" xml:space="preserve">
+    <value>使 bcdboot 输出更详细的日志</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BootEx.Header" xml:space="preserve">
+    <value>使用更新的引导程序二进制文件</value>
+  </data>
+  <data name="Page.WizStep.AdvOptions.BootEx.Desc" xml:space="preserve">
+    <value>创建引导时，使用 CA 2023 签名的引导程序二进制文件。该设置仅对 Windows 11 26100.8037 及以上可用</value>
   </data>
 </root>
