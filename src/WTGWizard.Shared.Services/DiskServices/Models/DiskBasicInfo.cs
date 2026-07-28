@@ -17,5 +17,5 @@ public sealed record DiskBasicInfo(
     private const double BytesPerGiB = 1073741824.0;
 
     /// <summary>ComboBox 显示文本。</summary>
-    public string DisplayName => $"{Index} {Model} ({SizeBytes / BytesPerGiB:F2} GiB)";
+    public string DisplayName => $"#{Index} - {Model} ({SizeBytes / BytesPerGiB:F2} GiB, {InterfaceType}, {MediaType})";
 }
