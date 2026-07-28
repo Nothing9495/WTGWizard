@@ -56,7 +56,6 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
     {
         _diskIO.DisksChanged += OnDisksChanged;
         _diskIO.StartWatcher();
-        _ = RefreshDiskStateAsync();
     }
 
     public void OnTabDeactivated()
@@ -111,7 +110,7 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
             MethodRadioButtons.SelectedIndex = 0;
 
             // 加载分区列表
-            _ = LoadPartitionsAsync(disk.Index);
+            await LoadPartitionsAsync(disk.Index);
 
             // 数据安全检测
             var danger = await _diskIO.CheckDiskSafetyAsync(disk.DeviceId);
@@ -184,8 +183,11 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
 
     private async Task RefreshDiskStateAsync()
     {
+        // ── 阶段 0：保存当前选中状态 ──
+        var prevDiskId = VM.Method.SelectedDisk?.DeviceId;
+        var prevPartNum = VM.Method.SelectedPartition?.PartitionNumber;
+
         // ── 阶段 1：枚举磁盘 ──
-        var prevId = VM.Method.SelectedDisk?.DeviceId;
         var disks = await _diskIO.EnumerateExternalDisksAsync();
 
         // 就地更新集合
@@ -196,15 +198,26 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
         foreach (var d in disks) DiskListComboBox.Items.Add(d);
         _syncingDiskSelection = false;
 
-        // ── 阶段 2：恢复选中 ──
-        if (prevId is not null)
+        // ── 阶段 2：恢复磁盘选中 ──
+        if (prevDiskId is not null)
         {
-            var match = VM.Method.Disks.FirstOrDefault(d => d.DeviceId == prevId);
+            var match = VM.Method.Disks.FirstOrDefault(d => d.DeviceId == prevDiskId);
             if (match is not null)
             {
                 VM.Method.SelectedDisk = match;
                 DiskListComboBox.SelectedItem = match;
-                _ = LoadPartitionsAsync(match.Index);
+                await LoadPartitionsAsync(match.Index);
+
+                // ── 阶段 3：恢复分区选中 ──
+                if (prevPartNum is not null)
+                {
+                    var partMatch = VM.Method.Partitions.FirstOrDefault(p => p.PartitionNumber == prevPartNum);
+                    if (partMatch is not null)
+                    {
+                        VM.Method.SelectedPartition = partMatch;
+                        InstallPartitionComboBox.SelectedItem = partMatch;
+                    }
+                }
             }
             else
             {
