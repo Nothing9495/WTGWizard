@@ -17,13 +17,13 @@ namespace WTGWizard.Shared.Services.DiskServices;
 /// <summary>
 /// 磁盘读取器 — 封装所有磁盘查询操作。
 /// </summary>
-internal sealed class DiskReader
+internal sealed class DiskIOReader
 {
     private readonly ILoggerService _logger;
 
     private static readonly Guid GUID_DEVINTERFACE_DISK = new("53F56307-B6BF-11D0-94F2-00A0C91EFB8B");
 
-    internal DiskReader(ILoggerService logger)
+    internal DiskIOReader(ILoggerService logger)
     {
         _logger = logger;
     }
@@ -31,7 +31,7 @@ internal sealed class DiskReader
     /// <summary>枚举外部磁盘。</summary>
     internal Task<IReadOnlyList<DiskBasicInfo>> EnumerateExternalDisksAsync(CancellationToken ct = default)
     {
-        _logger.Debug("DiskReader", "EnumerateExternalDisks start");
+        _logger.Debug("DiskIOReader", "EnumerateExternalDisks start");
         var disks = new List<DiskBasicInfo>();
 
         try
@@ -44,7 +44,7 @@ internal sealed class DiskReader
 
             if (hDevInfo.IsInvalid)
             {
-                _logger.Error("DiskReader", "SetupDiGetClassDevs failed");
+                _logger.Error("DiskIOReader", "SetupDiGetClassDevs failed");
                 return Task.FromResult<IReadOnlyList<DiskBasicInfo>>(disks);
             }
 
@@ -65,21 +65,21 @@ internal sealed class DiskReader
                     if (diskInfo is not null)
                     {
                         disks.Add(diskInfo);
-                        _logger.Debug("DiskReader", "Found disk: {Index} {Model}", diskInfo.Index, diskInfo.Model);
+                        _logger.Debug("DiskIOReader", "Found disk: {Index} {Model}", diskInfo.Index, diskInfo.Model);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.Warn("DiskReader", "Device {Index} failed: {Error}", i, ex.Message);
+                    _logger.Warn("DiskIOReader", "Device {Index} failed: {Error}", i, ex.Message);
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.Error("DiskReader", "EnumerateExternalDisks failed: {Error}", ex.Message);
+            _logger.Error("DiskIOReader", "EnumerateExternalDisks failed: {Error}", ex.Message);
         }
 
-        _logger.Debug("DiskReader", "EnumerateExternalDisks done, count={Count}", disks.Count);
+        _logger.Debug("DiskIOReader", "EnumerateExternalDisks done, count={Count}", disks.Count);
         return Task.FromResult<IReadOnlyList<DiskBasicInfo>>(disks);
     }
 
@@ -119,21 +119,21 @@ internal sealed class DiskReader
                 // 检测系统卷
                 if (string.Equals(upper, systemDrive, StringComparison.Ordinal))
                 {
-                    _logger.Warn("DiskReader", "Target disk contains system volume ({Drive}:), operation may cause system unbootable", driveLetter);
+                    _logger.Warn("DiskIOReader", "Target disk contains system volume ({Drive}:), operation may cause system unbootable", driveLetter);
                     return Task.FromResult<string?>($"Target disk contains system volume ({driveLetter}:)");
                 }
 
                 // 检测页面文件卷
                 if (pageFileDrives.Contains(upper))
                 {
-                    _logger.Warn("DiskReader", "Target disk contains page file volume ({Drive}:), operation may affect system performance", driveLetter);
+                    _logger.Warn("DiskIOReader", "Target disk contains page file volume ({Drive}:), operation may affect system performance", driveLetter);
                     return Task.FromResult<string?>($"Target disk contains page file volume ({driveLetter}:)");
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskReader", "CheckDiskSafety failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOReader", "CheckDiskSafety failed: {Error}", ex.Message);
         }
 
         return Task.FromResult<string?>(null);
@@ -145,7 +145,7 @@ internal sealed class DiskReader
         ct.ThrowIfCancellationRequested();
         var partitions = new List<PartitionBasicInfo>();
 
-        _logger.Debug("DiskReader", "GetPartitions for disk {Index}", diskIndex);
+        _logger.Debug("DiskIOReader", "GetPartitions for disk {Index}", diskIndex);
 
         try
         {
@@ -213,10 +213,10 @@ internal sealed class DiskReader
         }
         catch (Exception ex)
         {
-            _logger.Error("DiskReader", "GetPartitions failed: {Error}", ex.Message);
+            _logger.Error("DiskIOReader", "GetPartitions failed: {Error}", ex.Message);
         }
 
-        _logger.Debug("DiskReader", "GetPartitions: disk {Index} returned {Count} partitions", diskIndex, partitions.Count);
+        _logger.Debug("DiskIOReader", "GetPartitions: disk {Index} returned {Count} partitions", diskIndex, partitions.Count);
         return Task.FromResult<IReadOnlyList<PartitionBasicInfo>>(partitions);
     }
 
@@ -305,7 +305,7 @@ internal sealed class DiskReader
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskReader", "GetDriveLayoutEntries failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOReader", "GetDriveLayoutEntries failed: {Error}", ex.Message);
         }
 
         return result;
@@ -386,7 +386,7 @@ internal sealed class DiskReader
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskReader", "GetVolumeDiskExtents failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOReader", "GetVolumeDiskExtents failed: {Error}", ex.Message);
         }
 
         return extents;
@@ -510,7 +510,7 @@ internal sealed class DiskReader
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskReader", "QueryDiskInfo failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOReader", "QueryDiskInfo failed: {Error}", ex.Message);
             return null;
         }
     }

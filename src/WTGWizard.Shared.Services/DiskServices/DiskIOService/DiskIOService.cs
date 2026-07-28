@@ -6,7 +6,7 @@ using WTGWizard.Shared.Services.Logger;
 namespace WTGWizard.Shared.Services.DiskServices;
 
 /// <summary>
-/// 磁盘 I/O 服务实现 — 委托给 DiskReader（读）和 DiskWriter（写）。
+/// 磁盘 I/O 服务实现 — 委托给 DiskIOReader（读）和 DiskIOWriter（写）。
 /// </summary>
 public sealed class DiskIOService : IDiskIOService
 {

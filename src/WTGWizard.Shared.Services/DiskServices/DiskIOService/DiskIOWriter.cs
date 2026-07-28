@@ -11,11 +11,11 @@ namespace WTGWizard.Shared.Services.DiskServices;
 /// - RefreshDisk (IOCTL_DISK_UPDATE_PROPERTIES) — 刷新磁盘属性
 /// - ReenumerateDisk (CM_Locate_DevNodeW / CM_Reenumerate_DevNode) — PnP 重新枚举
 /// </summary>
-public sealed class DiskWriter
+public sealed class DiskIOWriter
 {
     private readonly ILoggerService _logger;
 
-    public DiskWriter(ILoggerService logger)
+    public DiskIOWriter(ILoggerService logger)
     {
         _logger = logger;
     }
