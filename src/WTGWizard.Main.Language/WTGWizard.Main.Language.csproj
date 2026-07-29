@@ -6,6 +6,7 @@
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<RootNamespace>WTGWizard.Main.Language</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
