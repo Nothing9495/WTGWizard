@@ -453,7 +453,8 @@
     <value>选择应答文件</value>
   </data>
   <data name="Page.WizStep.AdvOptions.SelectAnsFile.Desc" xml:space="preserve">
-    <value>选择要使用的应答文件。不正确的应答文件可能导致Windows To Go 初始化失败！</value>
+    <value>选择要使用的应答文件
+不正确的应答文件可能导致 Windows 初始化失败！</value>
   </data>
   <data name="Page.WizStep.AdvOptions.AnsFilePath.Placeholder" xml:space="preserve">
     <value>未选择应答文件</value>
