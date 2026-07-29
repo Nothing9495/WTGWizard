@@ -3,7 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Animation;
+using System;
+using System.IO;
 using WTGWizard.Helpers;
 using WTGWizard.Messages;
 using WTGWizard.Pages;
@@ -51,6 +52,8 @@ public sealed partial class MainWindow : Window
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(AppTitleBar);
         this.AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+        //修复任务栏缩略图不显示图标
+        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "AppLogo.ico"));
     }
 
     private void AdjustNavigationViewMargin(bool? force = null)
