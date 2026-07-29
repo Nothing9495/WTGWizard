@@ -16,6 +16,7 @@ internal static class PowerShellCommand
     {
         string scriptPath = CommandArgs.GetArg(args, "--script");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
+        int timeoutMs = int.TryParse(CommandArgs.TryGetArg(args, "--timeout"), out var t) ? t : 0;
 
         if (!System.IO.File.Exists(scriptPath))
         {
@@ -31,7 +32,8 @@ internal static class PowerShellCommand
         {
             int exitCode = ProcessRunner.Run(
                 "powershell.exe",
-                $"-ExecutionPolicy Bypass -File \"{scriptPath}\"");
+                $"-ExecutionPolicy Bypass -File \"{scriptPath}\"",
+                timeoutMs);
 
             if (exitCode == 0)
                 pipe.WriteCompleted("pwsh", 0);

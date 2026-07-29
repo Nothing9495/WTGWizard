@@ -69,10 +69,7 @@ internal static class ProcessRunner
 
         if (timeoutMs > 0)
         {
-            var timeoutTask = System.Threading.Tasks.Task.Delay(timeoutMs);
-            var completedTask = System.Threading.Tasks.Task.WhenAny(exited.WaitHandle.AsTask(), timeoutTask).Result;
-
-            if (completedTask == timeoutTask)
+            if (!exited.Wait(TimeSpan.FromMilliseconds(timeoutMs)))
             {
                 process.Kill(entireProcessTree: true);
                 throw new TimeoutException($"Process timed out after {timeoutMs}ms: {fileName}");
@@ -86,20 +83,5 @@ internal static class ProcessRunner
         outputDone.Wait(TimeSpan.FromSeconds(2));
 
         return exitCode;
-    }
-
-    /// <summary>
-    /// 将 WaitHandle 转换为 Task。
-    /// </summary>
-    private static System.Threading.Tasks.Task AsTask(this WaitHandle handle)
-    {
-        var tcs = new System.Threading.Tasks.TaskCompletionSource<bool>();
-        ThreadPool.RegisterWaitForSingleObject(
-            handle,
-            (state, _) => ((System.Threading.Tasks.TaskCompletionSource<bool>)state!).TrySetResult(true),
-            tcs,
-            Timeout.Infinite,
-            executeOnlyOnce: true);
-        return tcs.Task;
     }
 }

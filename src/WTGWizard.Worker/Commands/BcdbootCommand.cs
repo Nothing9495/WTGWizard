@@ -16,13 +16,14 @@ internal static class BcdbootCommand
     {
         string bcdbootArgs = CommandArgs.GetArg(args, "--args");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
+        int timeoutMs = int.TryParse(CommandArgs.TryGetArg(args, "--timeout"), out var t) ? t : 0;
 
         using var pipe = PipeHelper.Connect(pipeName);
         pipe.WriteRunning("bcdboot", $"Executing bcdboot: {bcdbootArgs}");
 
         try
         {
-            int exitCode = ProcessRunner.Run("bcdboot.exe", bcdbootArgs);
+            int exitCode = ProcessRunner.Run("bcdboot.exe", bcdbootArgs, timeoutMs);
 
             if (exitCode == 0)
                 pipe.WriteCompleted("bcdboot", 0);
