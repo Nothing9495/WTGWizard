@@ -11,6 +11,9 @@
   <Project Path="src/WTGWizard.Main.Language/WTGWizard.Main.Language.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/WTGWizard.Main.DeploymentCore/WTGWizard.Main.DeploymentCore.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/WTGWizard.Shared.Common/WTGWizard.Shared.Common.csproj">
     <Platform Project="x64" />
   </Project>

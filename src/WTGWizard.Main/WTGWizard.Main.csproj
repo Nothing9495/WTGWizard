@@ -35,6 +35,7 @@
 		<ProjectReference Include="..\WTGWizard.Shared.Services\WTGWizard.Shared.Services.csproj" />
 		<ProjectReference Include="..\WTGWizard.Shared.Common\WTGWizard.Shared.Common.csproj" />
 		<ProjectReference Include="..\WTGWizard.Main.Language\WTGWizard.Main.Language.csproj" />
+		<ProjectReference Include="..\WTGWizard.Main.DeploymentCore\WTGWizard.Main.DeploymentCore.csproj" />
 	</ItemGroup>
 
   <ItemGroup>
