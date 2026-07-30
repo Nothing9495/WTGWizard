@@ -349,7 +349,7 @@
     <value>Prevent device encryption</value>
   </data>
   <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption.Desc" xml:space="preserve">
-    <value>Prevent BitLocker device encryption from running automatically after Windows To Go is initialized on eligible devices.</value>
+    <value>Prevent BitLocker device encryption from running automatically after Windows is initialized on eligible devices.</value>
   </data>
   <data name="Page.WizStep.DeployOptions.DiskGroup" xml:space="preserve">
     <value>Disk Settings</value>
@@ -358,7 +358,8 @@
     <value>Don't assign drive letter for OS partition</value>
   </data>
   <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter.Desc" xml:space="preserve">
-    <value>Prevent Windows from assigning a drive letter to the OS partition to avoid accidentally damaging Windows To Go. This setting is only available for external hard disks.</value>
+    <value>Prevent Windows from assigning a drive letter to the OS partition to avoid accidentally damaging Windows To Go. 
+This setting is only available for external hard disks.</value>
   </data>
   <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter.Header" xml:space="preserve">
     <value>Remove OS partition drive letter</value>
@@ -477,7 +478,8 @@ Found path: {0}</value>
     <value>Use updated boot binaries</value>
   </data>
   <data name="Page.WizStep.AdvOptions.BootEx.Desc" xml:space="preserve">
-    <value>Use the CA 2023-signed boot binaries for boot creation. This setting is available only on Windows 11 version 26100.8037 and later.</value>
+    <value>Use the CA 2023-signed boot binaries for boot creation.
+This setting is available only on Windows 11 version 26100.8037 and later.</value>
   </data>
   <data name="Page.WizStep.Confirm.Title" xml:space="preserve">
     <value>Confirm</value>

@@ -48,12 +48,12 @@ public static class Constants
 
     // ═══ Worker 超时（毫秒） ═══
 
-    public const int TimeoutPartitionMs = 300_000;   // 5 分钟
+    public const int TimeoutPartitionMs = 300_000;   // 5 分钟（pwsh）
     public const int TimeoutExtractMs = 0;           // 无超时（WIM 提取耗时不可预测）
-    public const int TimeoutDriverMs = 0;            // 无超时（DISM 驱动集成耗时不可预测）
-    public const int TimeoutApplyWtgMs = 90_000;     // 1.5 分钟
-    public const int TimeoutBcdbootMs = 60_000;      // 1 分钟
-    public const int TimeoutCleanupMs = 60_000;      // 1 分钟
+    public const int TimeoutDriverMs = 600_000;      // 10 分钟（DISM /Add-Driver）
+    public const int TimeoutApplyWtgMs = 120_000;    // 2 分钟（DISM /Apply-Unattend）
+    public const int TimeoutBcdbootMs = 120_000;     // 2 分钟（bcdboot）
+    public const int TimeoutCleanupMs = 300_000;     // 5 分钟（pwsh）
 
     // ═══ 错误格式化 ═══
 

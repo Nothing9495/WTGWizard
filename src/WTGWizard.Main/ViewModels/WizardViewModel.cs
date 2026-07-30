@@ -1,8 +1,10 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WTGWizard.Main.Language;
-using WTGWizard.Messages;
+using WTGWizard.Main.DeploymentCore.Models;
+using WTGWizard.Main.DeploymentCore.Orchestrator;
+using WTGWizard.Shared.Services.DiskServices;
+using WTGWizard.Shared.Services.Logger;
 
 namespace WTGWizard.ViewModels;
 
@@ -37,10 +39,22 @@ public sealed partial class WizardViewModel : ObservableObject
     public DeployMethodVM Method { get; }
     public AdvancedOptionsVM Advanced { get; } = new();
 
+    // ═══ 服务 ═══
+
+    private readonly IDriveLetterService _driveLetterService;
+    private readonly ILoggerService _logger;
+
+    // ═══ 部署状态 ═══
+
+    public DeploymentOrchestrator? Orchestrator { get; private set; }
+
     // ═══ 构造函数 ═══
 
-    public WizardViewModel()
+    public WizardViewModel(IDriveLetterService driveLetterService, ILoggerService logger)
     {
+        _driveLetterService = driveLetterService;
+        _logger = logger;
+
         Method = new DeployMethodVM();
         Image.PropertyChanged += OnSubPropertyChanged;
         Image.PropertyChanged += OnImagePropertyChanged;
@@ -111,9 +125,105 @@ public sealed partial class WizardViewModel : ObservableObject
     [RelayCommand]
     private void StartDeploy()
     {
-        // TODO: 创建 DeploymentOrchestrator
+        var config = BuildDeploymentConfig();
+
+        Orchestrator = new DeploymentOrchestrator(config, _driveLetterService, _logger);
         IsDeploying = true;
         NavigateToTaskRequested?.Invoke();
+    }
+
+    private DeploymentConfig BuildDeploymentConfig()
+    {
+        var imageInfo = Image.ImageInfo;
+        var disk = Method.SelectedDisk;
+
+        if (disk is null || imageInfo is null)
+            throw new InvalidOperationException("Disk or image not selected");
+
+        char espDriveLetter;
+        char osDriveLetter;
+
+        if (Method.IsCleanInstall)
+        {
+            var (esp, os) = _driveLetterService.ReserveForCleanInstall();
+            espDriveLetter = esp;
+            osDriveLetter = os;
+        }
+        else
+        {
+            espDriveLetter = _driveLetterService.ReserveForPartitionInstall();
+            osDriveLetter = Method.SelectedPartition?.DriveLetter is { Length: >= 1 } letter
+                ? letter[0]
+                : throw new InvalidOperationException("No partition selected for partition install");
+        }
+
+        uint espVolumeId = 0;
+        uint osDriveVolumeId = 0;
+
+        if (Method.IsCleanInstall)
+        {
+            espVolumeId = DeploymentConstants.CleanInstallEspPartNum;
+            osDriveVolumeId = DeploymentConstants.CleanInstallOsPartNum;
+        }
+        else
+        {
+            espVolumeId = Method.SelectedDisk?.EspPartitionNumber ?? 0;
+            osDriveVolumeId = Method.SelectedPartition?.PartitionNumber ?? 0;
+        }
+
+        return new DeploymentConfig
+        {
+            // ── 映像 ──
+            SrcImageFile = Image.FilePath,
+            ImageSelectedIndex = Image.SelectedIndex,
+            ImageWindowsArch = imageInfo.Architecture,
+            ImageWinBuildNum = imageInfo.BuildNumber,
+            ImageExpandedSize = imageInfo.ExpandedSizeGB,
+            UseDismToDeploy = Options.UseDismToDeploy,
+
+            // ── 磁盘 ──
+            DiskSelectedId = (int)disk.Index,
+            DiskSizeBytes = disk.SizeBytes,
+            IsCleanInstall = Method.IsCleanInstall,
+            EnableReservedVol = Method.EnableReservedVol,
+
+            // ── 分区（Clean 模式）──
+            EfiPartSize = Method.EfiPartSize,
+            OsDriveSize = Method.OsDriveSize,
+            OsDriveLabel = Method.OsDriveLabel,
+            ReservedDriveLabel = Method.ReservedDriveLabel,
+            ReservedDriveFs = Method.ReservedDriveFs,
+            NoDefaultDriveLetter = Options.NoDefaultDriveLetter,
+            AutoRemoveOsDriveLetter = Options.AutoRemoveOsDriveLetter,
+            MaxOsDriveSize = Method.MaxOsDriveSize,
+
+            // ── 分区（Partition Install 模式）──
+            EspVolumeId = espVolumeId,
+            OsDriveVolumeId = osDriveVolumeId,
+            SelectedPartitionDriveLetter = Method.SelectedPartition?.DriveLetter,
+
+            // ── 盘符 ──
+            EspDriveLetter = espDriveLetter,
+            OsDriveLetter = osDriveLetter,
+
+            // ── 驱动集成 ──
+            DriverIntegrationEnabled = Advanced.DriverEnabled,
+            DriversDirectoryPath = Advanced.DriverPath,
+            ForceUnsignedDriver = Advanced.ForceUnsigned,
+
+            // ── 应答文件 ──
+            CustomAnsFileEnabled = Advanced.CustomAnsFileEnabled,
+            AnsFilePath = Advanced.AnsFilePath,
+            CleanImageAnsFile = Advanced.CleanImageAnsFile,
+
+            // ── WTG 设置 ──
+            HideLocalDisks = Options.HideLocalDisks,
+            PreventDeviceEncryption = Options.PreventDeviceEncryption,
+
+            // ── BCDBoot ──
+            EnableBootEx = Advanced.EnableBootEx,
+            EnableBootVerbose = Advanced.EnableBootVerbose,
+        };
     }
 
     // ═══ 步骤指示器 ═══
@@ -128,4 +238,5 @@ public sealed partial class WizardViewModel : ObservableObject
             CurrentStepTitle = Localization.GetString(stepResourceKeys[CurrentStep]);
         }
     }
+
 }

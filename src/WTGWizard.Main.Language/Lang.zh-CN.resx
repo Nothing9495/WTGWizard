@@ -349,7 +349,7 @@
     <value>阻止设备加密</value>
   </data>
   <data name="Page.WizStep.DeployOptions.PreventDeviceEncryption.Desc" xml:space="preserve">
-    <value>阻止 Windows To Go 在符合条件的设备上初始化后，自动运行 BitLocker 设备加密</value>
+    <value>阻止 Windows 在符合条件的设备上初始化后运行 BitLocker 设备加密</value>
   </data>
   <data name="Page.WizStep.DeployOptions.DiskGroup" xml:space="preserve">
     <value>磁盘设置</value>
@@ -358,7 +358,8 @@
     <value>系统分区不分配默认盘符</value>
   </data>
   <data name="Page.WizStep.DeployOptions.NoDefaultDriveLetter.Desc" xml:space="preserve">
-    <value>阻止 Windows 为系统分区分配盘符，避免意外损坏 Windows To Go。该设置仅对移动硬盘可用</value>
+    <value>阻止 Windows 为系统分区分配盘符，避免意外损坏 Windows To Go
+该设置仅对移动硬盘可用</value>
   </data>
   <data name="Page.WizStep.DeployOptions.RemoveOsDriveLetter.Header" xml:space="preserve">
     <value>移除系统分区盘符</value>
@@ -478,7 +479,8 @@
     <value>使用更新的引导程序二进制文件</value>
   </data>
   <data name="Page.WizStep.AdvOptions.BootEx.Desc" xml:space="preserve">
-    <value>创建引导时，使用 CA 2023 签名的引导程序二进制文件。该设置仅对 Windows 11 26100.8037 及以上可用</value>
+    <value>创建引导时，使用 CA 2023 签名的引导程序二进制文件
+该设置仅对 Windows 11 26100.8037 及以上可用</value>
   </data>
   <data name="Page.WizStep.Confirm.Title" xml:space="preserve">
     <value>确认部署</value>

@@ -314,7 +314,8 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Use the CA 2023-signed boot binaries for boot creation. This setting is available only on Windows 11 version 26100.8037 and later. 的本地化字符串。
+        ///   查找类似 Use the CA 2023-signed boot binaries for boot creation.
+        ///This setting is available only on Windows 11 version 26100.8037 and later. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_AdvOptions_BootEx_Desc {
             get {
@@ -1215,7 +1216,8 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Prevent Windows from assigning a drive letter to the OS partition to avoid accidentally damaging Windows To Go. This setting is only available for external hard disks. 的本地化字符串。
+        ///   查找类似 Prevent Windows from assigning a drive letter to the OS partition to avoid accidentally damaging Windows To Go. 
+        ///This setting is only available for external hard disks. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployOptions_NoDefaultDriveLetter_Desc {
             get {
@@ -1233,7 +1235,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Prevent BitLocker device encryption from running automatically after Windows To Go is initialized on eligible devices. 的本地化字符串。
+        ///   查找类似 Prevent BitLocker device encryption from running automatically after Windows is initialized on eligible devices. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployOptions_PreventDeviceEncryption_Desc {
             get {

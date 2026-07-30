@@ -37,6 +37,8 @@ public partial class App : Application
 
         var logger = Services.GetService<ILoggerService>();
         logger?.Shutdown();
+
+        // TODO: 程序关闭后有概率触发Access violation异常，等待进一步排查。
     }
 
     private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
