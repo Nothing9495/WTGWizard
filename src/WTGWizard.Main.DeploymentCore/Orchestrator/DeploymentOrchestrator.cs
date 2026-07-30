@@ -132,33 +132,52 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
     {
         var c = _currentConfig;
         _logger.Debug("DeployConfig", "══════ Deployment Configuration ══════");
-        _logger.Debug("DeployConfig", "[Image] Source={Src}", c.SrcImageFile);
-        _logger.Debug("DeployConfig", "[Image] Index={Idx}, Arch={Arch}, Build={Build}",
-            c.ImageSelectedIndex, c.ImageWindowsArch, c.ImageWinBuildNum);
-        _logger.Debug("DeployConfig", "[Disk]  #{Id}, Clean={Clean}, Size={Size:N0} bytes",
-            c.DiskSelectedId, c.IsCleanInstall, c.DiskSizeBytes);
+
+        _logger.Debug("DeployConfig", "[ImageSrc]  {Src}", c.SrcImageFile);
+        _logger.Debug("DeployConfig", "[ImageInfo] Index={Idx}, Arch={Arch}, Build={Build}, Expand={Exp}GB",
+            c.ImageSelectedIndex, c.ImageWindowsArch, c.ImageWinBuildNum, c.ImageExpandedSize);
+
+        string diskSizeGib = (c.DiskSizeBytes / DeploymentConstants.BytesPerGiB).ToString("F1");
+        _logger.Debug("DeployConfig", "[TargetDisk] Disk #{Id}, {Size}GiB", c.DiskSelectedId, diskSizeGib);
+
         if (c.IsCleanInstall)
         {
-            _logger.Debug("DeployConfig", "[Part] EFI={Efi}MB, OS={Os:F2}GB/{Max:F2}GB, Label={Lbl}",
+            _logger.Debug("DeployConfig", "[InstallType] Clean Install");
+            _logger.Debug("DeployConfig", "[DiskLayout] ESP={Efi}MB, OS={Os:F2}/{Max:F2}GB, OS Label=\"{Lbl}\"",
                 c.EfiPartSize, c.OsDriveSize, c.MaxOsDriveSize, c.OsDriveLabel);
-            _logger.Debug("DeployConfig", "[Part] Reserved={Res}, RsvLabel={RLbl}, RsvFS={RFs}",
-                c.EnableReservedVol, c.ReservedDriveLabel, c.ReservedDriveFs);
+            if (c.EnableReservedVol)
+                _logger.Debug("DeployConfig", "[DiskLayout] Reserved Label=\"{Lbl}\", Reserved FS={Fs}",
+                    c.ReservedDriveLabel, c.ReservedDriveFs);
         }
         else
         {
-            _logger.Debug("DeployConfig", "[Part] ESP=#{EspId}, OS=#{OsId}, Letter={Ltr}",
-                c.EspVolumeId, c.OsDriveVolumeId, c.SelectedPartitionDriveLetter);
+            _logger.Debug("DeployConfig", "[InstallType] Partition Install");
+            _logger.Debug("DeployConfig", "[Partitions] ESP=#{Esp}, OS=#{Os}, OS Letter={L}",
+                c.EspVolumeId, c.OsDriveVolumeId, c.SelectedPartitionDriveLetter ?? "?");
         }
-        _logger.Debug("DeployConfig", "[Letter] ESP={Esp}:, OS={Os}:, NoDefault={N}, AutoRemove={A}",
-            c.EspDriveLetter, c.OsDriveLetter, c.NoDefaultDriveLetter, c.AutoRemoveOsDriveLetter);
-        _logger.Debug("DeployConfig", "[Driver] Enabled={E}, Path={P}, ForceUnsigned={F}",
-            c.DriverIntegrationEnabled, c.DriversDirectoryPath ?? "(none)", c.ForceUnsignedDriver);
-        _logger.Debug("DeployConfig", "[Ans]   Custom={C}, Path={P}, CleanBuiltin={B}",
-            c.CustomAnsFileEnabled, c.AnsFilePath ?? "(none)", c.CleanImageAnsFile);
-        _logger.Debug("DeployConfig", "[WTG]   SanPolicy={S}, NoEncrypt={E}",
+
+        _logger.Debug("DeployConfig", "[DriveLetter] ESP={Esp}:, OS={Os}:",
+            c.EspDriveLetter, c.OsDriveLetter);
+
+        _logger.Debug("DeployConfig", "[OSDriveSettings] NoDefaultDriveLetter={N}, AutoRemoveDriveLetter={A}",
+            c.NoDefaultDriveLetter, c.AutoRemoveOsDriveLetter);
+
+        _logger.Debug("DeployConfig", "[DeployOpts] UseDismToDeploy={D}", c.UseDismToDeploy);
+
+        _logger.Debug("DeployConfig", "[SysSettings] HideLocalDisks={H}, PreventDeviceEncryption={P}",
             c.HideLocalDisks, c.PreventDeviceEncryption);
-        _logger.Debug("DeployConfig", "[Boot]  BootEx={Ex}, Verbose={V}",
-            c.EnableBootEx, c.EnableBootVerbose);
+
+        if (c.DriverIntegrationEnabled)
+            _logger.Debug("DeployConfig", "[DrvInt] Drivers Path={P}, Allow Unsigned Drivers={F}",
+                c.DriversDirectoryPath ?? "(none)", c.ForceUnsignedDriver);
+
+        if (c.CustomAnsFileEnabled)
+            _logger.Debug("DeployConfig", "[AnsFile] File Path={P}, Clean In-image Answer File={C}",
+                c.AnsFilePath ?? "(none)", c.CleanImageAnsFile);
+
+        _logger.Debug("DeployConfig", "[BcdBoot] Detailed Output={V}, BootEx={E}",
+            c.EnableBootVerbose, c.EnableBootEx);
+
         _logger.Debug("DeployConfig", "════════════════════════════════════");
     }
 }
