@@ -5,7 +5,7 @@ using WTGWizard.Main.DeploymentCore.Models;
 
 namespace WTGWizard.Main.DeploymentCore.Contracts;
 
-public interface IWorkerProcess
+public interface IWorkerProcess : IDisposable
 {
     Task<WorkerExecutionResult> ExecuteAsync(
         WorkerCommand command, IProgress<double>? progress = null, CancellationToken ct = default);

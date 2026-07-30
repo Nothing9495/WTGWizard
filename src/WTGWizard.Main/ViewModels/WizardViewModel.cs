@@ -1,8 +1,11 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WTGWizard.Main.DeploymentCore.Builders;
 using WTGWizard.Main.DeploymentCore.Models;
 using WTGWizard.Main.DeploymentCore.Orchestrator;
+using WTGWizard.Main.DeploymentCore.Steps;
+using WTGWizard.Main.DeploymentCore.Worker;
 using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
 
@@ -127,7 +130,20 @@ public sealed partial class WizardViewModel : ObservableObject
     {
         var config = BuildDeploymentConfig();
 
-        Orchestrator = new DeploymentOrchestrator(config, _driveLetterService, _logger);
+        var pipeline = new DeploymentPipeline()
+            .AddStep<PartitionStep>()
+            .AddStep<ExtractStep>()
+            .AddStep<DriverStep>()
+            .AddStep<ImportAnsFileStep>()
+            .AddStep<ApplyWtgStep>()
+            .AddStep<BcdbootStep>()
+            .AddStep<CleanupStep>();
+        var worker = new WorkerProcess(_logger);
+        var commands = new WorkerCommandFactory();
+        var tempFiles = new TempFileManager();
+
+        Orchestrator = new DeploymentOrchestrator(pipeline, config, _driveLetterService, _logger,
+            worker, commands, tempFiles);
         IsDeploying = true;
         NavigateToTaskRequested?.Invoke();
     }

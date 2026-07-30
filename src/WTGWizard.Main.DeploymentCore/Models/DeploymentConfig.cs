@@ -34,8 +34,8 @@ public sealed record DeploymentConfig
     public required string? SelectedPartitionDriveLetter { get; init; }
 
     // ── 盘符 ──
-    public required char EspDriveLetter { get; set; }
-    public required char OsDriveLetter { get; set; }
+    public required char EspDriveLetter { get; init; }
+    public required char OsDriveLetter { get; init; }
 
     // ── 驱动集成 ──
     public required bool DriverIntegrationEnabled { get; init; }

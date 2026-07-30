@@ -1,6 +1,6 @@
 using System;
 
-namespace WTGWizard.Main.DeploymentCore.WorkerCore;
+namespace WTGWizard.Main.DeploymentCore.Worker;
 
 /// <summary>
 /// 外部工具命令参数构建器 — DISM / BCDBoot。

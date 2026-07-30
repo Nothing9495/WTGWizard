@@ -3,40 +3,29 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using WTGWizard.Main.DeploymentCore.Contracts;
 using WTGWizard.Main.DeploymentCore.Models;
 using WTGWizard.Shared.Common;
 using WTGWizard.Shared.Services.Logger;
 
-namespace WTGWizard.Main.DeploymentCore.WorkerCore;
+namespace WTGWizard.Main.DeploymentCore.Worker;
 
-/// <summary>
-/// Worker 进程管理器 — 负责单个 Worker 进程的完整生命周期：
-/// 启动进程、通过 PipeServer 接收进度消息、清理。
-/// Worker 侧自控超时，Main 只等待 pipe 消息。
-/// </summary>
-public sealed class WorkerProcessManager
+public sealed class WorkerProcess : IWorkerProcess, IDisposable
 {
     private readonly ILoggerService _logger;
 
-    public WorkerProcessManager(ILoggerService logger)
-    {
-        _logger = logger;
-    }
+    public WorkerProcess(ILoggerService logger) => _logger = logger;
 
-    public async Task<WorkerExecutionResult> ExecuteCommandAsync(
-        string command,
-        string arguments,
-        Action<double>? onProgress = null,
-        CancellationToken ct = default)
+    public async Task<WorkerExecutionResult> ExecuteAsync(
+        WorkerCommand command, IProgress<double>? progress = null, CancellationToken ct = default)
     {
-        string workerExePath = FindWorkerExe();
+        string exePath = FindExe();
         string pipeName = PipeProtocol.GeneratePipeName();
-        string workerArgs = $"{command} {arguments} --pipe {pipeName}";
+        string workerArgs = $"{command.Command} {command.Arguments} --pipe {pipeName}";
 
-        _logger.Debug("WorkerMgr", "Launching Worker: {Path} {Args}", workerExePath, workerArgs);
+        _logger.Debug("WorkerMgr", "Launching Worker: {Path} {Args}", exePath, workerArgs);
 
         using var pipeServer = new PipeServer(pipeName);
-
         var tcs = new TaskCompletionSource<WorkerExecutionResult>();
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
 
@@ -45,13 +34,11 @@ public sealed class WorkerProcessManager
             _logger.Debug("WorkerMgr", "Worker completed: {Task} exit={ExitCode}", task, rc);
             tcs.TrySetResult(WorkerExecutionResult.Ok(rc));
         };
-
         pipeServer.OnFailed += (task, rc, msg) =>
         {
             _logger.Error("WorkerMgr", "Worker failed: {Task} exit={ExitCode} msg={Msg}", task, rc, msg);
             tcs.TrySetResult(WorkerExecutionResult.Fail(rc, msg ?? $"Exit code: {rc}"));
         };
-
         pipeServer.OnDisconnected += () =>
         {
             if (!tcs.Task.IsCompleted)
@@ -60,23 +47,17 @@ public sealed class WorkerProcessManager
                 tcs.TrySetResult(WorkerExecutionResult.Fail(-1, "Pipe disconnected unexpectedly"));
             }
         };
-
-        pipeServer.OnProgress += (task, percent) => onProgress?.Invoke(percent);
+        pipeServer.OnProgress += (_, p) => progress?.Report(p);
 
         Process? process = null;
-
         try
         {
             var psi = new ProcessStartInfo
             {
-                FileName = workerExePath,
-                Arguments = workerArgs,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
+                FileName = exePath, Arguments = workerArgs,
+                UseShellExecute = false, CreateNoWindow = true,
+                RedirectStandardOutput = true, RedirectStandardError = true
             };
-
             psi.Environment.Remove("DOTNET_ROOT");
             psi.Environment.Remove("DOTNET_ROOT(x86)");
 
@@ -93,9 +74,7 @@ public sealed class WorkerProcessManager
             var result = await tcs.Task;
 
             if (!process.HasExited)
-            {
                 await processExitTask;
-            }
 
             _logger.Debug("WorkerMgr", "Process exited with code {ExitCode}", process.ExitCode);
             return result;
@@ -104,7 +83,7 @@ public sealed class WorkerProcessManager
         {
             _logger.Warn("WorkerMgr", "Operation cancelled");
             KillProcessTree(process);
-            return WorkerExecutionResult.Fail(-1, "Operation cancelled");
+            return WorkerExecutionResult.Cancelled();
         }
         catch (TimeoutException ex)
         {
@@ -120,33 +99,21 @@ public sealed class WorkerProcessManager
         }
     }
 
-    private static string FindWorkerExe()
+    private static string FindExe()
     {
         string baseDir = AppContext.BaseDirectory;
-        string workerPath = Path.Combine(baseDir, "WTGWizard.Worker.exe");
-        if (File.Exists(workerPath))
-            return workerPath;
-
-        string parentDir = Path.GetFullPath(Path.Combine(baseDir, ".."));
-        string parentWorkerPath = Path.Combine(parentDir, "WTGWizard.Worker.exe");
-        if (File.Exists(parentWorkerPath))
-            return parentWorkerPath;
-
-        throw new FileNotFoundException($"WTGWizard.Worker.exe not found in {baseDir} or {parentDir}");
+        string path = Path.Combine(baseDir, "WTGWizard.Worker.exe");
+        if (File.Exists(path)) return path;
+        path = Path.Combine(Path.GetFullPath(Path.Combine(baseDir, "..")), "WTGWizard.Worker.exe");
+        if (File.Exists(path)) return path;
+        throw new FileNotFoundException("WTGWizard.Worker.exe not found");
     }
 
     private static void KillProcessTree(Process? process)
     {
-        if (process is null || process.HasExited)
-            return;
-
-        try
-        {
-            process.Kill(true);
-        }
-        catch
-        {
-            // Best effort
-        }
+        if (process is null || process.HasExited) return;
+        try { process.Kill(true); } catch { /* best effort */ }
     }
+
+    public void Dispose() { }
 }

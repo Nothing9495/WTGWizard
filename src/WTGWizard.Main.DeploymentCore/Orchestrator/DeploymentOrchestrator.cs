@@ -1,252 +1,164 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using WTGWizard.Main.DeploymentCore.Builders;
+using WTGWizard.Main.DeploymentCore.Contracts;
 using WTGWizard.Main.DeploymentCore.Models;
-using WTGWizard.Main.DeploymentCore.DplySteps;
+using WTGWizard.Main.DeploymentCore.Worker;
 using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
+using static WTGWizard.Main.DeploymentCore.Models.DeploymentConstants;
 
 namespace WTGWizard.Main.DeploymentCore.Orchestrator;
 
-/// <summary>
-/// 部署编排器 — 按序执行步骤，更新任务状态供 TaskPage 展示。
-/// </summary>
-public sealed class DeploymentOrchestrator
+public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
 {
-    private readonly StepContext _ctx;
-    private readonly IReadOnlyList<IDeploymentStep> _steps;
-    private readonly IDriveLetterService _driveLetterService;
+    private readonly IDeploymentPipeline _pipeline;
+    private readonly IDriveLetterService _driveLetter;
+    private readonly ILoggerService _logger;
+    private readonly IWorkerProcess _worker;
+    private readonly WorkerCommandFactory _commands;
+    private readonly TempFileManager _tempFiles;
     private readonly ObservableCollection<DeployTaskItem> _tasks;
+    private readonly Subject<TaskUpdate> _subject = new();
+    private DeploymentConfig _currentConfig;
 
+    public IObservable<TaskUpdate> Progress => _subject;
     public ObservableCollection<DeployTaskItem> Tasks => _tasks;
 
-    public uint DiskNumber
-    {
-        get
-        {
-            int id = _ctx.Config.DiskSelectedId;
-            if (id < 0)
-                throw new InvalidOperationException($"无效的磁盘编号: {id}");
-            return (uint)id;
-        }
-    }
-
     public DeploymentOrchestrator(
-        DeploymentConfig config,
-        IDriveLetterService driveLetterService,
-        ILoggerService logger)
+        IDeploymentPipeline pipeline, DeploymentConfig config,
+        IDriveLetterService driveLetter, ILoggerService logger,
+        IWorkerProcess worker, WorkerCommandFactory commands,
+        TempFileManager tempFiles)
     {
-        _driveLetterService = driveLetterService;
-        _tasks = BuildTaskList(config);
-        _ctx = new StepContext(config, logger);
+        _pipeline = pipeline;
+        _currentConfig = config;
+        _driveLetter = driveLetter;
+        _logger = logger;
+        _worker = worker;
+        _commands = commands;
+        _tempFiles = tempFiles;
+        _tasks = new ObservableCollection<DeployTaskItem>(
+            _pipeline.ActiveTasks(config).Select(id => new DeployTaskItem
+            {
+                Id = id.Value,
+                Title = id.Value,
+                Description = id.Value
+            }));
 
-        _ctx.OnTaskStatusChanged += (id, status, progress) =>
-        {
-            var task = _tasks.FirstOrDefault(t => t.Id == id);
-            if (task is null) return;
-            task.ProgressValue = progress;
-            task.Status = status;
-        };
-
-        _ctx.OnTaskProgressChanged += (id, value) =>
-        {
-            var task = _tasks.FirstOrDefault(t => t.Id == id);
-            if (task is not null)
-                task.ProgressValue = value;
-        };
-
-        _ctx.OnCurrentTaskFailed += () =>
-        {
-            var task = _tasks.FirstOrDefault(t => t.Status == DeployTaskStatus.Running);
-            if (task is not null)
-                task.Status = DeployTaskStatus.Failed;
-        };
-
-        _steps = BuildSteps();
+        _logger.Debug("Orchestrator", "Pipeline: {Steps}",
+            string.Join(" → ", _tasks.Select(t => t.Id)));
         LogDeploymentConfig();
     }
 
-    public async Task StartAsync(CancellationToken ct = default)
+    public async Task<DeploymentResult> StartAsync(CancellationToken ct = default)
     {
-        _ctx.Logger.Debug("Orchestrator", "Deployment started");
-
-        string? osApplyDir = null;
-
         try
         {
-            foreach (IDeploymentStep step in _steps)
+            foreach (var step in _pipeline.Steps)
             {
-                if (!step.ShouldRun(_ctx.Config))
+                if (!step.ShouldRun(_currentConfig))
                 {
-                    _ctx.Logger.Debug("Orchestrator", "Step skipped: {TaskId}", step.TaskId);
+                    _subject.OnNext(new(step.TaskId, DeployTaskStatus.Skipped, 0));
                     continue;
                 }
 
-                await step.ExecuteAsync(_ctx, osApplyDir, ct);
-
-                if (step.TaskId == "partition")
-                {
-                    osApplyDir = await ResolveDriveLettersAsync(ct);
-                    if (string.IsNullOrEmpty(osApplyDir))
+                using var ctx = new StepContext(_currentConfig, _worker,
+                    _commands, _tempFiles, _logger);
+                using var _ = ctx.Progress
+                    .Subscribe(u =>
                     {
-                        _ctx.Logger.Error("Orchestrator", "Drive letter resolution returned empty");
-                        throw new InvalidOperationException("Drive letter resolution returned empty — partition step may have failed");
-                    }
-                }
+                        _subject.OnNext(u);
+                        var task = _tasks.FirstOrDefault(t => t.Id == u.TaskId.Value);
+                        if (task is not null)
+                        {
+                            task.Status = u.Status;
+                            task.ProgressValue = u.Progress;
+                        }
+                    });
+
+                var result = await step.ExecuteAsync(ctx, ct);
+
+                if (!result.IsSuccess)
+                    return DeploymentResult.Failed(step.TaskId, result.ErrorMessage ?? "Unknown error");
+
+                if (step.TaskId == DeployTaskId.Partition)
+                    await ResolveDriveLettersAsync();
             }
 
-            _ctx.Logger.Debug("Orchestrator", "Deployment completed");
+            return DeploymentResult.Ok();
         }
-        catch (OperationCanceledException)
-        {
-            _ctx.Logger.Warn("Orchestrator", "Deployment cancelled");
-            _ctx.MarkCurrentTaskFailed();
-        }
-        catch (Exception ex)
-        {
-            _ctx.MarkCurrentTaskFailed();
-            _ctx.Logger.Error("Orchestrator", "Deployment error: {Msg}", ex.Message);
-            throw;
-        }
+        catch (OperationCanceledException) { return DeploymentResult.Cancelled(); }
+        catch (Exception ex) { return DeploymentResult.Failed(null, ex.Message); }
     }
 
-    private IReadOnlyList<IDeploymentStep> BuildSteps()
+    public void Dispose()
     {
-        return new IDeploymentStep[]
-        {
-            new PartitionStep(),
-            new ExtractStep(),
-            new DriverStep(),
-            new ImportAnsFileStep(),
-            new ApplySettingsStep(),
-            new BcdbootStep(),
-            new CleanupStep(),
-        };
+        _subject.OnCompleted();
+        _subject.Dispose();
+        _worker.Dispose();
+        _tempFiles.Dispose();
     }
 
-    private static ObservableCollection<DeployTaskItem> BuildTaskList(DeploymentConfig config)
+    private async Task ResolveDriveLettersAsync()
     {
-        var list = new ObservableCollection<DeployTaskItem>();
+        uint diskNum = (uint)_currentConfig.DiskSelectedId;
 
-        foreach (IDeploymentStep step in AllSteps())
+        if (_currentConfig.IsCleanInstall)
         {
-            if (!step.ShouldRun(config)) continue;
-
-            list.Add(new()
-            {
-                Id = step.TaskId,
-                Title = step.TaskId,
-                Description = step.TaskId,
-            });
+            char esp = await _driveLetter.QueryActualDriveLetterAsync(diskNum, CleanInstallEspPartNum);
+            char os = await _driveLetter.QueryActualDriveLetterAsync(diskNum, CleanInstallOsPartNum);
+            _currentConfig = _currentConfig with { EspDriveLetter = esp, OsDriveLetter = os };
         }
-
-        return list;
-    }
-
-    private static IEnumerable<IDeploymentStep> AllSteps()
-    {
-        yield return new PartitionStep();
-        yield return new ExtractStep();
-        yield return new DriverStep();
-        yield return new ImportAnsFileStep();
-        yield return new ApplySettingsStep();
-        yield return new BcdbootStep();
-        yield return new CleanupStep();
-    }
-
-    private async Task<string> ResolveDriveLettersAsync(CancellationToken ct)
-    {
-        DeploymentConfig config = _ctx.Config;
-        uint diskNum = (uint)config.DiskSelectedId;
-
-        if (config.IsCleanInstall)
+        else if (_currentConfig.SelectedPartitionDriveLetter is { } letter)
         {
-            config.EspDriveLetter = await _driveLetterService.QueryActualDriveLetterAsync(
-                diskNum, DeploymentConstants.CleanInstallEspPartNum);
-
-        char osLetter = await _driveLetterService.QueryActualDriveLetterAsync(
-                diskNum, DeploymentConstants.CleanInstallOsPartNum);
-            config.OsDriveLetter = osLetter;
-            _ctx.Logger.Debug("Orchestrator", "Drive letters resolved: ESP={Esp}, OS={Os}", config.EspDriveLetter, osLetter);
-
-            return $"{osLetter}:\\";
-        }
-        else if (config.SelectedPartitionDriveLetter is string partLetter)
-        {
-            config.EspDriveLetter = await _driveLetterService.QueryActualDriveLetterAsync(
-                diskNum, config.EspVolumeId);
-
-            config.OsDriveLetter = partLetter[0];
-            _ctx.Logger.Debug("Orchestrator", "Drive letters resolved: ESP={Esp}, OS={Os}", config.EspDriveLetter, partLetter[0]);
-
-            return $"{partLetter}:\\";
+            char esp = await _driveLetter.QueryActualDriveLetterAsync(diskNum, _currentConfig.EspVolumeId);
+            _currentConfig = _currentConfig with { EspDriveLetter = esp, OsDriveLetter = letter[0] };
         }
         else
         {
             throw new InvalidOperationException("No target partition for drive letter resolution");
         }
+
+        _logger.Debug("Orchestrator", "Drive letters resolved: ESP={Esp}, OS={Os}",
+            _currentConfig.EspDriveLetter, _currentConfig.OsDriveLetter);
     }
 
     private void LogDeploymentConfig()
     {
-        var c = _ctx.Config;
-        _ctx.Logger.Debug("DeployConfig", "══════ Deployment Configuration ══════");
-
-        _ctx.Logger.Debug("DeployConfig", "[ImageInfo]  Source={Src}", c.SrcImageFile);
-        _ctx.Logger.Debug("DeployConfig", "[ImageInfo]  Index={Idx}, Arch={Arch}, Build={Build}, Expanded Size={ExpandedSize}GB",
-            c.ImageSelectedIndex, c.ImageWindowsArch, c.ImageWinBuildNum, c.ImageExpandedSize);
-
-        _ctx.Logger.Debug("DeployConfig", "[DiskInfo]   Disk #{Id}, Size={Size:N0} bytes",
-            c.DiskSelectedId, c.DiskSizeBytes);
-
-        _ctx.Logger.Debug("DeployConfig", "[InstType]   Installation Type: {InstType}",
-            c.IsCleanInstall ? "Clean Install" : "Partition Install");
-
+        var c = _currentConfig;
+        _logger.Debug("DeployConfig", "══════ Deployment Configuration ══════");
+        _logger.Debug("DeployConfig", "[Image] Source={Src}", c.SrcImageFile);
+        _logger.Debug("DeployConfig", "[Image] Index={Idx}, Arch={Arch}, Build={Build}",
+            c.ImageSelectedIndex, c.ImageWindowsArch, c.ImageWinBuildNum);
+        _logger.Debug("DeployConfig", "[Disk]  #{Id}, Clean={Clean}, Size={Size:N0} bytes",
+            c.DiskSelectedId, c.IsCleanInstall, c.DiskSizeBytes);
         if (c.IsCleanInstall)
         {
-            _ctx.Logger.Debug("DeployConfig", "[DiskLayout] ESP Size={Efi}MB, OS Size={Os:F2}GB/{Max:F2}GB, OS Label={Lbl}",
+            _logger.Debug("DeployConfig", "[Part] EFI={Efi}MB, OS={Os:F2}GB/{Max:F2}GB, Label={Lbl}",
                 c.EfiPartSize, c.OsDriveSize, c.MaxOsDriveSize, c.OsDriveLabel);
-            if (c.EnableReservedVol)
-            {
-                _ctx.Logger.Debug("DeployConfig", "[DiskLayout] Reserved Label={RLbl}, Reserved FS={RFs}",
-                    c.ReservedDriveLabel, c.ReservedDriveFs.ToUpperInvariant());
-            }
+            _logger.Debug("DeployConfig", "[Part] Reserved={Res}, RsvLabel={RLbl}, RsvFS={RFs}",
+                c.EnableReservedVol, c.ReservedDriveLabel, c.ReservedDriveFs);
         }
         else
         {
-            _ctx.Logger.Debug("DeployConfig", "[PartInfo]   ESP=#{EspVolId}, OS=#{OsVolId}, OS Letter={Letter}",
+            _logger.Debug("DeployConfig", "[Part] ESP=#{EspId}, OS=#{OsId}, Letter={Ltr}",
                 c.EspVolumeId, c.OsDriveVolumeId, c.SelectedPartitionDriveLetter);
         }
-
-        _ctx.Logger.Debug("DeployConfig", "[PartInfo]   Drive letter assignment: ESP={Esp}:, OS={Os}:",
-            c.EspDriveLetter, c.OsDriveLetter);
-
-        _ctx.Logger.Debug("DeployConfig", "[PartInfo]   OS Drive Settings: NoDefaultDriveLetter={N}, RemoveOsDriveLetter={R}",
-            c.NoDefaultDriveLetter, c.AutoRemoveOsDriveLetter);
-
-        _ctx.Logger.Debug("DeployConfig", "[SystemSets] HideLocalDisks={H}, PreventDeviceEncryption={P}",
+        _logger.Debug("DeployConfig", "[Letter] ESP={Esp}:, OS={Os}:, NoDefault={N}, AutoRemove={A}",
+            c.EspDriveLetter, c.OsDriveLetter, c.NoDefaultDriveLetter, c.AutoRemoveOsDriveLetter);
+        _logger.Debug("DeployConfig", "[Driver] Enabled={E}, Path={P}, ForceUnsigned={F}",
+            c.DriverIntegrationEnabled, c.DriversDirectoryPath ?? "(none)", c.ForceUnsignedDriver);
+        _logger.Debug("DeployConfig", "[Ans]   Custom={C}, Path={P}, CleanBuiltin={B}",
+            c.CustomAnsFileEnabled, c.AnsFilePath ?? "(none)", c.CleanImageAnsFile);
+        _logger.Debug("DeployConfig", "[WTG]   SanPolicy={S}, NoEncrypt={E}",
             c.HideLocalDisks, c.PreventDeviceEncryption);
-
-        _ctx.Logger.Debug("DeployConfig", "[DplyOption] UseDismToDeploy={Dism}", c.UseDismToDeploy);
-
-        if (c.DriverIntegrationEnabled)
-        {
-            _ctx.Logger.Debug("DeployConfig", "[DriverInt]  Drivers Path={P}, ForceUnsigned={F}",
-                c.DriversDirectoryPath ?? "(none)", c.ForceUnsignedDriver);
-        }
-
-        if (c.CustomAnsFileEnabled)
-        {
-            _ctx.Logger.Debug("DeployConfig", "[AnsFile]    Answer File Path={P}, CleanImageAnsFile={C}",
-                c.AnsFilePath ?? "(none)", c.CleanImageAnsFile);
-        }
-
-        _ctx.Logger.Debug("DeployConfig", "[BCDBoot]    Verbose Output={V}, BootEx={Ex}",
-            c.EnableBootVerbose, c.EnableBootEx);
-
-        _ctx.Logger.Debug("DeployConfig", "════════════════════════════════════");
+        _logger.Debug("DeployConfig", "[Boot]  BootEx={Ex}, Verbose={V}",
+            c.EnableBootEx, c.EnableBootVerbose);
+        _logger.Debug("DeployConfig", "════════════════════════════════════");
     }
 }

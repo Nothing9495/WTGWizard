@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
+using WTGWizard.Main.DeploymentCore.Contracts;
 using WTGWizard.Main.DeploymentCore.Models;
 
 namespace WTGWizard.Main.DeploymentCore.Builders;
