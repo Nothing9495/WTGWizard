@@ -14,4 +14,7 @@ public sealed record WorkerExecutionResult
 
     public static WorkerExecutionResult Fail(int exitCode, string error)
         => new() { Success = false, ExitCode = exitCode, ErrorMessage = error };
+
+    public static WorkerExecutionResult Cancelled()
+        => new() { Success = false, ExitCode = -1, ErrorMessage = "Cancelled" };
 }

@@ -44,6 +44,7 @@ public sealed class WimService : IWimService
     {
         _logger = logger;
         EnsureInitialized();
+        _logger.Debug("WimService", "WimService initialized");
     }
 
     // ══════════════════════════════════════════════════════

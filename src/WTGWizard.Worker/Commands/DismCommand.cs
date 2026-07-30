@@ -16,13 +16,14 @@ internal static class DismCommand
     {
         string dismArgs = CommandArgs.GetArg(args, "--args");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
+        int timeoutMs = int.TryParse(CommandArgs.TryGetArg(args, "--timeout"), out var t) ? t : 0;
 
         using var pipe = PipeHelper.Connect(pipeName);
         pipe.WriteRunning("dism", $"Executing DISM: {dismArgs}");
 
         try
         {
-            int exitCode = ProcessRunner.Run("dism.exe", dismArgs);
+            int exitCode = ProcessRunner.Run("dism.exe", dismArgs, timeoutMs);
 
             if (exitCode == 0)
                 pipe.WriteCompleted("dism", 0);
