@@ -1,11 +1,13 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using WTGWizard.Main.DeploymentCore.Builders;
 using WTGWizard.Main.DeploymentCore.Models;
 using WTGWizard.Main.DeploymentCore.Orchestrator;
 using WTGWizard.Main.DeploymentCore.Steps;
 using WTGWizard.Main.DeploymentCore.Worker;
+using WTGWizard.Messages;
 using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
 
@@ -121,9 +123,14 @@ public sealed partial class WizardViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 请求导航到任务执行页（由 MainWindow 处理）。
+    /// 取走并清空当前 Orchestrator（由 TaskPage 在部署开始时调用，防止重复部署）。
     /// </summary>
-    public event Action? NavigateToTaskRequested;
+    public DeploymentOrchestrator? TakeOrchestrator()
+    {
+        var orchestrator = Orchestrator;
+        Orchestrator = null;
+        return orchestrator;
+    }
 
     [RelayCommand]
     private void StartDeploy()
@@ -145,7 +152,7 @@ public sealed partial class WizardViewModel : ObservableObject
         Orchestrator = new DeploymentOrchestrator(pipeline, config, _driveLetterService, _logger,
             worker, commands, tempFiles);
         IsDeploying = true;
-        NavigateToTaskRequested?.Invoke();
+        WeakReferenceMessenger.Default.Send(new NavigateToPageMessage("TaskPage"));
     }
 
     private DeploymentConfig BuildDeploymentConfig()

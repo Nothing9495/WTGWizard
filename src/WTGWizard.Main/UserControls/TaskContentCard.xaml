@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UserControl x:Class="WTGWizard.UserControls.TaskContentCard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             PointerEntered="OnPointerEntered"
+             PointerExited="OnPointerExited"
+             mc:Ignorable="d">
+
+  <Grid>
+    <!--  卡片主体（三列布局）  -->
+    <Grid x:Name="RootGrid"
+          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+          CornerRadius="{x:Bind CornerRadius, Mode=OneWay}">
+
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <!--  左侧图标：固定默认图标  -->
+      <FontIcon Grid.Column="0"
+                Margin="16"
+                FontSize="20"
+                Glyph="&#xF7EC;"
+                Foreground="{StaticResource AccentFillColorDefaultBrush}" />
+
+      <!--  文本区域  -->
+      <StackPanel Grid.Column="1" Margin="0,12,12,12" VerticalAlignment="Center" Spacing="4">
+        <TextBlock x:Name="HeaderTextBlock"
+                   FontWeight="SemiBold"
+                   Style="{StaticResource BodyStrongTextBlockStyle}"
+                   Text="{x:Bind Header, Mode=OneWay}"
+                   TextWrapping="WrapWholeWords" />
+        <TextBlock x:Name="DescriptionTextBlock"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Description, Mode=OneWay}"
+                   TextWrapping="WrapWholeWords">
+          <ToolTipService.ToolTip>
+            <ToolTip Content="{x:Bind Description, Mode=OneWay}"
+                     Visibility="{x:Bind DescriptionTextBlock.IsTextTrimmed, Mode=OneWay}" />
+          </ToolTipService.ToolTip>
+        </TextBlock>
+      </StackPanel>
+
+      <!--  右侧状态区域  -->
+      <Grid Grid.Column="2" Width="24" Height="24"
+            VerticalAlignment="Center" Margin="0,16,16,16">
+        <!--  执行中 + 无进度：不确定进度环  -->
+        <ProgressRing IsActive="True"
+                      IsIndeterminate="True"
+                      Width="20" Height="20"
+                      Visibility="{x:Bind ShowIndeterminateProgress, Mode=OneWay}" />
+        <!--  执行中 + 有进度：确定进度环  -->
+        <ProgressRing IsActive="True"
+                      IsIndeterminate="False"
+                      Value="{x:Bind ProgressValue, Mode=OneWay}"
+                      Width="20" Height="20"
+                      Visibility="{x:Bind ShowDeterminateProgress, Mode=OneWay}" />
+        <!--  完成：绿色勾选  -->
+        <FontIcon FontSize="20"
+                  Glyph="&#xE8FB;"
+                  Foreground="Green"
+                  Visibility="{x:Bind ShowCompletedIcon, Mode=OneWay}" />
+        <!--  失败：红色错误  -->
+        <FontIcon FontSize="20"
+                  Glyph="&#xEDAE;"
+                  Foreground="Red"
+                  Visibility="{x:Bind ShowFailedIcon, Mode=OneWay}" />
+      </Grid>
+    </Grid>
+
+    <!--  悬浮高亮遮罩  -->
+    <Border x:Name="HoverOverlay"
+            Background="Transparent"
+            CornerRadius="{x:Bind CornerRadius, Mode=OneWay}"
+            IsHitTestVisible="False" />
+  </Grid>
+</UserControl>
