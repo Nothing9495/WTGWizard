@@ -7,7 +7,8 @@ param(
 
 $ErrorActionPreference = "Stop";
 
-dotnet publish src/WTGWizard.Worker -c Release -r "win-$Architecture" -o "$Output" -p:Platform=$Architecture -p:Version=$WorkerVer;
+Remove-Item $Output -Recurse -Force;
+dotnet publish src/WTGWizard.Worker -c Release -r "win-$Architecture" -p:Platform=$Architecture -p:Version=$WorkerVer;
 dotnet publish src/WTGWizard.Main -c Release -r "win-$Architecture" -o "$Output" -p:Platform=$Architecture -p:Version=$MainVer;
 
 Remove-Item "$Output/WTGWizard.*.pdb" -Force;
