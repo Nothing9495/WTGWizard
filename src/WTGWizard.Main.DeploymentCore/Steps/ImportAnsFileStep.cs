@@ -9,7 +9,9 @@ namespace WTGWizard.Main.DeploymentCore.Steps;
 
 public sealed class ImportAnsFileStep : Contracts.IDeploymentStep
 {
-    public DeployTaskId TaskId => DeployTaskId.ImportAns;
+    public DeployTaskId TaskId => DeployTaskId.ImportAnswerFile;
+    public string TitleKey => "Task.ImportAnswerFile.Title";
+    public string DescriptionKey => "Task.ImportAnswerFile.Desc";
     public bool ShouldRun(DeploymentConfig config)
         => config.CustomAnsFileEnabled && !string.IsNullOrWhiteSpace(config.AnsFilePath);
 

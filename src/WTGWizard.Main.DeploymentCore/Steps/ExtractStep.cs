@@ -8,7 +8,9 @@ namespace WTGWizard.Main.DeploymentCore.Steps;
 
 public sealed class ExtractStep : Contracts.IDeploymentStep
 {
-    public DeployTaskId TaskId => DeployTaskId.Extract;
+    public DeployTaskId TaskId => DeployTaskId.ExtractImage;
+    public string TitleKey => "Task.ExtractImage.Title";
+    public string DescriptionKey => "Task.ExtractImage.Desc";
     public bool ShouldRun(DeploymentConfig config) => true;
 
     public async Task<StepResult> ExecuteAsync(Contracts.IStepContext ctx, CancellationToken ct)

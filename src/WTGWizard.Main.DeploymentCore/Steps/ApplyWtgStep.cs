@@ -10,7 +10,9 @@ namespace WTGWizard.Main.DeploymentCore.Steps;
 
 public sealed class ApplyWtgStep : Contracts.IDeploymentStep
 {
-    public DeployTaskId TaskId => DeployTaskId.ApplyWtg;
+    public DeployTaskId TaskId => DeployTaskId.ApplySysSettings;
+    public string TitleKey => "Task.ApplySysSettings.Title";
+    public string DescriptionKey => "Task.ApplySysSettings.Desc";
     public bool ShouldRun(DeploymentConfig config)
         => config.HideLocalDisks || config.PreventDeviceEncryption;
 

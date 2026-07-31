@@ -9,7 +9,9 @@ namespace WTGWizard.Main.DeploymentCore.Steps;
 
 public sealed class CleanupStep : Contracts.IDeploymentStep
 {
-    public DeployTaskId TaskId => DeployTaskId.RemoveLetter;
+    public DeployTaskId TaskId => DeployTaskId.RemoveDriveLetters;
+    public string TitleKey => "Task.RemoveDriveLetters.Title";
+    public string DescriptionKey => "Task.RemoveDriveLetters.Desc.Esp";
     public bool ShouldRun(DeploymentConfig config) => true;
 
     public async Task<StepResult> ExecuteAsync(Contracts.IStepContext ctx, CancellationToken ct)

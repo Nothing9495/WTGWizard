@@ -17,5 +17,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\WTGWizard.Shared.Services\WTGWizard.Shared.Services.csproj" />
 		<ProjectReference Include="..\WTGWizard.Shared.Common\WTGWizard.Shared.Common.csproj" />
+		<ProjectReference Include="..\WTGWizard.Main.Language\WTGWizard.Main.Language.csproj" />
 	</ItemGroup>
 </Project>

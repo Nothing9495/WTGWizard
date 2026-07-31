@@ -27,6 +27,7 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
     private DeploymentConfig _currentConfig;
 
     public IObservable<TaskUpdate> Progress => _subject;
+    public IObservable<string> TerminalOutput => _worker.Output;
     public ObservableCollection<DeployTaskItem> Tasks => _tasks;
 
     public DeploymentOrchestrator(
@@ -86,7 +87,7 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
                 if (!result.IsSuccess)
                     return DeploymentResult.Failed(step.TaskId, result.ErrorMessage ?? "Unknown error");
 
-                if (step.TaskId == DeployTaskId.Partition)
+                if (step.TaskId == DeployTaskId.CreateDiskLayout)
                     await ResolveDriveLettersAsync();
             }
 

@@ -8,6 +8,8 @@ namespace WTGWizard.Main.DeploymentCore.Orchestrator;
 public abstract class DeploymentStepBase : Contracts.IDeploymentStep
 {
     public abstract DeployTaskId TaskId { get; }
+    public abstract string TitleKey { get; }
+    public abstract string DescriptionKey { get; }
     public abstract bool ShouldRun(DeploymentConfig config);
 
     protected abstract Task<StepResult> ExecuteCoreAsync(Contracts.IStepContext ctx, CancellationToken ct);

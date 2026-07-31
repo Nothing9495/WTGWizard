@@ -9,7 +9,9 @@ namespace WTGWizard.Main.DeploymentCore.Steps;
 
 public sealed class BcdbootStep : Contracts.IDeploymentStep
 {
-    public DeployTaskId TaskId => DeployTaskId.CreateBoot;
+    public DeployTaskId TaskId => DeployTaskId.CreateBootFiles;
+    public string TitleKey => "Task.CreateBootFiles.Title";
+    public string DescriptionKey => "Task.CreateBootFiles.Desc";
     public bool ShouldRun(DeploymentConfig config) => true;
 
     public async Task<StepResult> ExecuteAsync(Contracts.IStepContext ctx, CancellationToken ct)

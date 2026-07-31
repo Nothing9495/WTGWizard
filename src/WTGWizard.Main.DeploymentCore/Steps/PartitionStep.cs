@@ -9,7 +9,9 @@ namespace WTGWizard.Main.DeploymentCore.Steps;
 
 public sealed class PartitionStep : Contracts.IDeploymentStep
 {
-    public DeployTaskId TaskId => DeployTaskId.Partition;
+    public DeployTaskId TaskId => DeployTaskId.CreateDiskLayout;
+    public string TitleKey => "Task.CreateDiskLayout.Title";
+    public string DescriptionKey => "Task.CreateDiskLayout.Desc";
     public bool ShouldRun(DeploymentConfig config) => true;
 
     public async Task<StepResult> ExecuteAsync(Contracts.IStepContext ctx, CancellationToken ct)

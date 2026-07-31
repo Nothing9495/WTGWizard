@@ -10,7 +10,9 @@ namespace WTGWizard.Main.DeploymentCore.Steps;
 
 public sealed class DriverStep : Contracts.IDeploymentStep
 {
-    public DeployTaskId TaskId => DeployTaskId.Drivers;
+    public DeployTaskId TaskId => DeployTaskId.IntegrateDrivers;
+    public string TitleKey => "Task.IntegrateDrivers.Title";
+    public string DescriptionKey => "Task.IntegrateDrivers.Desc";
     public bool ShouldRun(DeploymentConfig config)
         => config.DriverIntegrationEnabled && !string.IsNullOrWhiteSpace(config.DriversDirectoryPath);
 
