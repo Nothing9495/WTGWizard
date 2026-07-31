@@ -601,4 +601,67 @@ This setting is available only on Windows 11 version 26100.8037 and later.</valu
   <data name="Page.WizStep.Confirm.OsSize.Auto" xml:space="preserve">
     <value>Auto (Use All Space)</value>
   </data>
+  <data name="Page.Task.DiskPerf.NumberLabel" xml:space="preserve">
+    <value>Disk #</value>
+  </data>
+  <data name="Page.Task.DiskPerf.BusyLabel" xml:space="preserve">
+    <value>Disk Busy</value>
+  </data>
+  <data name="Page.Task.DiskPerf.ReadWriteLabel" xml:space="preserve">
+    <value>Disk R/W</value>
+  </data>
+  <data name="Page.Task.WrapToggle" xml:space="preserve">
+    <value>Word Wrap</value>
+  </data>
+  <data name="Page.Task.FreezeToggle" xml:space="preserve">
+    <value>Freeze Output</value>
+  </data>
+  <data name="Page.Task.AbortButton" xml:space="preserve">
+    <value>Abort</value>
+  </data>
+  <data name="Task.CreateDiskLayout.Title" xml:space="preserve">
+    <value>Create disk layout</value>
+  </data>
+  <data name="Task.CreateDiskLayout.Desc" xml:space="preserve">
+    <value>Create EFI system partition and primary partition</value>
+  </data>
+  <data name="Task.ExtractImage.Title" xml:space="preserve">
+    <value>Extract image</value>
+  </data>
+  <data name="Task.ExtractImage.Desc" xml:space="preserve">
+    <value>Extract Windows image to target partition.</value>
+  </data>
+  <data name="Task.IntegrateDrivers.Title" xml:space="preserve">
+    <value>Integrate drivers</value>
+  </data>
+  <data name="Task.IntegrateDrivers.Desc" xml:space="preserve">
+    <value>Integrate drivers into Windows.</value>
+  </data>
+  <data name="Task.ImportAnswerFile.Title" xml:space="preserve">
+    <value>Import answer file</value>
+  </data>
+  <data name="Task.ImportAnswerFile.Desc" xml:space="preserve">
+    <value>Import new answer file.</value>
+  </data>
+  <data name="Task.ApplySysSettings.Title" xml:space="preserve">
+    <value>Apply Windows settings</value>
+  </data>
+  <data name="Task.ApplySysSettings.Desc" xml:space="preserve">
+    <value>Apply Windows To Go settings</value>
+  </data>
+  <data name="Task.CreateBootFiles.Title" xml:space="preserve">
+    <value>Create boot files</value>
+  </data>
+  <data name="Task.CreateBootFiles.Desc" xml:space="preserve">
+    <value>Create Windows boot files.</value>
+  </data>
+  <data name="Task.RemoveDriveLetters.Title" xml:space="preserve">
+    <value>Remove drive letters</value>
+  </data>
+  <data name="Task.RemoveDriveLetters.Desc.Esp" xml:space="preserve">
+    <value>Remove ESP drive letter.</value>
+  </data>
+  <data name="Task.RemoveDriveLetters.Desc.EspOs" xml:space="preserve">
+    <value>Remove ESP and OS drive letters.</value>
+  </data>
 </root>

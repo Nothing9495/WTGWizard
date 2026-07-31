@@ -602,4 +602,67 @@
   <data name="Page.WizStep.Confirm.OsSize.Auto" xml:space="preserve">
     <value>自动 (使用全部空间)</value>
   </data>
+  <data name="Page.Task.DiskPerf.NumberLabel" xml:space="preserve">
+    <value>磁盘编号</value>
+  </data>
+  <data name="Page.Task.DiskPerf.BusyLabel" xml:space="preserve">
+    <value>磁盘活动</value>
+  </data>
+  <data name="Page.Task.DiskPerf.ReadWriteLabel" xml:space="preserve">
+    <value>磁盘读写</value>
+  </data>
+  <data name="Page.Task.WrapToggle" xml:space="preserve">
+    <value>自动换行</value>
+  </data>
+  <data name="Page.Task.FreezeToggle" xml:space="preserve">
+    <value>冻结输出</value>
+  </data>
+  <data name="Page.Task.AbortButton" xml:space="preserve">
+    <value>终止</value>
+  </data>
+  <data name="Task.CreateDiskLayout.Title" xml:space="preserve">
+    <value>创建磁盘布局</value>
+  </data>
+  <data name="Task.CreateDiskLayout.Desc" xml:space="preserve">
+    <value>创建 EFI 系统分区和主分区</value>
+  </data>
+  <data name="Task.ExtractImage.Title" xml:space="preserve">
+    <value>提取映像</value>
+  </data>
+  <data name="Task.ExtractImage.Desc" xml:space="preserve">
+    <value>将 Windows 映像释放到目标分区</value>
+  </data>
+  <data name="Task.IntegrateDrivers.Title" xml:space="preserve">
+    <value>集成驱动</value>
+  </data>
+  <data name="Task.IntegrateDrivers.Desc" xml:space="preserve">
+    <value>集成驱动程序到目标系统</value>
+  </data>
+  <data name="Task.ImportAnswerFile.Title" xml:space="preserve">
+    <value>导入应答文件</value>
+  </data>
+  <data name="Task.ImportAnswerFile.Desc" xml:space="preserve">
+    <value>导入自定义应答文件</value>
+  </data>
+  <data name="Task.ApplySysSettings.Title" xml:space="preserve">
+    <value>应用系统设置</value>
+  </data>
+  <data name="Task.ApplySysSettings.Desc" xml:space="preserve">
+    <value>应用 Windows To Go 设置</value>
+  </data>
+  <data name="Task.CreateBootFiles.Title" xml:space="preserve">
+    <value>创建引导文件</value>
+  </data>
+  <data name="Task.CreateBootFiles.Desc" xml:space="preserve">
+    <value>创建 Windows 引导文件</value>
+  </data>
+  <data name="Task.RemoveDriveLetters.Title" xml:space="preserve">
+    <value>移除盘符</value>
+  </data>
+  <data name="Task.RemoveDriveLetters.Desc.Esp" xml:space="preserve">
+    <value>移除 ESP 盘符</value>
+  </data>
+  <data name="Task.RemoveDriveLetters.Desc.EspOs" xml:space="preserve">
+    <value>移除 ESP 和 OS 盘符</value>
+  </data>
 </root>

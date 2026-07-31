@@ -1503,5 +1503,131 @@ namespace WTGWizard.Main.Language {
                 return ResourceManager.GetString("UsrCtrl.ImageInfoCard.VersionLabel", resourceCulture);
             }
         }
+        
+        public static string Page_Task_DiskPerf_NumberLabel {
+            get {
+                return ResourceManager.GetString("Page.Task.DiskPerf.NumberLabel", resourceCulture);
+            }
+        }
+        
+        public static string Page_Task_DiskPerf_BusyLabel {
+            get {
+                return ResourceManager.GetString("Page.Task.DiskPerf.BusyLabel", resourceCulture);
+            }
+        }
+        
+        public static string Page_Task_DiskPerf_ReadWriteLabel {
+            get {
+                return ResourceManager.GetString("Page.Task.DiskPerf.ReadWriteLabel", resourceCulture);
+            }
+        }
+        
+        public static string Page_Task_WrapToggle {
+            get {
+                return ResourceManager.GetString("Page.Task.WrapToggle", resourceCulture);
+            }
+        }
+        
+        public static string Page_Task_FreezeToggle {
+            get {
+                return ResourceManager.GetString("Page.Task.FreezeToggle", resourceCulture);
+            }
+        }
+        
+        public static string Page_Task_AbortButton {
+            get {
+                return ResourceManager.GetString("Page.Task.AbortButton", resourceCulture);
+            }
+        }
+        
+        public static string Task_CreateDiskLayout_Title {
+            get {
+                return ResourceManager.GetString("Task.CreateDiskLayout.Title", resourceCulture);
+            }
+        }
+        
+        public static string Task_CreateDiskLayout_Desc {
+            get {
+                return ResourceManager.GetString("Task.CreateDiskLayout.Desc", resourceCulture);
+            }
+        }
+        
+        public static string Task_ExtractImage_Title {
+            get {
+                return ResourceManager.GetString("Task.ExtractImage.Title", resourceCulture);
+            }
+        }
+        
+        public static string Task_ExtractImage_Desc {
+            get {
+                return ResourceManager.GetString("Task.ExtractImage.Desc", resourceCulture);
+            }
+        }
+        
+        public static string Task_IntegrateDrivers_Title {
+            get {
+                return ResourceManager.GetString("Task.IntegrateDrivers.Title", resourceCulture);
+            }
+        }
+        
+        public static string Task_IntegrateDrivers_Desc {
+            get {
+                return ResourceManager.GetString("Task.IntegrateDrivers.Desc", resourceCulture);
+            }
+        }
+        
+        public static string Task_ImportAnswerFile_Title {
+            get {
+                return ResourceManager.GetString("Task.ImportAnswerFile.Title", resourceCulture);
+            }
+        }
+        
+        public static string Task_ImportAnswerFile_Desc {
+            get {
+                return ResourceManager.GetString("Task.ImportAnswerFile.Desc", resourceCulture);
+            }
+        }
+        
+        public static string Task_ApplySysSettings_Title {
+            get {
+                return ResourceManager.GetString("Task.ApplySysSettings.Title", resourceCulture);
+            }
+        }
+        
+        public static string Task_ApplySysSettings_Desc {
+            get {
+                return ResourceManager.GetString("Task.ApplySysSettings.Desc", resourceCulture);
+            }
+        }
+        
+        public static string Task_CreateBootFiles_Title {
+            get {
+                return ResourceManager.GetString("Task.CreateBootFiles.Title", resourceCulture);
+            }
+        }
+        
+        public static string Task_CreateBootFiles_Desc {
+            get {
+                return ResourceManager.GetString("Task.CreateBootFiles.Desc", resourceCulture);
+            }
+        }
+        
+        public static string Task_RemoveDriveLetters_Title {
+            get {
+                return ResourceManager.GetString("Task.RemoveDriveLetters.Title", resourceCulture);
+            }
+        }
+        
+        public static string Task_RemoveDriveLetters_Desc_Esp {
+            get {
+                return ResourceManager.GetString("Task.RemoveDriveLetters.Desc.Esp", resourceCulture);
+            }
+        }
+        
+        public static string Task_RemoveDriveLetters_Desc_EspOs {
+            get {
+                return ResourceManager.GetString("Task.RemoveDriveLetters.Desc.EspOs", resourceCulture);
+            }
+        }
     }
 }
