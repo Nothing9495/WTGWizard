@@ -198,7 +198,7 @@ public sealed partial class WizardViewModel : ObservableObject
         {
             // ── 映像 ──
             SrcImageFile = Image.FilePath,
-            ImageSelectedIndex = Image.SelectedIndex,
+            ImageSelectedIndex = Image.WimIndex,
             ImageWindowsArch = imageInfo.Architecture,
             ImageWinBuildNum = imageInfo.BuildNumber,
             ImageExpandedSize = imageInfo.ExpandedSizeGB,
