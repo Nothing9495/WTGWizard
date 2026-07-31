@@ -8,6 +8,7 @@ using WTGWizard.Main.DeploymentCore.Builders;
 using WTGWizard.Main.DeploymentCore.Contracts;
 using WTGWizard.Main.DeploymentCore.Models;
 using WTGWizard.Main.DeploymentCore.Worker;
+using WTGWizard.Main.Language;
 using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
 using static WTGWizard.Main.DeploymentCore.Models.DeploymentConstants;
@@ -55,12 +56,17 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
         _commands = commands;
         _tempFiles = tempFiles;
         _tasks = new ObservableCollection<DeployTaskItem>(
-            _pipeline.ActiveTasks(config).Select(id => new DeployTaskItem
-            {
-                Id = id.Value,
-                Title = id.Value,
-                Description = id.Value
-            }));
+            _pipeline.Steps
+                .Where(s => s.ShouldRun(config))
+                .Select(s => new DeployTaskItem
+                {
+                    Id = s.TaskId.Value,
+                    Title = Localization.GetString(s.TitleKey),
+                    Description = Localization.GetString(
+                        s.TaskId == DeployTaskId.RemoveDriveLetters && config.AutoRemoveOsDriveLetter
+                            ? "Task.RemoveDriveLetters.Desc.EspOs"
+                            : s.DescriptionKey)
+                }));
 
         _logger.Debug("Orchestrator", "Pipeline: {Steps}",
             string.Join(" → ", _tasks.Select(t => t.Id)));
