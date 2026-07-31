@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="WTGWizard.UserControls.TerminalBox"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
+          BorderBrush="{ThemeResource CardStrokeColorDefault}"
+          BorderThickness="1" CornerRadius="8" Padding="8">
+    <ScrollViewer x:Name="OutputScrollViewer"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Auto"
+                  ViewChanged="OutputScrollViewer_ViewChanged"
+                  PointerPressed="OutputScrollViewer_PointerPressed"
+                  PointerWheelChanged="OutputScrollViewer_PointerWheelChanged">
+      <RichTextBlock x:Name="OutputRichTextBlock"
+                     MinHeight="200"
+                     IsTextSelectionEnabled="True"
+                     FontFamily="Cascadia Code, Consolas, Microsoft YaHei UI, monospace"
+                     FontSize="13"
+                     TextWrapping="{x:Bind TerminalTextWrapping, Mode=OneWay}"
+                     Foreground="{x:Bind Foreground, Mode=OneWay}"
+                     Margin="0,0,0,13" />
+    </ScrollViewer>
+  </Border>
+</UserControl>
