@@ -3,8 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using WTGWizard.Helpers;
 using WTGWizard.Messages;
 using WTGWizard.Pages;
@@ -52,8 +54,29 @@ public sealed partial class MainWindow : Window
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(AppTitleBar);
         this.AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
-        //修复任务栏缩略图不显示图标
-        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "AppLogo.ico"));
+        //标题栏图标与系统菜单由系统从窗口图标绘制
+        this.AppWindow.TitleBar.IconShowOptions = IconShowOptions.ShowIconAndSystemMenu;
+        //任务栏/Alt+Tab/任务栏缩略图图标（实验1：MAUI 方式 ExtractAssociatedIcon + SetIcon(IconId)）
+        WindowHelper.SetIcon(this);
+        //标题栏图标（从 exe 内嵌资源加载）
+        _ = SetTitleBarIconAsync();
+    }
+
+    private async Task SetTitleBarIconAsync()
+    {
+        try
+        {
+            using var stream = typeof(MainWindow).Assembly.GetManifestResourceStream("WTGWizard.Assets.AppLogo.ico");
+            if (stream is null)
+                return;
+            using var memStream = new MemoryStream();
+            await stream.CopyToAsync(memStream);
+            memStream.Position = 0;
+            var bitmap = new BitmapImage();
+            await bitmap.SetSourceAsync(memStream.AsRandomAccessStream());
+            AppTitleBar.IconSource = new ImageIconSource { ImageSource = bitmap };
+        }
+        catch { }
     }
 
     private void AdjustNavigationViewMargin(bool? force = null)

@@ -6,6 +6,7 @@
 		<LangVersion>preview</LangVersion>
 		<RootNamespace>WTGWizard</RootNamespace>
 		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Platforms>x64</Platforms>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
@@ -18,6 +19,11 @@
 	<PropertyGroup>
 		<ApplicationIcon>Assets\AppLogo.ico</ApplicationIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- 图标同时嵌入为 .NET 资源，供运行时标题栏图标使用（无磁盘文件依赖） -->
+		<EmbeddedResource Include="Assets\AppLogo.ico" LogicalName="WTGWizard.Assets.AppLogo.ico" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Manifest Include="$(ApplicationManifest)" />

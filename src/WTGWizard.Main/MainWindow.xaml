@@ -24,9 +24,6 @@
               Title="WTGWizard"
               MinHeight="48"
               IsBackButtonVisible="False">
-      <TitleBar.IconSource>
-        <ImageIconSource ImageSource="ms-appx:///Assets/AppLogo.ico" />
-      </TitleBar.IconSource>
     </TitleBar>
 
     <NavigationView x:Name="NavView" Grid.Row="1"
