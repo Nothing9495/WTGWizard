@@ -30,6 +30,12 @@ static class Program
         var tee = new TeeWriter(stdoutWriter, logFileStream);
         Console.SetOut(tee);
 
+        // stderr 同样包装为 UTF-8 双重输出（stdout 与 stderr 共享日志文件，TeeWriter 内部加锁保证并发安全）
+        var stderrStream = Console.OpenStandardError();
+        var stderrWriter = new System.IO.StreamWriter(stderrStream, new System.Text.UTF8Encoding(false)) { AutoFlush = true };
+        var stderrTee = new TeeWriter(stderrWriter, logFileStream);
+        Console.SetError(stderrTee);
+
         logService.Info("Worker", "Worker started, PID: {Pid}", Environment.ProcessId);
 
         if (args.Length < 2)

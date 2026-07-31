@@ -1,12 +1,13 @@
 using System;
 using System.Diagnostics;
-using System.Text;
 using System.Threading;
+using WTGWizard.Worker.Encoding;
 
 namespace WTGWizard.Worker;
 
 /// <summary>
 /// 外部进程运行器 — 统一的进程启动逻辑。
+/// 输出解码编码由 EncodingResolver 按程序名解析。
 /// </summary>
 internal static class ProcessRunner
 {
@@ -19,6 +20,8 @@ internal static class ProcessRunner
     /// <returns>进程退出码。</returns>
     public static int Run(string fileName, string arguments, int timeoutMs = 0)
     {
+        var encoding = EncodingResolver.Resolve(fileName);
+
         using var process = new Process
         {
             StartInfo = new ProcessStartInfo
@@ -29,8 +32,8 @@ internal static class ProcessRunner
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                StandardOutputEncoding = Encoding.UTF8,
-                StandardErrorEncoding = Encoding.UTF8,
+                StandardOutputEncoding = encoding,
+                StandardErrorEncoding = encoding,
             },
             EnableRaisingEvents = true,
         };

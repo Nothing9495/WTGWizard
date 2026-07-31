@@ -12,6 +12,7 @@ public sealed class TeeWriter : TextWriter
 {
     private readonly TextWriter _stdout;
     private readonly StreamWriter _logFile;
+    private readonly object _lock = new();
 
     public override Encoding Encoding => _stdout.Encoding;
 
@@ -23,27 +24,39 @@ public sealed class TeeWriter : TextWriter
 
     public override void Write(char value)
     {
-        _stdout.Write(value);
-        _logFile.Write(value);
+        lock (_lock)
+        {
+            _stdout.Write(value);
+            _logFile.Write(value);
+        }
     }
 
     public override void Write(string? value)
     {
-        _stdout.Write(value);
-        _logFile.Write(value);
+        lock (_lock)
+        {
+            _stdout.Write(value);
+            _logFile.Write(value);
+        }
     }
 
     public override void WriteLine(string? value)
     {
-        _stdout.WriteLine(value);
-        _logFile.WriteLine(value);
-        _logFile.Flush();
+        lock (_lock)
+        {
+            _stdout.WriteLine(value);
+            _logFile.WriteLine(value);
+            _logFile.Flush();
+        }
     }
 
     public override void Flush()
     {
-        _stdout.Flush();
-        _logFile.Flush();
+        lock (_lock)
+        {
+            _stdout.Flush();
+            _logFile.Flush();
+        }
     }
 
     protected override void Dispose(bool disposing)
