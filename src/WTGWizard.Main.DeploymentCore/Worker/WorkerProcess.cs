@@ -1,11 +1,13 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WTGWizard.Main.DeploymentCore.Contracts;
 using WTGWizard.Main.DeploymentCore.Models;
 using WTGWizard.Shared.Common;
+using WTGWizard.Shared.Services;
 using WTGWizard.Shared.Services.Logger;
 
 namespace WTGWizard.Main.DeploymentCore.Worker;
@@ -56,7 +58,9 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
             {
                 FileName = exePath, Arguments = workerArgs,
                 UseShellExecute = false, CreateNoWindow = true,
-                RedirectStandardOutput = true, RedirectStandardError = true
+                RedirectStandardOutput = true, RedirectStandardError = true,
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8
             };
             psi.Environment.Remove("DOTNET_ROOT");
             psi.Environment.Remove("DOTNET_ROOT(x86)");
@@ -67,6 +71,17 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
                 _logger.Error("WorkerMgr", "Failed to start Worker process");
                 return WorkerExecutionResult.Fail(-1, "Failed to start Worker process");
             }
+
+            process.OutputDataReceived += (_, e) =>
+            {
+                if (e.Data is not null) TerminalOutputBuffer.Shared.Append(e.Data);
+            };
+            process.ErrorDataReceived += (_, e) =>
+            {
+                if (e.Data is not null) TerminalOutputBuffer.Shared.Append($"[ERR] {e.Data}");
+            };
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
 
             await pipeServer.WaitForConnectionAsync(PipeProtocol.ConnectTimeoutMs, cts.Token);
 

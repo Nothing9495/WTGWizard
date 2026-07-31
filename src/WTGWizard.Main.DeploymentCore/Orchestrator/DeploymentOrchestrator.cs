@@ -27,8 +27,19 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
     private DeploymentConfig _currentConfig;
 
     public IObservable<TaskUpdate> Progress => _subject;
-    public IObservable<string> TerminalOutput => _worker.Output;
     public ObservableCollection<DeployTaskItem> Tasks => _tasks;
+
+    /// <summary>目标磁盘编号，供性能监控使用。</summary>
+    public uint DiskNumber
+    {
+        get
+        {
+            int id = _currentConfig.DiskSelectedId;
+            if (id < 0)
+                throw new InvalidOperationException($"Invalid disk number: {id}");
+            return (uint)id;
+        }
+    }
 
     public DeploymentOrchestrator(
         IDeploymentPipeline pipeline, DeploymentConfig config,
