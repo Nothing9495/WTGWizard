@@ -59,7 +59,7 @@
         <Border Grid.Column="0"
                 Background="{ThemeResource CardBackgroundFillColorDefault}"
                 BorderBrush="{ThemeResource CardStrokeColorDefault}"
-                BorderThickness="1" CornerRadius="8" Padding="12,4">
+                BorderThickness="1" CornerRadius="8">
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <TextBlock Text="{x:Bind lang:Lang.Page_Task_DiskPerf_NumberLabel}" VerticalAlignment="Center" Opacity="0.6" />
@@ -89,12 +89,13 @@
                             Checked="WrapToggle_Changed" Unchecked="WrapToggle_Changed" />
               <ToggleButton x:Name="FreezeToggle" Content="{x:Bind lang:Lang.Page_Task_FreezeToggle}" IsChecked="False"
                             Checked="FreezeToggle_Changed" Unchecked="FreezeToggle_Changed" />
+              <Button x:Name="AbortButton" Content="{x:Bind lang:Lang.Page_Task_AbortButton}"
+                      IsEnabled="{x:Bind VM.IsDeploying, Mode=OneWay}"
+                      Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}"
+                      Click="AbortButton_Click"
+                      VerticalAlignment="Stretch" />
             </StackPanel>
           </Border>
-          <Button x:Name="AbortButton" Content="{x:Bind lang:Lang.Page_Task_AbortButton}"
-                  IsEnabled="{x:Bind VM.IsDeploying, Mode=OneWay}"
-                  Click="AbortButton_Click"
-                  VerticalAlignment="Stretch" />
         </StackPanel>
       </Grid>
     </Grid>
