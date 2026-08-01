@@ -44,7 +44,7 @@ public sealed class WimService : IWimService
     {
         _logger = logger;
         EnsureInitialized();
-        _logger.Debug("WimService", "WimService initialized");
+        _logger.Debug("WimService", "WimService: Initialized");
     }
 
     // ══════════════════════════════════════════════════════
@@ -66,18 +66,18 @@ public sealed class WimService : IWimService
         return await Task.Run(() =>
         {
             ct.ThrowIfCancellationRequested();
+            _logger.Debug("WimService", "EnumerateIndicesAsync: imagePath={ImagePath}", imagePath);
             try
             {
                 using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None);
                 var count = (int)wim.GetWimInfo().ImageCount;
                 IReadOnlyList<int> indices = Enumerable.Range(1, count).ToList();
-                _logger.Debug("WimService", "Enumerate indices: {ImagePath}, count={Count}", imagePath, count);
+                _logger.Info("WimService", "EnumerateIndicesAsync: {Count} indices found.", count);
                 return indices;
             }
             catch (Exception ex)
             {
-                _logger.Error("WimService", "OpenWim failed: {ImagePath} — {ErrorType}: {ErrorMessage}", 
-                    imagePath, ex.GetType().Name, ex.Message);
+                _logger.Error("WimService", "EnumerateIndicesAsync: Method failed - ({ErrorType}: {Error}).", ex.GetType().Name, ex.Message);
                 throw;
             }
         });
@@ -89,7 +89,7 @@ public sealed class WimService : IWimService
         return await Task.Run(() =>
         {
             ct.ThrowIfCancellationRequested();
-            _logger.Debug("WimService", "GetImageInfo: index={Index}", index);
+            _logger.Debug("WimService", "GetImageInfo: Reading info for index {Index}", index);
             try
             {
                 using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None);
@@ -103,11 +103,12 @@ public sealed class WimService : IWimService
                 }
 
                 var info = BuildImageInfo(wim, index, foundPaths);
+                _logger.Debug("WimService", "GetImageInfo: Loaded index {Index} info.", index);
                 return info;
             }
             catch (Exception ex)
             {
-                _logger.Error("WimService", "GetImageInfo failed (index {Index}): {ErrorMessage}", index, ex.Message);
+                _logger.Error("WimService", "GetImageInfo: Method failed - ({Error}).", ex.Message);
                 throw;
             }
         });
@@ -119,9 +120,17 @@ public sealed class WimService : IWimService
         await Task.Run(() =>
         {
             ct.ThrowIfCancellationRequested();
-            using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None);
-            wim.VerifyWim();
-            _logger.Debug("WimService", "Verify passed: {ImagePath}", imagePath);
+            try
+            {
+                using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None);
+                wim.VerifyWim();
+                _logger.Info("WimService", "VerifyAsync: Image {ImagePath} passed verification.", imagePath);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("WimService", "VerifyAsync: Method failed - ({Error}).", ex.Message);
+                throw;
+            }
         });
     }
 
@@ -136,11 +145,11 @@ public sealed class WimService : IWimService
                 using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None);
                 Directory.CreateDirectory(targetDir);
                 wim.ExtractPath(index, targetDir, wimFilePath, ExtractFlags.None);
-                _logger.Debug("WimService", "Extract file: {WimFilePath} → {TargetDir}", wimFilePath, targetDir);
+                _logger.Info("WimService", "ExtractFileAsync: Extracted {WimFilePath} to {TargetDir}", wimFilePath, targetDir);
             }
             catch (Exception ex)
             {
-                _logger.Error("WimService", "Extract file failed: {ErrorMessage}", ex.Message);
+                _logger.Error("WimService", "ExtractFileAsync: Method failed - ({Error}).", ex.Message);
                 throw;
             }
         });
@@ -171,9 +180,9 @@ public sealed class WimService : IWimService
             try
             {
                 using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None, OnProgress, null);
-                _logger.Debug("WimService", "ExtractImage #{Index}: {ImagePath} → {TargetDir}", index, imagePath, targetDir);
+                _logger.Info("WimService", "ExtractImage:  - Extracting index {Index} from {ImagePath} to {TargetDir}", index, imagePath, targetDir);
                 wim.ExtractImage(index, targetDir, ExtractFlags.None);
-                _logger.Debug("WimService", "ExtractImage #{Index} completed", index);
+                _logger.Info("WimService", "ExtractImage: {ImagePath} - Index {Index} extraction completed", imagePath, index);
 
                 CallbackStatus OnProgress(ProgressMsg msg, object? info, object? ctx)
                 {
@@ -207,12 +216,12 @@ public sealed class WimService : IWimService
             }
             catch (WimLibException ex) when (ex.ErrorCode == ErrorCode.AbortedByProgress)
             {
-                _logger.Warn("WimService", "ExtractImage cancelled");
+                _logger.Info("WimService", "ExtractImage: Extraction is aborted by progress.");
                 throw new OperationCanceledException(ct);
             }
             catch (Exception ex)
             {
-                _logger.Error("WimService", "ExtractImage failed: {ErrorMessage}", ex.Message);
+                _logger.Error("WimService", "ExtractImage: Method failed - ({Error}).", ex.Message);
                 throw;
             }
         }, ct);
@@ -364,6 +373,10 @@ public sealed class WimService : IWimService
 
     private static readonly Dictionary<string, string> KnownBuilds = new(StringComparer.OrdinalIgnoreCase)
     {
+        // Windows 10 Build
+        ["19041"] = "2004", ["19042"] = "20H2", ["19043"] = "21H1",
+        ["19044"] = "21H2", ["19045"] = "22H2",
+        // Windows 11 Build
         ["22000"] = "21H2", ["22621"] = "22H2", ["22631"] = "23H2",
         ["26100"] = "24H2", ["26200"] = "25H2", ["26300"] = "26H2",
         ["28000"] = "26H1",
