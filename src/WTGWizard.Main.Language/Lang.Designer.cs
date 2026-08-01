@@ -178,6 +178,60 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Abort 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_AbortButton {
+            get {
+                return ResourceManager.GetString("Page.Task.AbortButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Disk Busy 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_DiskPerf_BusyLabel {
+            get {
+                return ResourceManager.GetString("Page.Task.DiskPerf.BusyLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Disk # 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_DiskPerf_NumberLabel {
+            get {
+                return ResourceManager.GetString("Page.Task.DiskPerf.NumberLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Disk R/W 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_DiskPerf_ReadWriteLabel {
+            get {
+                return ResourceManager.GetString("Page.Task.DiskPerf.ReadWriteLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Freeze Output 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_FreezeToggle {
+            get {
+                return ResourceManager.GetString("Page.Task.FreezeToggle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Word Wrap 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_WrapToggle {
+            get {
+                return ResourceManager.GetString("Page.Task.WrapToggle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Try it now! 的本地化字符串。
         /// </summary>
         public static string Page_Welcome_GoWizard_Content {
@@ -242,7 +296,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Answer File Indicator 的本地化字符串。
+        ///   查找类似 In-image Answer File! 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_AdvOptions_AnsFile_Header {
             get {
@@ -251,7 +305,8 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Current image already contains an answer file. Importing a new answer file will overwrite the existing configuration. Enable &quot;Clear in-image answer files&quot; option. 的本地化字符串。
+        ///   查找类似 Current image already contains an answer file. Importing a new answer file will overwrite the existing configuration.
+        ///Enable &quot;Clear in-image answer files&quot; option if you want to use a new answer file. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_AdvOptions_AnsFile_InfoBar {
             get {
@@ -1397,6 +1452,141 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Apply Windows To Go settings 的本地化字符串。
+        /// </summary>
+        public static string Task_ApplySysSettings_Desc {
+            get {
+                return ResourceManager.GetString("Task.ApplySysSettings.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Apply Windows settings 的本地化字符串。
+        /// </summary>
+        public static string Task_ApplySysSettings_Title {
+            get {
+                return ResourceManager.GetString("Task.ApplySysSettings.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Create Windows boot files. 的本地化字符串。
+        /// </summary>
+        public static string Task_CreateBootFiles_Desc {
+            get {
+                return ResourceManager.GetString("Task.CreateBootFiles.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Create boot files 的本地化字符串。
+        /// </summary>
+        public static string Task_CreateBootFiles_Title {
+            get {
+                return ResourceManager.GetString("Task.CreateBootFiles.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Create EFI system partition and primary partition 的本地化字符串。
+        /// </summary>
+        public static string Task_CreateDiskLayout_Desc {
+            get {
+                return ResourceManager.GetString("Task.CreateDiskLayout.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Create disk layout 的本地化字符串。
+        /// </summary>
+        public static string Task_CreateDiskLayout_Title {
+            get {
+                return ResourceManager.GetString("Task.CreateDiskLayout.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Extract Windows image to target partition. 的本地化字符串。
+        /// </summary>
+        public static string Task_ExtractImage_Desc {
+            get {
+                return ResourceManager.GetString("Task.ExtractImage.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Extract image 的本地化字符串。
+        /// </summary>
+        public static string Task_ExtractImage_Title {
+            get {
+                return ResourceManager.GetString("Task.ExtractImage.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Import new answer file. 的本地化字符串。
+        /// </summary>
+        public static string Task_ImportAnswerFile_Desc {
+            get {
+                return ResourceManager.GetString("Task.ImportAnswerFile.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Import answer file 的本地化字符串。
+        /// </summary>
+        public static string Task_ImportAnswerFile_Title {
+            get {
+                return ResourceManager.GetString("Task.ImportAnswerFile.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Integrate drivers into Windows. 的本地化字符串。
+        /// </summary>
+        public static string Task_IntegrateDrivers_Desc {
+            get {
+                return ResourceManager.GetString("Task.IntegrateDrivers.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Integrate drivers 的本地化字符串。
+        /// </summary>
+        public static string Task_IntegrateDrivers_Title {
+            get {
+                return ResourceManager.GetString("Task.IntegrateDrivers.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Remove ESP drive letter. 的本地化字符串。
+        /// </summary>
+        public static string Task_RemoveDriveLetters_Desc_Esp {
+            get {
+                return ResourceManager.GetString("Task.RemoveDriveLetters.Desc.Esp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Remove ESP and OS drive letters. 的本地化字符串。
+        /// </summary>
+        public static string Task_RemoveDriveLetters_Desc_EspOs {
+            get {
+                return ResourceManager.GetString("Task.RemoveDriveLetters.Desc.EspOs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Remove drive letters 的本地化字符串。
+        /// </summary>
+        public static string Task_RemoveDriveLetters_Title {
+            get {
+                return ResourceManager.GetString("Task.RemoveDriveLetters.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Architecture: 的本地化字符串。
         /// </summary>
         public static string UsrCtrl_ImageInfoCard_ArchLabel {
@@ -1501,132 +1691,6 @@ namespace WTGWizard.Main.Language {
         public static string UsrCtrl_ImageInfoCard_VersionLabel {
             get {
                 return ResourceManager.GetString("UsrCtrl.ImageInfoCard.VersionLabel", resourceCulture);
-            }
-        }
-        
-        public static string Page_Task_DiskPerf_NumberLabel {
-            get {
-                return ResourceManager.GetString("Page.Task.DiskPerf.NumberLabel", resourceCulture);
-            }
-        }
-        
-        public static string Page_Task_DiskPerf_BusyLabel {
-            get {
-                return ResourceManager.GetString("Page.Task.DiskPerf.BusyLabel", resourceCulture);
-            }
-        }
-        
-        public static string Page_Task_DiskPerf_ReadWriteLabel {
-            get {
-                return ResourceManager.GetString("Page.Task.DiskPerf.ReadWriteLabel", resourceCulture);
-            }
-        }
-        
-        public static string Page_Task_WrapToggle {
-            get {
-                return ResourceManager.GetString("Page.Task.WrapToggle", resourceCulture);
-            }
-        }
-        
-        public static string Page_Task_FreezeToggle {
-            get {
-                return ResourceManager.GetString("Page.Task.FreezeToggle", resourceCulture);
-            }
-        }
-        
-        public static string Page_Task_AbortButton {
-            get {
-                return ResourceManager.GetString("Page.Task.AbortButton", resourceCulture);
-            }
-        }
-        
-        public static string Task_CreateDiskLayout_Title {
-            get {
-                return ResourceManager.GetString("Task.CreateDiskLayout.Title", resourceCulture);
-            }
-        }
-        
-        public static string Task_CreateDiskLayout_Desc {
-            get {
-                return ResourceManager.GetString("Task.CreateDiskLayout.Desc", resourceCulture);
-            }
-        }
-        
-        public static string Task_ExtractImage_Title {
-            get {
-                return ResourceManager.GetString("Task.ExtractImage.Title", resourceCulture);
-            }
-        }
-        
-        public static string Task_ExtractImage_Desc {
-            get {
-                return ResourceManager.GetString("Task.ExtractImage.Desc", resourceCulture);
-            }
-        }
-        
-        public static string Task_IntegrateDrivers_Title {
-            get {
-                return ResourceManager.GetString("Task.IntegrateDrivers.Title", resourceCulture);
-            }
-        }
-        
-        public static string Task_IntegrateDrivers_Desc {
-            get {
-                return ResourceManager.GetString("Task.IntegrateDrivers.Desc", resourceCulture);
-            }
-        }
-        
-        public static string Task_ImportAnswerFile_Title {
-            get {
-                return ResourceManager.GetString("Task.ImportAnswerFile.Title", resourceCulture);
-            }
-        }
-        
-        public static string Task_ImportAnswerFile_Desc {
-            get {
-                return ResourceManager.GetString("Task.ImportAnswerFile.Desc", resourceCulture);
-            }
-        }
-        
-        public static string Task_ApplySysSettings_Title {
-            get {
-                return ResourceManager.GetString("Task.ApplySysSettings.Title", resourceCulture);
-            }
-        }
-        
-        public static string Task_ApplySysSettings_Desc {
-            get {
-                return ResourceManager.GetString("Task.ApplySysSettings.Desc", resourceCulture);
-            }
-        }
-        
-        public static string Task_CreateBootFiles_Title {
-            get {
-                return ResourceManager.GetString("Task.CreateBootFiles.Title", resourceCulture);
-            }
-        }
-        
-        public static string Task_CreateBootFiles_Desc {
-            get {
-                return ResourceManager.GetString("Task.CreateBootFiles.Desc", resourceCulture);
-            }
-        }
-        
-        public static string Task_RemoveDriveLetters_Title {
-            get {
-                return ResourceManager.GetString("Task.RemoveDriveLetters.Title", resourceCulture);
-            }
-        }
-        
-        public static string Task_RemoveDriveLetters_Desc_Esp {
-            get {
-                return ResourceManager.GetString("Task.RemoveDriveLetters.Desc.Esp", resourceCulture);
-            }
-        }
-        
-        public static string Task_RemoveDriveLetters_Desc_EspOs {
-            get {
-                return ResourceManager.GetString("Task.RemoveDriveLetters.Desc.EspOs", resourceCulture);
             }
         }
     }
