@@ -608,8 +608,11 @@ This setting is available only on Windows 11 version 26100.8037 and later.</valu
   <data name="Page.Task.DiskPerf.BusyLabel" xml:space="preserve">
     <value>Disk Busy</value>
   </data>
-  <data name="Page.Task.DiskPerf.ReadWriteLabel" xml:space="preserve">
-    <value>Disk R/W</value>
+  <data name="Page.Task.DiskPerf.ReadLabel" xml:space="preserve">
+    <value>Read</value>
+  </data>
+  <data name="Page.Task.DiskPerf.WriteLabel" xml:space="preserve">
+    <value>Write</value>
   </data>
   <data name="Page.Task.WrapToggle" xml:space="preserve">
     <value>Word Wrap</value>

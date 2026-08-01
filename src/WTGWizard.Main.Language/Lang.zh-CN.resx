@@ -608,8 +608,11 @@
   <data name="Page.Task.DiskPerf.BusyLabel" xml:space="preserve">
     <value>磁盘活动</value>
   </data>
-  <data name="Page.Task.DiskPerf.ReadWriteLabel" xml:space="preserve">
-    <value>磁盘读写</value>
+  <data name="Page.Task.DiskPerf.ReadLabel" xml:space="preserve">
+    <value>磁盘读取</value>
+  </data>
+  <data name="Page.Task.DiskPerf.WriteLabel" xml:space="preserve">
+    <value>磁盘写入</value>
   </data>
   <data name="Page.Task.WrapToggle" xml:space="preserve">
     <value>自动换行</value>

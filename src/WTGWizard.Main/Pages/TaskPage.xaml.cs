@@ -222,7 +222,8 @@ public sealed partial class TaskPage : Page, ITabActivatable
 
         DiskNumText.Text = "-";
         DiskBusyText.Text = "-";
-        DiskReadWriteText.Text = "-";
+        DiskReadText.Text = "-";
+        DiskWriteText.Text = "-";
     }
 
     private void OnDiskPerfUpdated(DiskPerformanceSnapshot snapshot)
@@ -230,7 +231,8 @@ public sealed partial class TaskPage : Page, ITabActivatable
         DispatcherQueue.TryEnqueue(() =>
         {
             DiskBusyText.Text = snapshot.BusyDisplay;
-            DiskReadWriteText.Text = snapshot.ReadWriteDisplay;
+            DiskReadText.Text = snapshot.ReadDisplay;
+            DiskWriteText.Text = snapshot.WriteDisplay;
         });
     }
 

@@ -205,11 +205,20 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Disk R/W 的本地化字符串。
+        ///   查找类似 Read 的本地化字符串。
         /// </summary>
-        public static string Page_Task_DiskPerf_ReadWriteLabel {
+        public static string Page_Task_DiskPerf_ReadLabel {
             get {
-                return ResourceManager.GetString("Page.Task.DiskPerf.ReadWriteLabel", resourceCulture);
+                return ResourceManager.GetString("Page.Task.DiskPerf.ReadLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Write 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_DiskPerf_WriteLabel {
+            get {
+                return ResourceManager.GetString("Page.Task.DiskPerf.WriteLabel", resourceCulture);
             }
         }
         
