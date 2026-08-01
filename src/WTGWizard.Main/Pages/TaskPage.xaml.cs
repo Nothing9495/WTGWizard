@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,8 +14,10 @@ using WTGWizard.ViewModels;
 
 namespace WTGWizard.Pages;
 
-public sealed partial class TaskPage : Page, ITabActivatable
+public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     private DeploymentOrchestrator? _orchestrator;
     private DiskPerformanceMonitor? _diskMonitor;
     private readonly object _syncRoot = new();
@@ -23,6 +26,19 @@ public sealed partial class TaskPage : Page, ITabActivatable
     private string _lastFlushedSnapshot = string.Empty;
     private bool _isFrozen;
     private bool _isConnected;
+
+    private bool _hasDeployment;
+    /// <summary>是否有进行中的部署（SwitchPresenter 双态界面切换依据）。</summary>
+    public bool HasDeployment
+    {
+        get => _hasDeployment;
+        set
+        {
+            if (_hasDeployment == value) return;
+            _hasDeployment = value;
+            PropertyChanged?.Invoke(this, new(nameof(HasDeployment)));
+        }
+    }
 
     private readonly DispatcherTimer _flushTimer;
 
@@ -63,11 +79,19 @@ public sealed partial class TaskPage : Page, ITabActivatable
         {
             // 返回已有部署页面，重连 UI
             if (_orchestrator is not null)
+            {
+                HasDeployment = true;
                 ConnectUI();
+            }
+            else
+            {
+                HasDeployment = false;
+            }
             return;
         }
 
         // ── 新的 orchestrator：完全重置 ──
+        HasDeployment = true;
         PrepareNewDeployment(incoming);
         _ = RunDeploymentAsync();
     }

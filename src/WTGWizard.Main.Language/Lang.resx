@@ -668,4 +668,10 @@ This setting is available only on Windows 11 version 26100.8037 and later.</valu
   <data name="Task.RemoveDriveLetters.Desc.EspOs" xml:space="preserve">
     <value>Remove ESP and OS drive letters.</value>
   </data>
+  <data name="Page.Task.EmptyTitle" xml:space="preserve">
+    <value>No Deployment in Progress😴</value>
+  </data>
+  <data name="Page.Task.EmptyMsg" xml:space="preserve">
+    <value>Start a new deployment from the setup wizard to see its progress here.</value>
+  </data>
 </root>

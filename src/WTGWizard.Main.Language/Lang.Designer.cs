@@ -223,6 +223,24 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Start a new deployment from the setup wizard to see its progress here. 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_EmptyMsg {
+            get {
+                return ResourceManager.GetString("Page.Task.EmptyMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No Deployment in Progress😴 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_EmptyTitle {
+            get {
+                return ResourceManager.GetString("Page.Task.EmptyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Freeze Output 的本地化字符串。
         /// </summary>
         public static string Page_Task_FreezeToggle {
