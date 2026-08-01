@@ -81,7 +81,7 @@
                   <StackPanel Orientation="Horizontal" Spacing="6">
                     <TextBlock VerticalAlignment="Center" FontSize="11" Opacity="0.5" Text="{x:Bind lang:Lang.Page_Task_DiskPerf_NumberLabel}" />
                     <TextBlock x:Name="DiskNumText"
-                               MinWidth="20"
+                               Width="7"
                                VerticalAlignment="Center"
                                FontFamily="Cascadia Mono"
                                FontSize="12"
