@@ -46,7 +46,7 @@
       <!--  终端输出区域  -->
       <uc:TerminalBox x:Name="Terminal"
                       Grid.Row="0"
-                      Margin="10,0,0,4" />
+                      Margin="10,0,0,8" />
 
       <!--  底部工具栏  -->
       <Grid Grid.Row="1" Margin="10,0,0,0" ColumnSpacing="8">
