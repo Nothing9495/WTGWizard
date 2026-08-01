@@ -20,6 +20,11 @@ public sealed partial class ImageConfigPage : Page
     private readonly IWimService _wimService = App.Services.GetRequiredService<IWimService>();
     public WizardViewModel VM { get; private set; } = null!;
 
+    private string _loadedPath = string.Empty;
+    private int _loadedIndex = -1;
+    private int _refreshSeq;
+    private string _verifiedPath = string.Empty;
+
     public ImageConfigPage()
     {
         VM = App.Services.GetRequiredService<WizardViewModel>();
@@ -69,6 +74,8 @@ public sealed partial class ImageConfigPage : Page
 
     /// <summary>
     /// 统一镜像信息加载入口 — 更新 UI + 加载元数据。
+    /// 缓存短路：同一 (path, index) 已加载过则跳过（切页/切回不重复加载）。
+    /// 并发防护：刷新序号丢弃过期异步结果。
     /// </summary>
     private async System.Threading.Tasks.Task RefreshImageStateAsync()
     {
@@ -79,18 +86,29 @@ public sealed partial class ImageConfigPage : Page
         if (pos < 0 || pos >= indices.Count) return;
         if (!int.TryParse(indices[pos], out var index)) return;
 
+        // 缓存短路：同一映像已加载完成，跳过重复加载
+        if (path == _loadedPath && index == _loadedIndex) return;
+
+        var seq = ++_refreshSeq;
         VM.Image.IsLoading = true;
         UpdateLoadingState(true);
 
         try
         {
             var info = await _wimService.GetImageInfo(path, index);
+            if (seq != _refreshSeq) return;
+
             VM.Image.ImageInfo = info;
             UpdateImageInfoCard(info);
             VM.Image.AnsFileFoundPaths = info.AnsFilePaths;
+
+            _loadedPath = path;
+            _loadedIndex = index;
         }
         catch (Exception)
         {
+            _loadedPath = path;
+            _loadedIndex = index;
         }
         finally
         {
@@ -104,9 +122,13 @@ public sealed partial class ImageConfigPage : Page
 
     private async System.Threading.Tasks.Task VerifyImageAsync(string path)
     {
+        // 缓存：同一映像仅校验一次（完整性校验开销大，避免 A→B→A 切换重复执行）
+        if (path == _verifiedPath) return;
+
         try
         {
             await _wimService.VerifyAsync(path);
+            _verifiedPath = path;
             VM.Image.ShowVerifyError = false;
         }
         catch (Exception ex)

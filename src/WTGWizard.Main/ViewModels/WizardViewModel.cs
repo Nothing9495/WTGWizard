@@ -85,6 +85,7 @@ public sealed partial class WizardViewModel : ObservableObject
             or nameof(ImageConfigVM.SelectedIndex))
         {
             Advanced.UpdateAnsFileIndicator(Image);
+            Advanced.ImageBuildNumber = Image.ImageInfo?.BuildNumber;
         }
     }
 

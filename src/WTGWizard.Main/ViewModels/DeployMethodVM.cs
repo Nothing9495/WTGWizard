@@ -83,7 +83,7 @@ public sealed partial class DeployMethodVM : ObservableObject
 
     public bool IsValid => IsDiskSelected
         && DiskSafetyError is null
-        && IsReservedValid
+        && (!IsCleanInstall || IsReservedValid)
         && (IsCleanInstall || (SelectedPartition is not null
             && !string.IsNullOrEmpty(SelectedPartition.DriveLetter)
             && (SelectedDisk?.HasEspPartition ?? false)));

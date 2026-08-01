@@ -91,7 +91,7 @@
                             Checked="FreezeToggle_Changed" Unchecked="FreezeToggle_Changed" />
               <Button x:Name="AbortButton" Content="{x:Bind lang:Lang.Page_Task_AbortButton}"
                       IsEnabled="{x:Bind VM.IsDeploying, Mode=OneWay}"
-                      Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}"
+                      Background="{ThemeResource SystemFillColorCriticalBrush}"
                       Click="AbortButton_Click"
                       VerticalAlignment="Stretch" />
             </StackPanel>
