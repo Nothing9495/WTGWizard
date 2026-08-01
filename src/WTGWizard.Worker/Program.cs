@@ -13,28 +13,20 @@ static class Program
 {
     static int Main(string[] args)
     {
-        // 初始化日志服务
-        using var logService = new LoggerService();
+        // 初始化日志服务：Serilog 文件模式（独立文件名，不与 Main 冲突），TerminalBox 仅显示操作消息
+        using var logService = new LoggerService(
+            enableFile: true,
+            fileNameTemplate: "WTGWorker-.log");
 
         // 创建 UTF-8 stdout Writer（不依赖 Console.OutputEncoding，直接包装底层流）
         var stdoutStream = Console.OpenStandardOutput();
         var stdoutWriter = new System.IO.StreamWriter(stdoutStream, new System.Text.UTF8Encoding(false)) { AutoFlush = true };
+        Console.SetOut(stdoutWriter);
 
-        // 包装为双重输出（stdout + 日志文件）
-        var logFileStream = new System.IO.StreamWriter(
-            System.IO.Path.Combine(logService.LogDirectory, $"WTGWorker_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log"),
-            append: true,
-            encoding: new System.Text.UTF8Encoding(false));
-        logFileStream.AutoFlush = true;
-
-        var tee = new TeeWriter(stdoutWriter, logFileStream);
-        Console.SetOut(tee);
-
-        // stderr 同样包装为 UTF-8 双重输出（stdout 与 stderr 共享日志文件，TeeWriter 内部加锁保证并发安全）
+        // stderr 同样包装为 UTF-8（独立输出，不含 tee 镜像）
         var stderrStream = Console.OpenStandardError();
         var stderrWriter = new System.IO.StreamWriter(stderrStream, new System.Text.UTF8Encoding(false)) { AutoFlush = true };
-        var stderrTee = new TeeWriter(stderrWriter, logFileStream);
-        Console.SetError(stderrTee);
+        Console.SetError(stderrWriter);
 
         logService.Info("Worker", "Worker started, PID: {Pid}", Environment.ProcessId);
 

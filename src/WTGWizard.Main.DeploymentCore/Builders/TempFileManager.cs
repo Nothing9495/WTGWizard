@@ -21,9 +21,22 @@ public sealed class TempFileManager : IDisposable
         return path;
     }
 
+    /// <summary>
+    /// 部署完成清理 — 仅删除本管理器管理的 Scripts 目录。
+    /// </summary>
     public void Dispose()
     {
-        try { Directory.Delete(Path.GetTempPath() + "WTGWizard", recursive: true); }
+        try { Directory.Delete(_rootDir, recursive: true); }
+        catch { /* best effort */ }
+    }
+
+    /// <summary>
+    /// 全局清理 — 删除整个 WTGWizard 临时目录（含 AnswerFiles 等）。
+    /// 由主程序生命周期结束（App 关闭）时调用，防部署中断残留。
+    /// </summary>
+    public static void CleanupAll()
+    {
+        try { Directory.Delete(Path.Combine(Path.GetTempPath(), "WTGWizard"), recursive: true); }
         catch { /* best effort */ }
     }
 }

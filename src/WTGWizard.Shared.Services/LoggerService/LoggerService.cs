@@ -20,7 +20,10 @@ public sealed class LoggerService : ILoggerService, IDisposable
     /// 创建日志服务实例。
     /// </summary>
     /// <param name="logDirectory">日志目录，null 时使用默认目录（%LOCALAPPDATA%\WTGWizard\logs）。</param>
-    public LoggerService(string? logDirectory = null)
+    /// <param name="enableFile">是否写入日志文件。</param>
+    /// <param name="fileNameTemplate">日志文件名模板（Serilog 自动追加滚动日期）。</param>
+    public LoggerService(string? logDirectory = null, bool enableFile = true,
+        string fileNameTemplate = "WTGWizard-.log")
     {
         _logDir = logDirectory ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -35,16 +38,20 @@ public sealed class LoggerService : ILoggerService, IDisposable
         config.MinimumLevel.Information();
 #endif
 
-        _logger = config
-            .WriteTo.Debug(
-                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{Category}] {Message:lj}{NewLine}{Exception}")
-            .WriteTo.File(
-                path: Path.Combine(_logDir, $"WTGWizard-{DateTime.Now:yyyyMMdd-HHmmss}.log"),
-                rollingInterval: RollingInterval.Infinite,
+        config.WriteTo.Debug(
+            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{Category}] {Message:lj}{NewLine}{Exception}");
+
+        if (enableFile)
+        {
+            config.WriteTo.File(
+                path: Path.Combine(_logDir, fileNameTemplate),
+                rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 7,
                 fileSizeLimitBytes: 10 * 1024 * 1024,
-                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{Category}] {Message:lj}{NewLine}{Exception}")
-            .CreateLogger();
+                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{Category}] {Message:lj}{NewLine}{Exception}");
+        }
+
+        _logger = config.CreateLogger();
     }
 
     public void Debug(string category, string message, params object?[] args)
@@ -64,7 +71,7 @@ public sealed class LoggerService : ILoggerService, IDisposable
 
     public void Shutdown()
     {
-        Log.CloseAndFlush();
+        (_logger as IDisposable)?.Dispose();
     }
 
     public void Dispose()

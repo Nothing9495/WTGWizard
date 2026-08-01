@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using System;
+using WTGWizard.Main.DeploymentCore.Builders;
 using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
 using WTGWizard.Shared.Services.WimService;
@@ -37,6 +38,9 @@ public partial class App : Application
 
         var logger = Services.GetService<ILoggerService>();
         logger?.Shutdown();
+
+        // 清理临时目录（部署中断残留兜底）
+        TempFileManager.CleanupAll();
 
         // TODO: 程序关闭后有概率触发Access violation异常，等待进一步排查。
     }
