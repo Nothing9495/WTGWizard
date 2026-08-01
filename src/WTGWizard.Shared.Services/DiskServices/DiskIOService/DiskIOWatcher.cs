@@ -55,13 +55,14 @@ internal sealed class DiskIOWatcher : IDisposable
         _lastDriveLetters = GetCurrentDriveLetters();
         _mountPointPoller = new Timer(_ => PollMountPoints(), null, TimeSpan.FromSeconds(2.5), TimeSpan.FromSeconds(2.5));
 
-        _logger.Debug("DiskIOWatcher", "Start");
+        _logger.Debug("DiskIOWatcher", "Start to monitor disk/volume/mountpoint changes.",
+            string.Join(",", _lastDriveLetters.Order()));
     }
 
     /// <summary>停止监视。</summary>
     internal void Stop()
     {
-        _logger.Debug("DiskIOWatcher", "Stop");
+        _logger.Debug("DiskIOWatcher", "Stop monitoring disk/volume/mountpoint changes.");
         Interlocked.Increment(ref _debounceGen);
 
         _mountPointPoller?.Dispose();
@@ -82,22 +83,30 @@ internal sealed class DiskIOWatcher : IDisposable
 
     private void RegisterNotification(Guid classGuid, ref SafeHCMNOTIFICATION? handle, string label)
     {
-        var filter = new CM_NOTIFY_FILTER(classGuid);
+        handle = null;
 
-        var cr = CM_Register_Notification(
-            in filter,
-            IntPtr.Zero,
-            _callback!,
-            out var notifyHandle);
-
-        if (cr != CONFIGRET.CR_SUCCESS)
+        try
         {
-            _logger.Error("DiskIOWatcher", "CM_Register_Notification({Label}) failed: CR_{Error}", label, cr);
-            handle = null;
+            var filter = new CM_NOTIFY_FILTER(classGuid);
+
+            var cr = CM_Register_Notification(
+                in filter,
+                IntPtr.Zero,
+                _callback!,
+                out var notifyHandle);
+
+            if (cr != CONFIGRET.CR_SUCCESS)
+            {
+                _logger.Error("DiskIOWatcher", "RegisterNotification: Failed to register {Label} change notification - ({Error}).", label, cr);
+            }
+            else
+            {
+                handle = notifyHandle;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            handle = notifyHandle;
+            _logger.Error("DiskIOWatcher", "RegisterNotification: Unexpected error while registering {Label} change notification - ({Error}).", label, ex.Message);
         }
     }
 
@@ -116,7 +125,7 @@ internal sealed class DiskIOWatcher : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOWatcher", "Notification callback failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOWatcher", "OnDeviceNotification: Notification callback failed - ({Error}).", ex.Message);
         }
         return Win32Error.ERROR_SUCCESS;
     }
@@ -134,14 +143,14 @@ internal sealed class DiskIOWatcher : IDisposable
 
             if (previous is not null && !current.SetEquals(previous))
             {
-                _logger.Debug("DiskIOWatcher", "Drive letters changed: [{Previous}] → [{Current}]",
+                _logger.Debug("DiskIOWatcher", "PollMountPoints: Drive letters changed: [{Previous}] → [{Current}].",
                     string.Join(",", previous.Order()), string.Join(",", current.Order()));
                 TriggerDebounced();
             }
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOWatcher", "PollMountPoints failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOWatcher", "PollMountPoints: PollMountPoints failed - ({Error}).", ex.Message);
         }
     }
 
@@ -177,7 +186,7 @@ internal sealed class DiskIOWatcher : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOWatcher", "TriggerDebounced failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOWatcher", "TriggerDebounced: Method failed - ({Error}).", ex.Message);
         }
     }
 

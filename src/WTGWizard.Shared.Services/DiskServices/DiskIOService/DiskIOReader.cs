@@ -31,7 +31,6 @@ internal sealed class DiskIOReader
     /// <summary>枚举外部磁盘。</summary>
     internal Task<IReadOnlyList<DiskBasicInfo>> EnumerateExternalDisksAsync(CancellationToken ct = default)
     {
-        _logger.Debug("DiskIOReader", "EnumerateExternalDisks start");
         var disks = new List<DiskBasicInfo>();
 
         try
@@ -44,7 +43,7 @@ internal sealed class DiskIOReader
 
             if (hDevInfo.IsInvalid)
             {
-                _logger.Error("DiskIOReader", "SetupDiGetClassDevs failed");
+                _logger.Error("DiskIOReader", "EnumerateExternalDisks: SetupDiGetClassDevs failed - ({Error}).", Marshal.GetLastWin32Error());
                 return Task.FromResult<IReadOnlyList<DiskBasicInfo>>(disks);
             }
 
@@ -65,34 +64,34 @@ internal sealed class DiskIOReader
                     if (diskInfo is not null)
                     {
                         disks.Add(diskInfo);
-                        _logger.Debug("DiskIOReader", "Found disk: {Index} {Model}", diskInfo.Index, diskInfo.Model);
+                        _logger.Debug("DiskIOReader", "EnumerateExternalDisks: Found disk: {Index} - {Model}", diskInfo.Index, diskInfo.Model);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.Warn("DiskIOReader", "Device {Index} failed: {Error}", i, ex.Message);
+                    _logger.Warn("DiskIOReader", "EnumerateExternalDisks: Device {Index} failed - ({Error}).", i, ex.Message);
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.Error("DiskIOReader", "EnumerateExternalDisks failed: {Error}", ex.Message);
+            _logger.Error("DiskIOReader", "EnumerateExternalDisks: Method failed - ({Error}).", ex.Message);
         }
 
-        _logger.Debug("DiskIOReader", "EnumerateExternalDisks done, count={Count}", disks.Count);
+        _logger.Info("DiskIOReader", "EnumerateExternalDisks done, enumerated disks: {Count}", disks.Count);
         return Task.FromResult<IReadOnlyList<DiskBasicInfo>>(disks);
     }
 
     /// <summary>检查磁盘安全性。</summary>
     internal Task<string?> CheckDiskSafetyAsync(string diskDeviceId, CancellationToken ct = default)
     {
-        _logger.Debug("DiskIOReader", "CheckDiskSafety: diskDeviceId={DiskDeviceId}", diskDeviceId);
+        _logger.Info("DiskIOReader", "CheckDiskSafety: Checking safety of disk {DiskDeviceId}", diskDeviceId);
         ct.ThrowIfCancellationRequested();
 
         uint targetDiskIndex = ParseDiskNumber(diskDeviceId);
         if (targetDiskIndex == uint.MaxValue)
         {
-            _logger.Debug("DiskIOReader", "CheckDiskSafety: invalid diskDeviceId");
+            _logger.Error("DiskIOReader", "CheckDiskSafety: Invalid diskDeviceId={DiskDeviceId}", diskDeviceId);
             return Task.FromResult<string?>(null);
         }
 
@@ -103,7 +102,7 @@ internal sealed class DiskIOReader
         try
         {
             var allVolumes = EnumerateAllVolumes();
-            _logger.Debug("DiskIOReader", "CheckDiskSafety: volumeCount={Count}", allVolumes.Count);
+            _logger.Debug("DiskIOReader", "CheckDiskSafety: Disk volume count={Count}", allVolumes.Count);
 
             foreach (string volumeGuid in allVolumes)
             {
@@ -122,24 +121,24 @@ internal sealed class DiskIOReader
                 // 检测系统卷
                 if (string.Equals(upper, systemDrive, StringComparison.Ordinal))
                 {
-                    _logger.Warn("DiskIOReader", "Target disk contains system volume ({Drive}:), operation may cause system unbootable", driveLetter);
-                    return Task.FromResult<string?>($"Target disk contains system volume ({driveLetter}:)");
+                    _logger.Warn("DiskIOReader", "CheckDiskSafety: System volume ({Drive}:) detected on disk {DiskIndex}!", driveLetter, targetDiskIndex);
+                    return Task.FromResult<string?>($"System volume ({driveLetter}:) detected on disk {targetDiskIndex}!");
                 }
 
                 // 检测页面文件卷
                 if (pageFileDrives.Contains(upper))
                 {
-                    _logger.Warn("DiskIOReader", "Target disk contains page file volume ({Drive}:), operation may affect system performance", driveLetter);
-                    return Task.FromResult<string?>($"Target disk contains page file volume ({driveLetter}:)");
+                    _logger.Warn("DiskIOReader", "CheckDiskSafety: Page file volume ({Drive}:) detected on disk {DiskIndex}!", driveLetter, targetDiskIndex);
+                    return Task.FromResult<string?>($"Page file volume ({driveLetter}:) detected on disk {targetDiskIndex}");
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOReader", "CheckDiskSafety failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOReader", "CheckDiskSafety: Method failed - ({Error}).", ex.Message);
         }
 
-        _logger.Debug("DiskIOReader", "CheckDiskSafety: disk {Index} is safe", targetDiskIndex);
+        _logger.Info("DiskIOReader", "CheckDiskSafety: Disk {Index} is safe for operations.", targetDiskIndex);
         return Task.FromResult<string?>(null);
     }
 
@@ -149,17 +148,17 @@ internal sealed class DiskIOReader
         ct.ThrowIfCancellationRequested();
         var partitions = new List<PartitionBasicInfo>();
 
-        _logger.Debug("DiskIOReader", "GetPartitions: disk={DiskIndex}, skipEsp={SkipEsp}", diskIndex, skipEsp);
+        _logger.Debug("DiskIOReader", "GetPartitionsAsync: disk={DiskIndex}, skipEsp={SkipEsp}", diskIndex, skipEsp);
 
         try
         {
             // 1. 获取磁盘布局条目
             var layoutEntries = GetDriveLayoutEntries(diskIndex);
-            _logger.Debug("DiskIOReader", "GetPartitions: layoutEntries count={Count}", layoutEntries.Count);
+            _logger.Debug("DiskIOReader", "GetPartitionsAsync: layoutEntries count={Count}", layoutEntries.Count);
 
             // 2. 枚举所有卷
             var allVolumes = EnumerateAllVolumes();
-            _logger.Debug("DiskIOReader", "GetPartitions: allVolumes count={Count}", allVolumes.Count);
+            _logger.Debug("DiskIOReader", "GetPartitionsAsync: allVolumes count={Count}", allVolumes.Count);
 
             // 3. 通过磁盘 extents 匹配分区
             foreach (string volumeGuid in allVolumes)
@@ -168,60 +167,48 @@ internal sealed class DiskIOReader
 
                 // 获取卷的磁盘 extents
                 var extents = GetVolumeDiskExtents(volumeGuid);
-                _logger.Debug("DiskIOReader", "GetPartitions: volume={VolumeGuid} - extentCount={Count}", volumeGuid, extents.Count);
 
-                // 计算卷在目标磁盘上的大小
+                // 单次遍历：计算卷在目标磁盘上的大小 + 记录首个 extent 偏移
                 ulong totalSizeOnDisk = 0;
-                foreach (var ext in extents)
-                {
-                    if (ext.diskNumber == diskIndex)
-                        totalSizeOnDisk += (ulong)ext.extentLength;
-                }
-
-                _logger.Debug("DiskIOReader", "GetPartitions: volume={VolumeGuid} - totalSizeOnDisk={Size} bytes", volumeGuid, totalSizeOnDisk);
-
-                // 跳过小卷（可能是 ESP）
-                if (totalSizeOnDisk == 0) continue;
-                if (skipEsp && totalSizeOnDisk < (ulong)DiskConstants.BytesPerGiB) continue;
-
-                // 通过 StartingOffset 匹配分区号
                 long matchOffset = -1;
                 foreach (var ext in extents)
                 {
-                    if (ext.diskNumber == diskIndex && matchOffset < 0)
-                        matchOffset = ext.startingOffset;
+                    if (ext.diskNumber != diskIndex) continue;
+                    totalSizeOnDisk += (ulong)ext.extentLength;
+                    if (matchOffset < 0) matchOffset = ext.startingOffset;
                 }
 
-                _logger.Debug("DiskIOReader", "GetPartitions: volume={VolumeGuid} - matchOffset={MatchOffset}", volumeGuid, matchOffset);
-
-                uint partNum = 0;
-                bool isEsp = false;
-                foreach (var entry in layoutEntries)
+                // 卷不在目标磁盘：单行合并（跳过卷日志精简）
+                if (totalSizeOnDisk == 0)
                 {
-                    if (entry.startingOffset == matchOffset)
-                    {
-                        partNum = entry.partitionNumber;
-                        isEsp = entry.isEsp;
-                        break;
-                    }
+                    _logger.Debug("DiskIOReader", "GetPartitionsAsync: volume={VolumeGuid} - Not on target disk.", volumeGuid);
+                    continue;
                 }
 
-                _logger.Debug("DiskIOReader", "GetPartitions: volume={VolumeGuid} - partNum={PartNum}, isEsp={IsEsp}", volumeGuid, partNum, isEsp);
+                // 跳过小卷（可能是 ESP）
+                if (skipEsp && totalSizeOnDisk < (ulong)DiskConstants.BytesPerGiB) continue;
+
+                _logger.Debug("DiskIOReader", "GetPartitionsAsync: volume={VolumeGuid} - totalSizeOnDisk={Size} bytes", volumeGuid, totalSizeOnDisk);
+                _logger.Debug("DiskIOReader", "GetPartitionsAsync: volume={VolumeGuid} - matchOffset={MatchOffset}", volumeGuid, matchOffset);
+
+                // 通过 StartingOffset 匹配分区（前置守卫保证 matchOffset 有效）
+                var matchedEntry = layoutEntries.FirstOrDefault(e => e.startingOffset == matchOffset);
+
+                _logger.Debug("DiskIOReader", "GetPartitionsAsync: volume={VolumeGuid} - partNum={PartNum}, isEsp={IsEsp}", volumeGuid, matchedEntry.partitionNumber, matchedEntry.isEsp);
 
                 // 跳过 ESP 分区
-                if (skipEsp && isEsp) continue;
+                if (skipEsp && matchedEntry.isEsp) continue;
 
                 // 获取驱动器字母和卷标
-                string[] driveLetters = GetVolumeDriveLetters(volumeGuid);
-                string? driveLetter = driveLetters.Length > 0 ? driveLetters[0] : null;
+                string? driveLetter = GetFirstDriveLetter(volumeGuid);
                 string? volumeLabel = GetVolumeLabel(volumeGuid);
 
-                _logger.Debug("DiskIOReader", "GetPartitions: volume={VolumeGuid} - driveLetter={DriveLetter}, volumeLabel={VolumeLabel}", volumeGuid, driveLetter, volumeLabel);
+                _logger.Debug("DiskIOReader", "GetPartitionsAsync: volume={VolumeGuid} - driveLetter={DriveLetter}, volumeLabel={VolumeLabel}", volumeGuid, driveLetter, volumeLabel);
 
                 // 添加到分区列表
                 partitions.Add(new PartitionBasicInfo(
                     DiskNumber: diskIndex,
-                    PartitionNumber: partNum,
+                    PartitionNumber: matchedEntry.partitionNumber,
                     Size: totalSizeOnDisk,
                     DriveLetter: driveLetter,
                     VolumeLabel: volumeLabel));
@@ -229,10 +216,10 @@ internal sealed class DiskIOReader
         }
         catch (Exception ex)
         {
-            _logger.Error("DiskIOReader", "GetPartitions failed: {Error}", ex.Message);
+            _logger.Error("DiskIOReader", "GetPartitionsAsync: Method failed - ({Error}).", ex.Message);
         }
 
-        _logger.Debug("DiskIOReader", "GetPartitions: disk {Index} returned {Count} partitions", diskIndex, partitions.Count);
+        _logger.Info("DiskIOReader", "GetPartitionsAsync: Disk {Index} returned {Count} partitions.", diskIndex, partitions.Count);
         return Task.FromResult<IReadOnlyList<PartitionBasicInfo>>(partitions);
     }
 
@@ -309,7 +296,7 @@ internal sealed class DiskIOReader
 
             if (hDevice.IsInvalid)
             {
-                _logger.Debug("DiskIOReader", "GetDriveLayoutEntries: device handle is invalid");
+                _logger.Warn("DiskIOReader", "GetDriveLayoutEntries: device handle is invalid.");
                 return result;
             }
 
@@ -330,7 +317,7 @@ internal sealed class DiskIOReader
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOReader", "GetDriveLayoutEntries failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOReader", "GetDriveLayoutEntries: Method failed - ({Error}).", ex.Message);
         }
 
         return result;
@@ -346,7 +333,7 @@ internal sealed class DiskIOReader
 
         if (espEntry.partitionNumber == 0)
         {
-            _logger.Debug("DiskIOReader", "GetEspPartitionInfo: disk={DiskIndex} - no ESP found", diskIndex);
+            _logger.Debug("DiskIOReader", "GetEspPartitionInfo: disk={DiskIndex} - No ESP partition found.", diskIndex);
             return (false, 0);
         }
 
@@ -362,8 +349,6 @@ internal sealed class DiskIOReader
     private List<string> EnumerateAllVolumes()
     {
         var volumes = new List<string>();
-
-        _logger.Debug("DiskIOReader", "EnumerateAllVolumes: start");
 
         try
         {
@@ -383,7 +368,6 @@ internal sealed class DiskIOReader
             // 忽略枚举失败
         }
 
-        _logger.Debug("DiskIOReader", "EnumerateAllVolumes: volumeCount={Count}", volumes.Count);
         return volumes;
     }
 
@@ -409,7 +393,7 @@ internal sealed class DiskIOReader
 
             if (hVolume.IsInvalid)
             {
-                _logger.Debug("DiskIOReader", "GetVolumeDiskExtents: volume handle is invalid");
+                _logger.Warn("DiskIOReader", "GetVolumeDiskExtents: Volume handle is invalid.");
                 return extents;
             }
 
@@ -423,39 +407,13 @@ internal sealed class DiskIOReader
                     extents.Add((extent.DiskNumber, extent.StartingOffset, extent.ExtentLength));
                 }
             }
-
-            _logger.Debug("DiskIOReader", "GetVolumeDiskExtents: volume={VolumeGuid} - extentCount={Count}", volumeGuid, extents.Count);
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOReader", "GetVolumeDiskExtents failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOReader", "GetVolumeDiskExtents: Method failed - ({Error}).", ex.Message);
         }
 
         return extents;
-    }
-
-    /// <summary>获取卷的驱动器字母。</summary>
-    private string[] GetVolumeDriveLetters(string volumeGuid)
-    {
-        try
-        {
-            if (GetVolumePathNamesForVolumeName(volumeGuid, out string[] paths))
-            {
-                var driveLetters = paths
-                    .Where(p => p.Length >= 2 && p[1] == ':')
-                    .Select(p => p[0].ToString())
-                    .ToArray();
-                _logger.Debug("DiskIOReader", "GetVolumeDriveLetters: volume={VolumeGuid} - letters=[{Letters}]", volumeGuid, string.Join(",", driveLetters));
-                return driveLetters;
-            }
-        }
-        catch (Exception)
-        {
-            // 忽略获取失败
-        }
-
-        _logger.Debug("DiskIOReader", "GetVolumeDriveLetters: volume={VolumeGuid} - no letters found", volumeGuid);
-        return Array.Empty<string>();
     }
 
     /// <summary>获取卷的第一个驱动器字母。</summary>
@@ -471,12 +429,12 @@ internal sealed class DiskIOReader
                 return driveLetter;
             }
         }
-        catch
+        catch (Exception)
         {
             // 忽略获取失败
         }
 
-        _logger.Debug("DiskIOReader", "GetFirstDriveLetter: volume={VolumeGuid} - no letter found", volumeGuid);
+        _logger.Debug("DiskIOReader", "GetFirstDriveLetter: volume={VolumeGuid} - No letter found.", volumeGuid);
         return null;
     }
 
@@ -495,9 +453,7 @@ internal sealed class DiskIOReader
                 out _,
                 null, 0))
             {
-                var label = volumeName.ToString();
-                _logger.Debug("DiskIOReader", "GetVolumeLabel: volume={VolumeGuid} - label={Label}", volumeGuid, label);
-                return label;
+                return volumeName.ToString();
             }
         }
         catch (Exception)
@@ -505,7 +461,6 @@ internal sealed class DiskIOReader
             // 忽略获取失败
         }
 
-        _logger.Debug("DiskIOReader", "GetVolumeLabel: volume={VolumeGuid} - no label found", volumeGuid);
         return null;
     }
 
@@ -529,7 +484,7 @@ internal sealed class DiskIOReader
 
             if (hDevice.IsInvalid)
             {
-                _logger.Debug("DiskIOReader", "QueryDiskInfo: device handle is invalid");
+                _logger.Debug("DiskIOReader", "QueryDiskInfo: Device handle is invalid.");
                 return null;
             }
 
@@ -537,7 +492,7 @@ internal sealed class DiskIOReader
             uint diskIndex = QueryDeviceNumber(hDevice);
             if (diskIndex == uint.MaxValue)
             {
-                _logger.Debug("DiskIOReader", "QueryDiskInfo: failed to get device number");
+                _logger.Warn("DiskIOReader", "QueryDiskInfo: Failed to get device number.");
                 return null;
             }
 
@@ -548,12 +503,12 @@ internal sealed class DiskIOReader
 
             if (!isExternal && !isVirtual)
             {
-                _logger.Debug("DiskIOReader", "QueryDiskInfo: disk {Index} is not external or virtual, skipping", diskIndex);
+                _logger.Debug("DiskIOReader", "QueryDiskInfo: Disk {Index} is not external or virtual.", diskIndex);
                 return null;
             }
 
             // 查询磁盘大小
-            var (sizeBytes, _, _) = QueryDiskGeometry(hDevice);
+            ulong sizeBytes = QueryDiskSize(hDevice);
 
             // 获取设备名称
             string model = GetDeviceFriendlyName(hDevInfo, devInfoData);
@@ -562,7 +517,7 @@ internal sealed class DiskIOReader
             // 检测 ESP 分区
             var (hasEsp, espPartitionNumber) = GetEspPartitionInfo(diskIndex);
 
-            _logger.Debug("DiskIOReader", "QueryDiskInfo: disk={Index}, model={Model}, size={Size}GB, busType={BusType}, hasEsp={HasEsp}",
+            _logger.Info("DiskIOReader", "QueryDiskInfo: disk={Index}, model={Model}, size={Size}GB, busType={BusType}, hasEsp={HasEsp}",
                 diskIndex, model, sizeBytes / (1024.0 * 1024 * 1024), busType, hasEsp);
 
             return new DiskBasicInfo(
@@ -578,7 +533,7 @@ internal sealed class DiskIOReader
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOReader", "QueryDiskInfo failed: {Error}", ex.Message);
+            _logger.Warn("DiskIOReader", "QueryDiskInfo: Method failed - ({Error}).", ex.Message);
             return null;
         }
     }
@@ -605,16 +560,11 @@ internal sealed class DiskIOReader
         return STORAGE_BUS_TYPE.BusTypeUnknown;
     }
 
-    private static (ulong sizeBytes, ulong totalSectors, uint bytesPerSector) QueryDiskGeometry(SafeHFILE hDevice)
+    private static ulong QueryDiskSize(SafeHFILE hDevice)
     {
         if (DeviceIoControl(hDevice, IOControlCode.IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, out DISK_GEOMETRY_EX geometry))
-        {
-            ulong sizeBytes = (ulong)geometry.DiskSize;
-            uint bps = geometry.Geometry.BytesPerSector;
-            ulong totalSectors = bps > 0 ? sizeBytes / bps : 0;
-            return (sizeBytes, totalSectors, bps);
-        }
-        return (0, 0, 512);
+            return (ulong)geometry.DiskSize;
+        return 0;
     }
 
     private static string GetDeviceFriendlyName(SafeHDEVINFO hDevInfo, SP_DEVINFO_DATA devInfoData)
