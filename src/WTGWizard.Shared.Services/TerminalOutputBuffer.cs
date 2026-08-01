@@ -26,40 +26,40 @@ public sealed class TerminalOutputBuffer
 
     public void Clear()
     {
-        string snapshot;
         lock (_lock)
         {
             _buffer.Clear();
-            snapshot = string.Empty;
         }
-        OutputUpdated?.Invoke(snapshot);
+        OutputUpdated?.Invoke(string.Empty);
     }
 
     public void AppendBlankLine()
     {
         if (_buffer.Length == 0) return;
 
-        string snapshot;
+        bool notify = OutputUpdated is not null;
+        string snapshot = string.Empty;
         lock (_lock)
         {
             _buffer.Append("\n ");
-            snapshot = _buffer.ToString();
+            if (notify) snapshot = _buffer.ToString();
         }
-        OutputUpdated?.Invoke(snapshot);
+        if (notify) OutputUpdated?.Invoke(snapshot);
     }
 
     public void Append(string text)
     {
         if (string.IsNullOrEmpty(text)) return;
 
-        string snapshot;
+        bool notify = OutputUpdated is not null;
+        string snapshot = string.Empty;
         lock (_lock)
         {
             if (_buffer.Length > 0)
                 _buffer.Append('\n');
             _buffer.Append(text);
-            snapshot = _buffer.ToString();
+            if (notify) snapshot = _buffer.ToString();
         }
-        OutputUpdated?.Invoke(snapshot);
+        if (notify) OutputUpdated?.Invoke(snapshot);
     }
 }

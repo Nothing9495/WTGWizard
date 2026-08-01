@@ -51,17 +51,11 @@
       <!--  右侧状态区域  -->
       <Grid Grid.Column="2" Width="24" Height="24"
             VerticalAlignment="Center" Margin="0,16,16,16">
-        <!--  执行中 + 无进度：不确定进度环  -->
-        <ProgressRing IsActive="True"
-                      IsIndeterminate="True"
-                      Width="20" Height="20"
-                      Visibility="{x:Bind ShowIndeterminateProgress, Mode=OneWay}" />
-        <!--  执行中 + 有进度：确定进度环  -->
-        <ProgressRing IsActive="True"
-                      IsIndeterminate="False"
+        <!--  运行中：单进度环（IsActive 控制显示，IsIndeterminate 控制模式）  -->
+        <ProgressRing IsActive="{x:Bind IsRunning, Mode=OneWay}"
+                      IsIndeterminate="{x:Bind IsIndeterminateMode, Mode=OneWay}"
                       Value="{x:Bind ProgressValue, Mode=OneWay}"
-                      Width="20" Height="20"
-                      Visibility="{x:Bind ShowDeterminateProgress, Mode=OneWay}" />
+                      Width="20" Height="20" />
         <!--  完成：绿色勾选  -->
         <FontIcon FontSize="20"
                   Glyph="&#xE8FB;"

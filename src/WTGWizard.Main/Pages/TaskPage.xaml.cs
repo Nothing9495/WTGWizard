@@ -113,6 +113,7 @@ public sealed partial class TaskPage : Page, ITabActivatable
             _cts?.Dispose();
             _cts = null;
             VM.IsDeploying = false;
+            _orchestrator?.Dispose();
         }
     }
 

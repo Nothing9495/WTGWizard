@@ -79,10 +79,15 @@ public sealed partial class TaskContentCard : UserControl, INotifyPropertyChange
 
     #region 状态可见性（内部控制，不暴露为依赖属性）
 
-    public Visibility ShowIndeterminateProgress { get; private set; } = Visibility.Collapsed;
-    public Visibility ShowDeterminateProgress { get; private set; } = Visibility.Collapsed;
-    public Visibility ShowCompletedIcon { get; private set; } = Visibility.Collapsed;
-    public Visibility ShowFailedIcon { get; private set; } = Visibility.Collapsed;
+    private bool _isRunning;
+    private bool _isIndeterminateMode;
+    private Visibility _showCompletedIcon = Visibility.Collapsed;
+    private Visibility _showFailedIcon = Visibility.Collapsed;
+
+    public bool IsRunning => _isRunning;
+    public bool IsIndeterminateMode => _isIndeterminateMode;
+    public Visibility ShowCompletedIcon => _showCompletedIcon;
+    public Visibility ShowFailedIcon => _showFailedIcon;
 
     private static void OnStatusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
@@ -99,15 +104,26 @@ public sealed partial class TaskContentCard : UserControl, INotifyPropertyChange
         var isRunning = Status == DeployTaskStatus.Running;
         var hasProgress = ProgressValue > 0;
 
-        ShowIndeterminateProgress = isRunning && !hasProgress ? Visibility.Visible : Visibility.Collapsed;
-        ShowDeterminateProgress = isRunning && hasProgress ? Visibility.Visible : Visibility.Collapsed;
-        ShowCompletedIcon = Status == DeployTaskStatus.Completed ? Visibility.Visible : Visibility.Collapsed;
-        ShowFailedIcon = Status == DeployTaskStatus.Failed ? Visibility.Visible : Visibility.Collapsed;
+        SetBool(ref _isRunning, nameof(IsRunning), isRunning);
+        SetBool(ref _isIndeterminateMode, nameof(IsIndeterminateMode), isRunning && !hasProgress);
+        SetVisibility(ref _showCompletedIcon, nameof(ShowCompletedIcon),
+            Status == DeployTaskStatus.Completed ? Visibility.Visible : Visibility.Collapsed);
+        SetVisibility(ref _showFailedIcon, nameof(ShowFailedIcon),
+            Status == DeployTaskStatus.Failed ? Visibility.Visible : Visibility.Collapsed);
+    }
 
-        PropertyChanged?.Invoke(this, new(nameof(ShowIndeterminateProgress)));
-        PropertyChanged?.Invoke(this, new(nameof(ShowDeterminateProgress)));
-        PropertyChanged?.Invoke(this, new(nameof(ShowCompletedIcon)));
-        PropertyChanged?.Invoke(this, new(nameof(ShowFailedIcon)));
+    private void SetBool(ref bool field, string propertyName, bool value)
+    {
+        if (field == value) return;
+        field = value;
+        PropertyChanged?.Invoke(this, new(propertyName));
+    }
+
+    private void SetVisibility(ref Visibility field, string propertyName, Visibility value)
+    {
+        if (field == value) return;
+        field = value;
+        PropertyChanged?.Invoke(this, new(propertyName));
     }
 
     #endregion
