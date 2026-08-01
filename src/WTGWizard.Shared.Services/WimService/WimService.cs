@@ -8,7 +8,7 @@ using System.Xml.Linq;
 using ManagedWimLib;
 using WTGWizard.Shared.Services.Logger;
 
-namespace WTGWizard.Shared.Services.Wim;
+namespace WTGWizard.Shared.Services.WimService;
 
 /// <summary>
 /// 统一 WIM 操作服务 — 封装 ManagedWimLib，统一初始化/错误处理/进度回调。
@@ -154,9 +154,16 @@ public sealed class WimService : IWimService
     /// 将 WIM 映像提取到目标目录。等价于 DISM /Apply-Image。
     /// 支持进度回调和取消。
     /// </summary>
+    /// <param name="imagePath">WIM 文件路径。</param>
+    /// <param name="index">映像索引（1-based）。</param>
+    /// <param name="targetDir">目标目录。</param>
+    /// <param name="progress">进度回调（当前/总字节）。</param>
+    /// <param name="stageChanged">阶段事件回调（由调用方决定如何展示）。</param>
+    /// <param name="ct">取消令牌。</param>
     public async Task ExtractImageAsync(
         string imagePath, int index, string targetDir,
         IProgress<(ulong current, ulong total)>? progress = null,
+        Action<WimExtractStage>? stageChanged = null,
         CancellationToken ct = default)
     {
         await Task.Run(() =>
@@ -174,7 +181,23 @@ public sealed class WimService : IWimService
                     if (ct.IsCancellationRequested)
                         return CallbackStatus.Abort;
 
-                    if (info is ExtractProgress ep)
+                    if (stageChanged is not null)
+                    {
+                        stageChanged(msg switch
+                        {
+                            ProgressMsg.ExtractImageBegin => WimExtractStage.ExtractImageBegin,
+                            ProgressMsg.ExtractTreeBegin => WimExtractStage.ExtractTreeBegin,
+                            ProgressMsg.ExtractFileStructure => WimExtractStage.ExtractFileStructure,
+                            ProgressMsg.ExtractStreams => WimExtractStage.ExtractStreams,
+                            ProgressMsg.ExtractMetadata => WimExtractStage.ExtractMetadata,
+                            _ => WimExtractStage.ExtractStreams,
+                        });
+                    }
+
+                    // 进度仅来自 EXTRACT_STREAMS（数据流期）——
+                    // 阶段消息（IMAGE_BEGIN/FILE_STRUCTURE/METADATA）也携带
+                    // ExtractProgress 字段，但那是阶段时点值（0%/100%），非流进度
+                    if (msg == ProgressMsg.ExtractStreams && info is ExtractProgress ep)
                     {
                         progress?.Report((ep.CompletedBytes, ep.TotalBytes));
                     }

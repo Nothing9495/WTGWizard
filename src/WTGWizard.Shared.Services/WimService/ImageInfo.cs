@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace WTGWizard.Shared.Services.Wim;
+namespace WTGWizard.Shared.Services.WimService;
 
 /// <summary>
 /// WIM 映像元数据快照。

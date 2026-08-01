@@ -54,7 +54,7 @@ static class Program
         {
             return args[0].ToLowerInvariant() switch
             {
-                "extract" => ExtractCommand.Run(args[1..]),
+                "extract" => ExtractCommand.Run(args[1..], logService),
                 "pwsh" => PowerShellCommand.Run(args[1..]),
                 "dism" => DismCommand.Run(args[1..]),
                 "bcdboot" => BcdbootCommand.Run(args[1..]),

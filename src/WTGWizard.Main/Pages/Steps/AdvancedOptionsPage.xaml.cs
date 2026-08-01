@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Windows.Storage.Pickers;
 using WTGWizard.Main;
-using WTGWizard.Shared.Services.Wim;
+using WTGWizard.Shared.Services.WimService;
 using WTGWizard.ViewModels;
 
 namespace WTGWizard.Pages.Steps;

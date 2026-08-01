@@ -1,4 +1,4 @@
-namespace WTGWizard.Shared.Services.Wim;
+namespace WTGWizard.Shared.Services.WimService;
 
 internal static class WimConstants
 {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using WTGWizard.Shared.Services.Wim;
+using WTGWizard.Shared.Services.WimService;
 
 namespace WTGWizard.ViewModels;
 

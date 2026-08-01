@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WTGWizard.Shared.Services.Wim;
+namespace WTGWizard.Shared.Services.WimService;
 
 /// <summary>
 /// WIM 服务接口 — 封装 ManagedWimLib，提供统一的 WIM 操作 API。
@@ -26,5 +26,6 @@ public interface IWimService
     Task ExtractImageAsync(
         string imagePath, int index, string targetDir,
         IProgress<(ulong current, ulong total)>? progress = null,
+        Action<WimExtractStage>? stageChanged = null,
         CancellationToken ct = default);
 }

@@ -10,7 +10,7 @@ using Microsoft.UI.Xaml.Navigation;
 using WTGWizard.Helpers;
 using WTGWizard.Main;
 using WTGWizard.Models;
-using WTGWizard.Shared.Services.Wim;
+using WTGWizard.Shared.Services.WimService;
 using WTGWizard.ViewModels;
 
 namespace WTGWizard.Pages.Steps;

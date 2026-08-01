@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml;
 using System;
 using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
-using WTGWizard.Shared.Services.Wim;
+using WTGWizard.Shared.Services.WimService;
 using WTGWizard.ViewModels;
 
 namespace WTGWizard.Main;
