@@ -187,6 +187,15 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Avg Resp. 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_DiskPerf_AvgRespLabel {
+            get {
+                return ResourceManager.GetString("Page.Task.DiskPerf.AvgRespLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Disk Busy 的本地化字符串。
         /// </summary>
         public static string Page_Task_DiskPerf_BusyLabel {

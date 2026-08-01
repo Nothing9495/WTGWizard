@@ -246,6 +246,7 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
 
         DiskNumText.Text = "-";
         DiskBusyText.Text = "-";
+        DiskAvgRespText.Text = "-";
         DiskReadText.Text = "-";
         DiskWriteText.Text = "-";
     }
@@ -255,6 +256,7 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
         DispatcherQueue.TryEnqueue(() =>
         {
             DiskBusyText.Text = snapshot.BusyDisplay;
+            DiskAvgRespText.Text = snapshot.AvgResponseDisplay;
             DiskReadText.Text = snapshot.ReadDisplay;
             DiskWriteText.Text = snapshot.WriteDisplay;
         });

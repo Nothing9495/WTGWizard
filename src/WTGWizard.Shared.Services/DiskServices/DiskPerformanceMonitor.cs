@@ -8,22 +8,27 @@ using static Vanara.PInvoke.Kernel32;
 namespace WTGWizard.Shared.Services.DiskServices;
 
 /// <summary>
-/// 磁盘性能快照 — 读写速率与活动时间。
+/// 磁盘性能快照 — 读写速率、活动时间与平均响应时间。
 /// </summary>
 public sealed record DiskPerformanceSnapshot(
     double ReadBytesPerSec,
     double WriteBytesPerSec,
-    double DiskBusyPercent)
+    double DiskBusyPercent,
+    double? AvgResponseTimeMs)
 {
     public string ReadDisplay => $"{ReadBytesPerSec / 1_048_576:F2} MB/s";
     public string WriteDisplay => $"{WriteBytesPerSec / 1_048_576:F2} MB/s";
     public string BusyDisplay => $"{DiskBusyPercent:F0}%";
+    public string AvgResponseDisplay =>
+        AvgResponseTimeMs is double v ? $"{v:F2} ms" : "-";
     public string ReadWriteDisplay => $"{ReadBytesPerSec / 1_048_576:F0} MB/s / {WriteBytesPerSec / 1_048_576:F0} MB/s";
 }
 
 /// <summary>
 /// 基于 IOCTL_DISK_PERFORMANCE 的磁盘性能监控器。
-/// 通过轮询累积计数器计算实时速率。
+/// 通过轮询累积计数器计算实时速率与平均响应时间。
+/// 平均响应时间 = (ReadTime + WriteTime) / (ReadCount + WriteCount)，与任务管理器/PerfMon 的
+/// "Avg. Disk sec/Transfer" 同源（PDH 底层即为这些计数器）。
 /// 参考：https://learn.microsoft.com/en-us/windows/win32/api/winioctl/ns-winioctl-disk_performance
 /// </summary>
 public sealed class DiskPerformanceMonitor : IDisposable
@@ -38,12 +43,16 @@ public sealed class DiskPerformanceMonitor : IDisposable
     private DiskPerformanceSnapshot? _snapshot;
     private SafeHFILE? _deviceHandle;
 
-    // 采样基线：只缓存 4 个 long 值
+    // 采样基线：缓存 IOCTL 计数器的上次采样值
     private bool _hasBaseline;
     private long _prevBytesRead;
     private long _prevBytesWritten;
     private long _prevIdleTime;
     private long _prevQueryTime;
+    private long _prevReadTime;
+    private long _prevWriteTime;
+    private long _prevReadCount;
+    private long _prevWriteCount;
 
     public DiskPerformanceSnapshot? CurrentSnapshot
     {
@@ -138,6 +147,10 @@ public sealed class DiskPerformanceMonitor : IDisposable
         long curBytesWritten = perf.BytesWritten;
         long curIdleTime = perf.IdleTime;
         long curQueryTime = perf.QueryTime;
+        long curReadTime = perf.ReadTime;
+        long curWriteTime = perf.WriteTime;
+        long curReadCount = perf.ReadCount;
+        long curWriteCount = perf.WriteCount;
 
         // 首次采样：存储基线，返回 null
         if (!_hasBaseline)
@@ -146,6 +159,10 @@ public sealed class DiskPerformanceMonitor : IDisposable
             _prevBytesWritten = curBytesWritten;
             _prevIdleTime = curIdleTime;
             _prevQueryTime = curQueryTime;
+            _prevReadTime = curReadTime;
+            _prevWriteTime = curWriteTime;
+            _prevReadCount = curReadCount;
+            _prevWriteCount = curWriteCount;
             _hasBaseline = true;
             return null;
         }
@@ -158,6 +175,10 @@ public sealed class DiskPerformanceMonitor : IDisposable
             _prevBytesWritten = curBytesWritten;
             _prevIdleTime = curIdleTime;
             _prevQueryTime = curQueryTime;
+            _prevReadTime = curReadTime;
+            _prevWriteTime = curWriteTime;
+            _prevReadCount = curReadCount;
+            _prevWriteCount = curWriteCount;
             return null;
         }
 
@@ -166,12 +187,33 @@ public sealed class DiskPerformanceMonitor : IDisposable
         double writeBps = (curBytesWritten - _prevBytesWritten) / elapsedSec;
         double busyPct = Math.Clamp((1.0 - (curIdleTime - _prevIdleTime) / (double)deltaQueryTime) * 100, 0, 100);
 
+        // 平均响应时间（与任务管理器/PerfMon "Avg. Disk sec/Transfer" 同源）：
+        // avg = (ReadTime + WriteTime) / (ReadCount + WriteCount)，100ns ticks → ms（除以 1e4）。
+        // 区间内无 I/O 时返回 0（空闲）。
+        double? avgResponseMs = null;
+        long deltaReadCount = curReadCount - _prevReadCount;
+        long deltaWriteCount = curWriteCount - _prevWriteCount;
+        long deltaIO = deltaReadCount + deltaWriteCount;
+        if (deltaIO > 0)
+        {
+            long deltaTime = (curReadTime - _prevReadTime) + (curWriteTime - _prevWriteTime);
+            avgResponseMs = deltaTime / (double)deltaIO / 10_000.0;
+        }
+        else
+        {
+            avgResponseMs = 0; // 空闲 → 0.00 ms
+        }
+
         // 更新基线
         _prevBytesRead = curBytesRead;
         _prevBytesWritten = curBytesWritten;
         _prevIdleTime = curIdleTime;
         _prevQueryTime = curQueryTime;
+        _prevReadTime = curReadTime;
+        _prevWriteTime = curWriteTime;
+        _prevReadCount = curReadCount;
+        _prevWriteCount = curWriteCount;
 
-        return new DiskPerformanceSnapshot(readBps, writeBps, busyPct);
+        return new DiskPerformanceSnapshot(readBps, writeBps, busyPct, avgResponseMs);
     }
 }

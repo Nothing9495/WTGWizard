@@ -89,16 +89,36 @@
                                Text="-" />
                   </StackPanel>
                   <Border Width="1" Margin="0,4" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
-                  <!--  Disk Busy  -->
-                  <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBlock VerticalAlignment="Center" FontSize="11" Opacity="0.5" Text="{x:Bind lang:Lang.Page_Task_DiskPerf_BusyLabel}" />
-                    <TextBlock x:Name="DiskBusyText"
-                               MinWidth="50"
-                               VerticalAlignment="Center"
-                               FontFamily="Cascadia Mono"
-                               FontSize="12"
-                               FontWeight="SemiBold"
-                               Text="-" />
+                  <!--  Disk Busy + Avg Resp：垂直双行  -->
+                  <StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="4">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <TextBlock MinWidth="66"
+                                 VerticalAlignment="Center"
+                                 FontSize="11"
+                                 Opacity="0.5"
+                                 Text="{x:Bind lang:Lang.Page_Task_DiskPerf_BusyLabel}" />
+                      <TextBlock x:Name="DiskBusyText"
+                                 MinWidth="50"
+                                 VerticalAlignment="Center"
+                                 FontFamily="Cascadia Mono"
+                                 FontSize="12"
+                                 FontWeight="SemiBold"
+                                 Text="-" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <TextBlock MinWidth="66"
+                                 VerticalAlignment="Center"
+                                 FontSize="11"
+                                 Opacity="0.5"
+                                 Text="{x:Bind lang:Lang.Page_Task_DiskPerf_AvgRespLabel}" />
+                      <TextBlock x:Name="DiskAvgRespText"
+                                 MinWidth="80"
+                                 VerticalAlignment="Center"
+                                 FontFamily="Cascadia Mono"
+                                 FontSize="12"
+                                 FontWeight="SemiBold"
+                                 Text="-" />
+                    </StackPanel>
                   </StackPanel>
                   <Border Width="1" Margin="0,4" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <!--  Disk R/W：双行布局（上读下写）  -->
