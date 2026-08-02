@@ -467,7 +467,7 @@
     <value>清理映像中的应答文件，确保导入的应答文件能够生效</value>
   </data>
   <data name="Page.WizStep.AdvOptions.BCDBootGroup" xml:space="preserve">
-    <value>bcdboot 设置</value>
+    <value>bcdboot 行为</value>
   </data>
   <data name="Page.WizStep.AdvOptions.BootVerbose.Header" xml:space="preserve">
     <value>启用详细输出</value>
@@ -608,6 +608,9 @@
   <data name="Page.Task.DiskPerf.BusyLabel" xml:space="preserve">
     <value>磁盘活动时间</value>
   </data>
+  <data name="Page.Task.DiskPerf.AvgRespLabel" xml:space="preserve">
+    <value>平均响应时间</value>
+  </data>
   <data name="Page.Task.DiskPerf.ReadLabel" xml:space="preserve">
     <value>读取速度</value>
   </data>
@@ -673,8 +676,5 @@
   </data>
   <data name="Page.Task.EmptyMsg" xml:space="preserve">
     <value>从设置向导开始新的部署后，此处将显示部署进度</value>
-  </data>
-  <data name="Page.Task.DiskPerf.AvgRespLabel" xml:space="preserve">
-    <value>平均响应时间</value>
   </data>
 </root>

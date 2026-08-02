@@ -467,7 +467,7 @@ Enable "Clear in-image answer files" option if you want to use a new answer file
     <value>Clear in-image answer files before importing.</value>
   </data>
   <data name="Page.WizStep.AdvOptions.BCDBootGroup" xml:space="preserve">
-    <value>bcdboot Settings</value>
+    <value>bcdboot Behaviour</value>
   </data>
   <data name="Page.WizStep.AdvOptions.BootVerbose.Header" xml:space="preserve">
     <value>Use verbose logging</value>

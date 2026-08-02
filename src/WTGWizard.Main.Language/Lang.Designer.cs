@@ -396,7 +396,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 bcdboot Settings 的本地化字符串。
+        ///   查找类似 bcdboot Behaviour 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_AdvOptions_BCDBootGroup {
             get {
