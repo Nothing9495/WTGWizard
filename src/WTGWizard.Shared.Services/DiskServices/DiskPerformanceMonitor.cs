@@ -27,9 +27,12 @@ public sealed record DiskPerformanceSnapshot(
 /// <summary>
 /// 基于 IOCTL_DISK_PERFORMANCE 的磁盘性能监控器。
 /// 通过轮询累积计数器计算实时速率与平均响应时间。
-/// 平均响应时间 = (ReadTime + WriteTime) / (ReadCount + WriteCount)，与任务管理器/PerfMon 的
-/// "Avg. Disk sec/Transfer" 同源（PDH 底层即为这些计数器）。
 /// 参考：https://learn.microsoft.com/en-us/windows/win32/api/winioctl/ns-winioctl-disk_performance
+/// 平均响应时间计算遵循任务管理器（WdcDiskMonitor）公式：(ΔReadTime + ΔWriteTime) / 10⁴ / ΔReadCount
+/// 平均响应时间无读时保留总值；负值归零。
+/// 公式出处：TaskMonitor（Apache Lisence 2.0）对 Taskmgr.exe 的逆向分析。
+/// 项目地址：https://github.com/linesoft2/TaskMonitor，感谢他们的研究与开源！
+/// TaskMonitor 是一个很不错的任务栏常驻系统负载监测工具
 /// </summary>
 public sealed class DiskPerformanceMonitor : IDisposable
 {
@@ -187,22 +190,17 @@ public sealed class DiskPerformanceMonitor : IDisposable
         double writeBps = (curBytesWritten - _prevBytesWritten) / elapsedSec;
         double busyPct = Math.Clamp((1.0 - (curIdleTime - _prevIdleTime) / (double)deltaQueryTime) * 100, 0, 100);
 
-        // 平均响应时间（与任务管理器/PerfMon "Avg. Disk sec/Transfer" 同源）：
-        // avg = (ReadTime + WriteTime) / (ReadCount + WriteCount)，100ns ticks → ms（除以 1e4）。
-        // 区间内无 I/O 时返回 0（空闲）。
+        // 计数器重置时归零保护
+        if (readBps < 0) readBps = 0;
+        if (writeBps < 0) writeBps = 0;
+
+        // 平均响应时间计算
         double? avgResponseMs = null;
         long deltaReadCount = curReadCount - _prevReadCount;
         long deltaWriteCount = curWriteCount - _prevWriteCount;
-        long deltaIO = deltaReadCount + deltaWriteCount;
-        if (deltaIO > 0)
-        {
-            long deltaTime = (curReadTime - _prevReadTime) + (curWriteTime - _prevWriteTime);
-            avgResponseMs = deltaTime / (double)deltaIO / 10_000.0;
-        }
-        else
-        {
-            avgResponseMs = 0; // 空闲 → 0.00 ms
-        }
+        double respMs = ((curReadTime - _prevReadTime) + (curWriteTime - _prevWriteTime)) / 10_000.0;
+        if (deltaReadCount != 0) respMs /= deltaReadCount;
+        avgResponseMs = respMs < 0 ? 0 : respMs;
 
         // 更新基线
         _prevBytesRead = curBytesRead;
