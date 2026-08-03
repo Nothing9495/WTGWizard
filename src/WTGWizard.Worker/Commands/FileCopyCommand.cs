@@ -18,6 +18,8 @@ internal static class FileCopyCommand
         string dst = CommandArgs.GetArg(args, "--dst");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
 
+        WorkerDebug.Write($"FileCopy: src={src}, dst={dst}, pipe={pipeName}");
+
         using var pipe = PipeHelper.Connect(pipeName);
         pipe.WriteRunning("filecopy", $"Copying {src} -> {dst}");
 

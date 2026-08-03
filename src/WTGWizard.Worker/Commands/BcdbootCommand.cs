@@ -18,6 +18,8 @@ internal static class BcdbootCommand
         string pipeName = CommandArgs.GetArg(args, "--pipe");
         int timeoutMs = int.TryParse(CommandArgs.TryGetArg(args, "--timeout"), out var t) ? t : 0;
 
+        WorkerDebug.Write($"BCDBoot: args={bcdbootArgs}, pipe={pipeName}, timeout={timeoutMs}ms");
+
         using var pipe = PipeHelper.Connect(pipeName);
         pipe.WriteRunning("bcdboot", $"Executing bcdboot: {bcdbootArgs}");
 

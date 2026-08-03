@@ -21,6 +21,7 @@ internal static class ProcessRunner
     public static int Run(string fileName, string arguments, int timeoutMs = 0)
     {
         var encoding = EncodingResolver.Resolve(fileName);
+        WorkerDebug.Write($"Process: file={fileName}, args={arguments}, timeout={timeoutMs}ms, encoding={encoding.WebName}");
 
         using var process = new Process
         {
@@ -74,6 +75,7 @@ internal static class ProcessRunner
         {
             if (!exited.Wait(TimeSpan.FromMilliseconds(timeoutMs)))
             {
+                WorkerDebug.Write($"Process timed out after {timeoutMs}ms: {fileName}");
                 process.Kill(entireProcessTree: true);
                 throw new TimeoutException($"Process timed out after {timeoutMs}ms: {fileName}");
             }
@@ -84,6 +86,8 @@ internal static class ProcessRunner
         }
 
         outputDone.Wait(TimeSpan.FromSeconds(2));
+
+        WorkerDebug.Write($"Process exited: {fileName}, code={exitCode}");
 
         return exitCode;
     }

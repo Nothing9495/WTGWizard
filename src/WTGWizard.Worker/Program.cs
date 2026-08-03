@@ -30,6 +30,14 @@ static class Program
 
         logService.Info("Worker", "Worker started, PID: {Pid}", Environment.ProcessId);
 
+        WorkerDebug.Initialize(args);
+
+#if DEBUG
+        WorkerDebug.Write("You're running a debug build of WTGWizard.Worker. Debug output is forced enabled.");
+#endif
+
+        WorkerDebug.Write($"Worker started, args: {string.Join(' ', args)}");
+
         if (args.Length < 2)
         {
             Console.Error.WriteLine("Usage: WTGWizard.Worker <command> [options...] --pipe <name>");

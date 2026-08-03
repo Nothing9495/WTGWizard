@@ -20,6 +20,8 @@ internal static class EncodingResolver
         // 系统 OEM 代码页，自动适配运行系统语言：中文 936 / 英文 437 / 日文 932
         SystemEncoding = System.Text.Encoding.GetEncoding(
             CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
+
+        WorkerDebug.Write($"EncodingResolver: OEM code page={SystemEncoding.CodePage} ({SystemEncoding.WebName})");
     }
 
     /// <summary>

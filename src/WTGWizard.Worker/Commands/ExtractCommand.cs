@@ -33,6 +33,8 @@ internal static class ExtractCommand
         string targetDir = CommandArgs.GetArg(args, "--target");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
 
+        WorkerDebug.Write($"Extract: wim={wimPath}, index={index}, target={targetDir}, pipe={pipeName}");
+
         using var pipe = PipeHelper.Connect(pipeName);
         pipe.WriteRunning("extract", $"Extracting {wimPath} #{index} -> {targetDir}");
 

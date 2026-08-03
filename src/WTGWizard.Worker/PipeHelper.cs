@@ -18,6 +18,7 @@ internal static class PipeHelper
         var pipe = new PipeWriter();
         try
         {
+            WorkerDebug.Write($"Pipe: connecting to {pipeName}");
             pipe.Connect(pipeName, timeoutMs: PipeProtocol.ConnectTimeoutMs);
             return pipe;
         }
