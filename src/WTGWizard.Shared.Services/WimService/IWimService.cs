@@ -17,7 +17,8 @@ public interface IWimService
     Task<ImageInfo> GetImageInfo(string imagePath, int index, CancellationToken ct = default);
 
     /// <summary>校验映像完整性。失败时抛出异常。</summary>
-    Task VerifyAsync(string imagePath, CancellationToken ct = default);
+    Task VerifyAsync(string imagePath,
+        IProgress<double>? progress = null, CancellationToken ct = default);
 
     /// <summary>提取映像内指定文件到目录。</summary>
     Task ExtractFileAsync(string imagePath, int index, string wimFilePath, string targetDir, CancellationToken ct = default);

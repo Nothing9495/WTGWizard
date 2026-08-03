@@ -115,23 +115,46 @@ public sealed class WimService : IWimService
     }
 
     /// <summary>校验映像完整性。失败时抛出异常。</summary>
-    public async Task VerifyAsync(string imagePath, CancellationToken ct = default)
+    public async Task VerifyAsync(string imagePath,
+        IProgress<double>? progress = null, CancellationToken ct = default)
     {
         await Task.Run(() =>
         {
             ct.ThrowIfCancellationRequested();
             try
             {
-                using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None);
+                using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None, OnProgress, null);
                 wim.VerifyWim();
                 _logger.Info("WimService", "VerifyAsync: Image {ImagePath} passed verification.", imagePath);
+
+                CallbackStatus OnProgress(ProgressMsg msg, object? info, object? ctx)
+                {
+                    // 通过返回 Abort 触发 wimlib 内部取消，而非抛异常穿过原生代码边界
+                    if (ct.IsCancellationRequested)
+                        return CallbackStatus.Abort;
+
+                    // 进度仅来自 VERIFY_STREAMS（数据流校验期）——
+                    // BEGIN/END_VERIFY_IMAGE 仅标记各映像元数据校验的起止
+                    if (msg == ProgressMsg.VerifyStreams && info is VerifyStreamsProgress vp
+                        && vp.TotalBytes > 0)
+                    {
+                        progress?.Report(vp.CurrentBytes * 100.0 / vp.TotalBytes);
+                    }
+
+                    return CallbackStatus.Continue;
+                }
+            }
+            catch (WimLibException ex) when (ex.ErrorCode == ErrorCode.AbortedByProgress)
+            {
+                _logger.Info("WimService", "VerifyAsync: Verification is aborted by progress.");
+                throw new OperationCanceledException(ct);
             }
             catch (Exception ex)
             {
                 _logger.Error("WimService", "VerifyAsync: Method failed - ({Error}).", ex.Message);
                 throw;
             }
-        });
+        }, ct);
     }
 
     /// <summary>提取映像内指定文件到目录。</summary>
