@@ -677,4 +677,16 @@ This setting is available only on Windows 11 version 26100.8037 and later.</valu
   <data name="Page.Task.EmptyMsg" xml:space="preserve">
     <value>Start a new deployment from the setup wizard to see its progress here.</value>
   </data>
+  <data name="Page.Settings.Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Page.Settings.WorkerGroup" xml:space="preserve">
+    <value>Worker Settings</value>
+  </data>
+  <data name="Page.Settings.WorkerDbgOutput.Header" xml:space="preserve">
+    <value>Enable Debug Output</value>
+  </data>
+  <data name="Page.Settings.WorkerDbgOutput.Desc" xml:space="preserve">
+    <value>Append "--debug" parameter to enable debug output in WTGWizard.Worker.</value>
+  </data>
 </root>

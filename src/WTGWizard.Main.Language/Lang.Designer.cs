@@ -178,6 +178,42 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Settings 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_Title {
+            get {
+                return ResourceManager.GetString("Page.Settings.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Append &quot;--debug&quot; parameter to enable debug output in WTGWizard.Worker. 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_WorkerDbgOutput_Desc {
+            get {
+                return ResourceManager.GetString("Page.Settings.WorkerDbgOutput.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Enable Debug Output 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_WorkerDbgOutput_Header {
+            get {
+                return ResourceManager.GetString("Page.Settings.WorkerDbgOutput.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Worker Settings 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_WorkerGroup {
+            get {
+                return ResourceManager.GetString("Page.Settings.WorkerGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Abort 的本地化字符串。
         /// </summary>
         public static string Page_Task_AbortButton {

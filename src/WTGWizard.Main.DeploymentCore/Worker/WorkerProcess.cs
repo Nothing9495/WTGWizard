@@ -24,6 +24,8 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         string exePath = FindExe();
         string pipeName = PipeProtocol.GeneratePipeName();
         string workerArgs = $"{command.Command} {command.Arguments} --pipe {pipeName}";
+        if (WorkerSettings.EnableDebugOutput)
+            workerArgs += " --debug";
 
         _logger.Debug("WorkerMgr", "Launching Worker: {Path} {Args}", exePath, workerArgs);
 
@@ -111,6 +113,10 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
             _logger.Error("WorkerMgr", "Unexpected error: {Msg}", ex.Message);
             KillProcessTree(process);
             return WorkerExecutionResult.Fail(-1, ex.Message);
+        }
+        finally
+        {
+            TerminalOutputBuffer.Shared.AppendBlankLine();
         }
     }
 

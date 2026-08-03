@@ -126,10 +126,10 @@
   <data name="App.NavTabTask.Content" xml:space="preserve">
     <value>任务</value>
   </data>
-  <data name="Page.Welcome.WelcomeTitle.Text" xml:space="preserve">
+  <data name="Page.Welcome.WelcomeTitle" xml:space="preserve">
     <value>欢迎使用 WTGWizard👋</value>
   </data>
-  <data name="Page.Welcome.WelcomeMsg.Text" xml:space="preserve">
+  <data name="Page.Welcome.WelcomeMsg" xml:space="preserve">
     <value>WTGWizard 将帮助您逐步创建个性化的 Windows To Go 工作站！</value>
   </data>
   <data name="Page.Welcome.GoWizard.Content" xml:space="preserve">
@@ -676,5 +676,17 @@
   </data>
   <data name="Page.Task.EmptyMsg" xml:space="preserve">
     <value>从设置向导开始新的部署后，此处将显示部署进度</value>
+  </data>
+  <data name="Page.Settings.Title" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="Page.Settings.WorkerGroup" xml:space="preserve">
+    <value>Worker 设置</value>
+  </data>
+  <data name="Page.Settings.WorkerDbgOutput.Header" xml:space="preserve">
+    <value>启用调试输出</value>
+  </data>
+  <data name="Page.Settings.WorkerDbgOutput.Desc" xml:space="preserve">
+    <value>为Worker追加“--debug”参数，使Worker运行时输出调试信息</value>
   </data>
 </root>
