@@ -103,6 +103,10 @@ public sealed class WimService : IWimService
                 }
 
                 var info = BuildImageInfo(wim, index, foundPaths);
+                _logger.Debug("WimService", "GetImageInfo: index={Index}, name={Name}, arch={Arch}, build={Build}, expand={Expand}GB",
+                    info.Index, info.Name, info.Architecture, info.BuildNumber, info.ExpandedSizeGB);
+                if (foundPaths.Count > 0)
+                    _logger.Debug("WimService", "GetImageInfo: AnsFile detected: {Paths}", string.Join(", ", foundPaths));
                 _logger.Debug("WimService", "GetImageInfo: Loaded index {Index} info.", index);
                 return info;
             }
@@ -121,6 +125,8 @@ public sealed class WimService : IWimService
         await Task.Run(() =>
         {
             ct.ThrowIfCancellationRequested();
+            _logger.Info("WimService", "VerifyAsync: Verifying {ImagePath}", imagePath);
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 // ① 打开阶段 — 失败原样重抛（WimLibException → 调用方归 Failed）
@@ -136,7 +142,7 @@ public sealed class WimService : IWimService
                     throw new WimVerificationException(Wim.GetErrorString(ex.ErrorCode), ex);
                 }
 
-                _logger.Info("WimService", "VerifyAsync: Image {ImagePath} passed verification.", imagePath);
+                _logger.Info("WimService", "VerifyAsync: Image {ImagePath} passed verification in {Elapsed:F1}s.", imagePath, sw.Elapsed.TotalSeconds);
 
                 CallbackStatus OnProgress(ProgressMsg msg, object? info, object? ctx)
                 {
@@ -160,7 +166,8 @@ public sealed class WimService : IWimService
                 _logger.Info("WimService", "VerifyAsync: Verification is aborted by progress.");
                 throw new OperationCanceledException(ct);
             }
-            catch (Exception ex)
+            // NotPass（内容损坏）已由内层 Warn 记录，避免在此重复记录为 Error
+            catch (Exception ex) when (ex is not WimVerificationException)
             {
                 _logger.Error("WimService", "VerifyAsync: Method failed - ({Error}).", ex.Message);
                 throw;
@@ -174,6 +181,7 @@ public sealed class WimService : IWimService
         await Task.Run(() =>
         {
             ct.ThrowIfCancellationRequested();
+            _logger.Debug("WimService", "ExtractFileAsync: Extracting {WimFilePath} (index {Index}) from {ImagePath} to {TargetDir}", wimFilePath, index, imagePath, targetDir);
             try
             {
                 using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None);
@@ -215,8 +223,9 @@ public sealed class WimService : IWimService
             {
                 using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None, OnProgress, null);
                 _logger.Info("WimService", "ExtractImage:  - Extracting index {Index} from {ImagePath} to {TargetDir}", index, imagePath, targetDir);
+                var sw = System.Diagnostics.Stopwatch.StartNew();
                 wim.ExtractImage(index, targetDir, ExtractFlags.None);
-                _logger.Info("WimService", "ExtractImage: {ImagePath} - Index {Index} extraction completed", imagePath, index);
+                _logger.Info("WimService", "ExtractImage: {ImagePath} - Index {Index} extraction completed in {Elapsed:F1}s", imagePath, index, sw.Elapsed.TotalSeconds);
 
                 CallbackStatus OnProgress(ProgressMsg msg, object? info, object? ctx)
                 {
