@@ -36,7 +36,12 @@ public sealed class TempFileManager : IDisposable
     /// </summary>
     public static void CleanupAll()
     {
-        try { Directory.Delete(Path.Combine(Path.GetTempPath(), "WTGWizard"), recursive: true); }
+        try
+        {
+            string dir = Path.Combine(Path.GetTempPath(), "WTGWizard");
+            if (Directory.Exists(dir))
+                Directory.Delete(dir, recursive: true);
+        }
         catch { /* best effort */ }
     }
 }
