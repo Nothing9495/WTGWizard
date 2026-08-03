@@ -1,7 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +50,7 @@ public sealed partial class ImageConfigPage : Page
         VM.Image.VerifyProgress = 0;
         VM.Image.ShowOpenError = false;
         VM.Image.FilePath = path;
+        VM.Image.Indices = [];   // 清空旧索引：修复换文件期间索引切换竞态 + 确保 ComboBox 归 -1 使事件必然触发
 
         // 句柄占用（程序生命周期）：防止映像被更名/移动/写入（FileShare.Read 兼容 Worker 读取）
         if (!ImageFileGuard.Acquire(path, out var openErr))
@@ -67,6 +66,7 @@ public sealed partial class ImageConfigPage : Page
             var indices = await _wimService.EnumerateIndicesAsync(path);
             VM.Image.Indices = new ObservableCollection<string>(indices.Select(i => i.ToString()));
 
+            // SelectedIndex -1 → 0 必然触发 SelectionChanged → RefreshImageStateAsync 加载（事件驱动，避免重复调用）
             if (indices.Count > 0)
                 VM.Image.SelectedIndex = 0;
         }
@@ -77,8 +77,6 @@ public sealed partial class ImageConfigPage : Page
             ResetImageState();
             return;
         }
-
-        await RefreshImageStateAsync();
     }
 
     private async void ImageIndexComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
