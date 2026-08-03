@@ -95,7 +95,7 @@ public sealed partial class MainWindow : Window
     {
         TitleBarHelper.ApplySystemThemeToCaptionButtons(this, RootGrid.ActualTheme);
         // Window 样式控制
-        WindowHelper.SetWindowSize(this, 1100, 740);
+        WindowHelper.SetWindowSize(this, 1100, 760);
         WindowHelper.SetWindowMinSize(this, 1100, 680);
     }
 

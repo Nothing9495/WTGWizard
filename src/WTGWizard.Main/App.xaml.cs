@@ -33,14 +33,17 @@ public partial class App : Application
     private void OnMainWindowClosed(object sender, WindowEventArgs args)
     {
         // 应用关闭时的清理逻辑
-        // TODO: WimService.Cleanup();导致Access violation问题，等待后续排查。
-        //WimService.Cleanup();
+        // TODO: WimService.Cleanup(); 补充对VerifyAsync的Cancel操作
+        WimService.Cleanup();
 
         var logger = Services.GetService<ILoggerService>();
         logger?.Shutdown();
 
         // 清理临时目录（部署中断残留兜底）
         TempFileManager.CleanupAll();
+
+        // 释放映像句柄占用（进程退出 OS 亦会回收，显式释放保持整洁）
+        ImageFileGuard.Release();
 
         // TODO: 程序关闭后有概率触发Access violation异常，等待进一步排查。
     }
