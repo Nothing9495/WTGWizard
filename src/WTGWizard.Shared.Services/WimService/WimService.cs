@@ -175,19 +175,30 @@ public sealed class WimService : IWimService
         }, ct);
     }
 
-    /// <summary>提取映像内指定文件到目录。</summary>
-    public async Task ExtractFileAsync(string imagePath, int index, string wimFilePath, string targetDir, CancellationToken ct = default)
+    /// <summary>提取映像内指定文件到指定目标文件路径（不保留目录结构、不提取 ACL）。</summary>
+    public async Task ExtractFileAsync(string imagePath, int index, string wimFilePath, string targetFilePath, CancellationToken ct = default)
     {
         await Task.Run(() =>
         {
             ct.ThrowIfCancellationRequested();
-            _logger.Debug("WimService", "ExtractFileAsync: Extracting {WimFilePath} (index {Index}) from {ImagePath} to {TargetDir}", wimFilePath, index, imagePath, targetDir);
+            string? targetDir = Path.GetDirectoryName(targetFilePath);
+            if (string.IsNullOrEmpty(targetDir))
+                throw new ArgumentException("targetFilePath must have a directory", nameof(targetFilePath));
+            Directory.CreateDirectory(targetDir);
+
+            _logger.Debug("WimService", "ExtractFileAsync: Extracting {WimFilePath} (index {Index}) from {ImagePath} to {TargetFilePath}", wimFilePath, index, imagePath, targetFilePath);
             try
             {
                 using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None);
-                Directory.CreateDirectory(targetDir);
-                wim.ExtractPath(index, targetDir, wimFilePath, ExtractFlags.None);
-                _logger.Info("WimService", "ExtractFileAsync: Extracted {WimFilePath} to {TargetDir}", wimFilePath, targetDir);
+                // 提取到目标目录（不保留目录结构 → 仅文件名；NoAcls → 不带 WIM 安全描述符）
+                wim.ExtractPath(index, targetDir, wimFilePath,
+                    ExtractFlags.NoPreserveDirStructure | ExtractFlags.NoAcls);
+
+                // 移动为指定的目标文件名（覆盖已存在文件）
+                string extracted = Path.Combine(targetDir, Path.GetFileName(wimFilePath));
+                File.Move(extracted, targetFilePath, overwrite: true);
+
+                _logger.Info("WimService", "ExtractFileAsync: Extracted {WimFilePath} to {TargetFilePath}", wimFilePath, targetFilePath);
             }
             catch (Exception ex)
             {

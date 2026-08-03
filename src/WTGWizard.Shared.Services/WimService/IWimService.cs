@@ -20,8 +20,8 @@ public interface IWimService
     Task VerifyAsync(string imagePath,
         IProgress<double>? progress = null, CancellationToken ct = default);
 
-    /// <summary>提取映像内指定文件到目录。</summary>
-    Task ExtractFileAsync(string imagePath, int index, string wimFilePath, string targetDir, CancellationToken ct = default);
+    /// <summary>提取映像内指定文件到指定目标文件路径。</summary>
+    Task ExtractFileAsync(string imagePath, int index, string wimFilePath, string targetFilePath, CancellationToken ct = default);
 
     /// <summary>将 WIM 映像提取到目标目录。等价于 DISM /Apply-Image。</summary>
     Task ExtractImageAsync(
