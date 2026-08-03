@@ -106,11 +106,120 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Image Verification Failed! 的本地化字符串。
+        ///   查找类似 Failed to open the image: {0} 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageOpenFailed_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageOpenFailed.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cannot Open Image 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageOpenFailed_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageOpenFailed.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Failed to verify the image: {0} 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationFailed_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationFailed.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image Verification Failed 的本地化字符串。
         /// </summary>
         public static string InfoBar_ImageVerificationFailed_Title {
             get {
                 return ResourceManager.GetString("InfoBar.ImageVerificationFailed.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cancel 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationInProgress_ActionBtn {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationInProgress.ActionBtn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Verifying the image file integrity. Proceeding to the next step is not allowed during this process. 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationInProgress_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationInProgress.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Verifying Selected Image 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationInProgress_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationInProgress.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image failed to pass verification due to: {0}.
+        ///Continue to deploy with this image will cause unexpected problems. 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationNotPass_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationNotPass.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image Verification Not Pass! 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationNotPass_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationNotPass.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The image has been verified and is ready for deployment. 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationPass_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationPass.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image Verification Pass! 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationPass_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationPass.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 An unexpected error occurred: {0} 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationUnknown_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationUnknown.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Unknown Error During Verification 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_ImageVerificationUnknown_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.ImageVerificationUnknown.Title", resourceCulture);
             }
         }
         

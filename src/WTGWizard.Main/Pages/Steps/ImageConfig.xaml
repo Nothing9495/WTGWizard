@@ -8,6 +8,7 @@
       xmlns:cc="using:CommunityToolkit.WinUI.Controls"
       xmlns:ui="using:CommunityToolkit.WinUI"
       xmlns:lang="using:WTGWizard.Main.Language"
+      xmlns:vm="using:WTGWizard.ViewModels"
       mc:Ignorable="d"
       NavigationCacheMode="Required">
 
@@ -25,11 +26,46 @@
                   Margin="0,12,0,6"
                   FontWeight="SemiBold"/>
         <uc:ImageInfoCard x:Name="ImageInfoCard" />
-        <InfoBar Title="{x:Bind lang:Lang.InfoBar_ImageVerificationFailed_Title}"
-                 Message="{x:Bind VM.Image.VerifyMessage, Mode=OneWay}"
-                 Severity="Warning"
-                 IsOpen="{x:Bind VM.Image.ShowVerifyError, Mode=OneWay}"
-                 IsClosable="False" />
+
+        <!-- 打开映像失败 InfoBar（与校验状态机无关，独立显示） -->
+        <InfoBar Severity="Error" IsClosable="True" IsOpen="{x:Bind VM.Image.ShowOpenError, Mode=OneWay}"
+                 Title="{x:Bind lang:Lang.InfoBar_ImageOpenFailed_Title}"
+                 Message="{x:Bind VM.Image.OpenErrorDisplayMessage, Mode=OneWay}" />
+
+        <!-- 校验状态 InfoBar：进行中（不可关）/ 通过（可关）/ 未通过·失败·未知（不可关） -->
+        <cc:SwitchPresenter TargetType="vm:VerifyStatus"
+                            Value="{x:Bind VM.Image.VerifyStatus, Mode=OneWay}">
+          <cc:Case Value="Verifying">
+            <InfoBar Severity="Informational" IsClosable="False" IsOpen="True"
+                     Title="{x:Bind lang:Lang.InfoBar_ImageVerificationInProgress_Title}"
+                     Message="{x:Bind lang:Lang.InfoBar_ImageVerificationInProgress_Message}">
+              <InfoBar.ActionButton>
+                <Button Content="{x:Bind lang:Lang.InfoBar_ImageVerificationInProgress_ActionBtn}" Click="CancelVerifyButton_Click" HorizontalAlignment="Right"/>
+              </InfoBar.ActionButton>
+            </InfoBar>
+          </cc:Case>
+          <cc:Case Value="Succeeded">
+            <InfoBar Severity="Success" IsClosable="True" IsOpen="{x:Bind VM.Image.ShowVerifySuccess, Mode=OneWay}"
+                     Title="{x:Bind lang:Lang.InfoBar_ImageVerificationPass_Title}"
+                     Message="{x:Bind lang:Lang.InfoBar_ImageVerificationPass_Message}"
+                     CloseButtonClick="VerifySuccessInfoBar_Closed" />
+          </cc:Case>
+          <cc:Case Value="NotPass">
+            <InfoBar Severity="Error" IsClosable="False" IsOpen="True"
+                     Title="{x:Bind lang:Lang.InfoBar_ImageVerificationNotPass_Title}"
+                     Message="{x:Bind VM.Image.VerifyNotPassMessage, Mode=OneWay}" />
+          </cc:Case>
+          <cc:Case Value="Failed">
+            <InfoBar Severity="Error" IsClosable="False" IsOpen="True"
+                     Title="{x:Bind lang:Lang.InfoBar_ImageVerificationFailed_Title}"
+                     Message="{x:Bind VM.Image.VerifyFailedMessage, Mode=OneWay}" />
+          </cc:Case>
+          <cc:Case Value="Unknown">
+            <InfoBar Severity="Error" IsClosable="False" IsOpen="True"
+                     Title="{x:Bind lang:Lang.InfoBar_ImageVerificationUnknown_Title}"
+                     Message="{x:Bind VM.Image.VerifyUnknownMessage, Mode=OneWay}" />
+          </cc:Case>
+        </cc:SwitchPresenter>
 
         <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelImgGroup}"
                           FontSize="14"
@@ -42,6 +78,7 @@
             <uc:FilePickerControl x:Name="ImageFilePicker"
                                   FileTypeFilter=".wim;.esd"
                                   FileSelected="ImageFilePicker_FileSelected" 
+                                  IsEnabled="{x:Bind VM.Image.CanSelectImage, Mode=OneWay}"
                                   VerticalAlignment="Center">
               <uc:FilePickerControl.ButtonContent>
                 <FontIcon FontSize="14" Glyph="&#xE8A5;" />
@@ -65,6 +102,38 @@
                     MinWidth="150"
                     VerticalAlignment="Center"
                     SelectionChanged="ImageIndexComboBox_SelectionChanged"/>
+        </cc:SettingsCard>
+
+        <cc:SettingsCard Header="校验映像完整性"
+                         Description="校验映像的数据完整性，这可能耗费需要较长时间"
+                         HeaderIcon="{ui:FontIcon Glyph=&#xEE6F;}">
+          <cc:SwitchPresenter TargetType="vm:VerifyStatus"
+                              Value="{x:Bind VM.Image.VerifyStatus, Mode=OneWay}">
+            <cc:Case Value="Idle">
+              <Button Content="开始校验" Click="VerifyButton_Click"
+                      IsEnabled="{x:Bind VM.Image.CanVerify, Mode=OneWay}" />
+            </cc:Case>
+            <cc:Case Value="Verifying">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="{x:Bind VM.Image.VerifyProgressDisplay, Mode=OneWay}"
+                           VerticalAlignment="Center" MinWidth="42" />
+                <ProgressBar Value="{x:Bind VM.Image.VerifyProgress, Mode=OneWay}"
+                             Maximum="100" Width="150" VerticalAlignment="Center" />
+              </StackPanel>
+            </cc:Case>
+            <cc:Case Value="Succeeded">
+              <Button Content="重新校验" Click="VerifyButton_Click" />
+            </cc:Case>
+            <cc:Case Value="NotPass">
+              <Button Content="重新校验" Click="VerifyButton_Click" />
+            </cc:Case>
+            <cc:Case Value="Failed">
+              <Button Content="重新校验" Click="VerifyButton_Click" />
+            </cc:Case>
+            <cc:Case Value="Unknown">
+              <Button Content="重新校验" Click="VerifyButton_Click" />
+            </cc:Case>
+          </cc:SwitchPresenter>
         </cc:SettingsCard>
       </StackPanel>
     </StackPanel>

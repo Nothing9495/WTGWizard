@@ -208,7 +208,7 @@
     <value>显示描述：</value>
   </data>
   <data name="InfoBar.ImageVerificationFailed.Title" xml:space="preserve">
-    <value>映像校验失败！</value>
+    <value>校验映像时发生错误</value>
   </data>
   <data name="Page.WizStep.DeployMethod.Title" xml:space="preserve">
     <value>部署方式</value>
@@ -688,5 +688,42 @@
   </data>
   <data name="Page.Settings.WorkerDbgOutput.Desc" xml:space="preserve">
     <value>为Worker追加“--debug”参数，使Worker运行时输出调试信息</value>
+  </data>
+  <data name="InfoBar.ImageVerificationInProgress.Title" xml:space="preserve">
+    <value>正在校验映像</value>
+  </data>
+  <data name="InfoBar.ImageVerificationInProgress.Message" xml:space="preserve">
+    <value>正在校验映像完整性，期间不允许进入下一步</value>
+  </data>
+  <data name="InfoBar.ImageVerificationInProgress.ActionBtn" xml:space="preserve">
+    <value>取消校验</value>
+  </data>
+  <data name="InfoBar.ImageVerificationPass.Title" xml:space="preserve">
+    <value>映像校验通过！</value>
+  </data>
+  <data name="InfoBar.ImageVerificationPass.Message" xml:space="preserve">
+    <value>当前映像已通过校验，可以用于部署</value>
+  </data>
+  <data name="InfoBar.ImageVerificationNotPass.Title" xml:space="preserve">
+    <value>映像校验未通过！</value>
+  </data>
+  <data name="InfoBar.ImageVerificationNotPass.Message" xml:space="preserve">
+    <value>当前映像文件未通过校验，使用该映像继续部署可能遇到意外问题！
+失败原因：{0}</value>
+  </data>
+  <data name="InfoBar.ImageVerificationFailed.Message" xml:space="preserve">
+    <value>校验映像时发生错误：{0}</value>
+  </data>
+  <data name="InfoBar.ImageVerificationUnknown.Title" xml:space="preserve">
+    <value>校验映像时发生未知错误</value>
+  </data>
+  <data name="InfoBar.ImageVerificationUnknown.Message" xml:space="preserve">
+    <value>校验映像时发生未预期的错误：{0}</value>
+  </data>
+  <data name="InfoBar.ImageOpenFailed.Title" xml:space="preserve">
+    <value>无法打开映像</value>
+  </data>
+  <data name="InfoBar.ImageOpenFailed.Message" xml:space="preserve">
+    <value>打开映像失败：{0}</value>
   </data>
 </root>

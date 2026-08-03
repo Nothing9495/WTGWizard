@@ -21,9 +21,9 @@ public sealed partial class ImageInfoCard : UserControl
 
     public static readonly DependencyProperty LogoSourceProperty =
         DependencyProperty.Register(nameof(LogoSource), typeof(ImageSource), typeof(ImageInfoCard), null);
-    public ImageSource LogoSource
+    public ImageSource? LogoSource
     {
-        get => (ImageSource)GetValue(LogoSourceProperty);
+        get => (ImageSource?)GetValue(LogoSourceProperty);
         set => SetValue(LogoSourceProperty, value);
     }
 

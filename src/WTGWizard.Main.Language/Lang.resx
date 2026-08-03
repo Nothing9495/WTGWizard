@@ -208,7 +208,7 @@
     <value>Display Description:</value>
   </data>
   <data name="InfoBar.ImageVerificationFailed.Title" xml:space="preserve">
-    <value>Image Verification Failed!</value>
+    <value>Image Verification Failed</value>
   </data>
   <data name="Page.WizStep.DeployMethod.Title" xml:space="preserve">
     <value>Deploy Method</value>
@@ -688,5 +688,42 @@ This setting is available only on Windows 11 version 26100.8037 and later.</valu
   </data>
   <data name="Page.Settings.WorkerDbgOutput.Desc" xml:space="preserve">
     <value>Append "--debug" parameter to enable debug output in WTGWizard.Worker.</value>
+  </data>
+  <data name="InfoBar.ImageVerificationInProgress.Title" xml:space="preserve">
+    <value>Verifying Selected Image</value>
+  </data>
+  <data name="InfoBar.ImageVerificationInProgress.Message" xml:space="preserve">
+    <value>Verifying the image file integrity. Proceeding to the next step is not allowed during this process.</value>
+  </data>
+  <data name="InfoBar.ImageVerificationInProgress.ActionBtn" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="InfoBar.ImageVerificationPass.Title" xml:space="preserve">
+    <value>Image Verification Pass!</value>
+  </data>
+  <data name="InfoBar.ImageVerificationPass.Message" xml:space="preserve">
+    <value>The image has been verified and is ready for deployment.</value>
+  </data>
+  <data name="InfoBar.ImageVerificationNotPass.Title" xml:space="preserve">
+    <value>Image Verification Not Pass!</value>
+  </data>
+  <data name="InfoBar.ImageVerificationNotPass.Message" xml:space="preserve">
+    <value>Image failed to pass verification due to: {0}.
+Continue to deploy with this image will cause unexpected problems.</value>
+  </data>
+  <data name="InfoBar.ImageVerificationFailed.Message" xml:space="preserve">
+    <value>Failed to verify the image: {0}</value>
+  </data>
+  <data name="InfoBar.ImageVerificationUnknown.Title" xml:space="preserve">
+    <value>Unknown Error During Verification</value>
+  </data>
+  <data name="InfoBar.ImageVerificationUnknown.Message" xml:space="preserve">
+    <value>An unexpected error occurred: {0}</value>
+  </data>
+  <data name="InfoBar.ImageOpenFailed.Title" xml:space="preserve">
+    <value>Cannot Open Image</value>
+  </data>
+  <data name="InfoBar.ImageOpenFailed.Message" xml:space="preserve">
+    <value>Failed to open the image: {0}</value>
   </data>
 </root>

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -10,6 +12,7 @@ using Microsoft.UI.Xaml.Navigation;
 using WTGWizard.Helpers;
 using WTGWizard.Main;
 using WTGWizard.Models;
+using ManagedWimLib;
 using WTGWizard.Shared.Services.WimService;
 using WTGWizard.ViewModels;
 
@@ -20,10 +23,8 @@ public sealed partial class ImageConfigPage : Page
     private readonly IWimService _wimService = App.Services.GetRequiredService<IWimService>();
     public WizardViewModel VM { get; private set; } = null!;
 
-    private string _loadedPath = string.Empty;
-    private int _loadedIndex = -1;
     private int _refreshSeq;
-    private string _verifiedPath = string.Empty;
+    private CancellationTokenSource? _verifyCts;
 
     public ImageConfigPage()
     {
@@ -47,8 +48,19 @@ public sealed partial class ImageConfigPage : Page
 
     private async void ImageFilePicker_FileSelected(object sender, string path)
     {
-        VM.Image.ShowVerifyError = false;
+        VM.Image.VerifyStatus = VerifyStatus.Idle;
+        VM.Image.VerifyProgress = 0;
+        VM.Image.ShowOpenError = false;
         VM.Image.FilePath = path;
+
+        // 句柄占用（程序生命周期）：防止映像被更名/移动/写入（FileShare.Read 兼容 Worker 读取）
+        if (!ImageFileGuard.Acquire(path, out var openErr))
+        {
+            VM.Image.OpenErrorMessage = openErr;
+            VM.Image.ShowOpenError = true;
+            ResetImageState();
+            return;
+        }
 
         try
         {
@@ -58,8 +70,11 @@ public sealed partial class ImageConfigPage : Page
             if (indices.Count > 0)
                 VM.Image.SelectedIndex = 0;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            VM.Image.OpenErrorMessage = ex.Message;
+            VM.Image.ShowOpenError = true;
+            ResetImageState();
             return;
         }
 
@@ -74,8 +89,7 @@ public sealed partial class ImageConfigPage : Page
 
     /// <summary>
     /// 统一镜像信息加载入口 — 更新 UI + 加载元数据。
-    /// 缓存短路：同一 (path, index) 已加载过则跳过（切页/切回不重复加载）。
-    /// 并发防护：刷新序号丢弃过期异步结果。
+    /// 返回页面时重新加载（无路径缓存）；并发防护：刷新序号丢弃过期异步结果。
     /// </summary>
     private async System.Threading.Tasks.Task RefreshImageStateAsync()
     {
@@ -86,9 +100,6 @@ public sealed partial class ImageConfigPage : Page
         if (pos < 0 || pos >= indices.Count) return;
         if (!int.TryParse(indices[pos], out var index)) return;
 
-        // 缓存短路：同一映像已加载完成，跳过重复加载
-        if (path == _loadedPath && index == _loadedIndex) return;
-
         var seq = ++_refreshSeq;
         VM.Image.IsLoading = true;
         UpdateLoadingState(true);
@@ -98,45 +109,110 @@ public sealed partial class ImageConfigPage : Page
             var info = await _wimService.GetImageInfo(path, index);
             if (seq != _refreshSeq) return;
 
+            VM.Image.ShowOpenError = false;
             VM.Image.ImageInfo = info;
             UpdateImageInfoCard(info);
             VM.Image.AnsFileFoundPaths = info.AnsFilePaths;
-
-            _loadedPath = path;
-            _loadedIndex = index;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            _loadedPath = path;
-            _loadedIndex = index;
+            if (seq != _refreshSeq) return;
+            VM.Image.OpenErrorMessage = ex.Message;
+            VM.Image.ShowOpenError = true;
+            ResetImageState();
         }
         finally
         {
             VM.Image.IsLoading = false;
             UpdateLoadingState(false);
         }
-
-        // 异步校验映像完整性（不阻塞主流程）
-        _ = VerifyImageAsync(path);
     }
 
-    private async System.Threading.Tasks.Task VerifyImageAsync(string path)
+    // ══════════════════════════════════════════════════════
+    //  打开失败状态清理（索引、元数据、校验状态、信息卡片）
+    // ══════════════════════════════════════════════════════
+
+    /// <summary>打开失败后清理映像选择状态（索引、元数据、校验状态、信息卡片）。</summary>
+    private void ResetImageState()
     {
-        // 缓存：同一映像仅校验一次（完整性校验开销大，避免 A→B→A 切换重复执行）
-        if (path == _verifiedPath) return;
+        VM.Image.Indices = [];
+        VM.Image.ImageInfo = null;
+        VM.Image.AnsFileFoundPaths = [];
+        VM.Image.VerifyStatus = VerifyStatus.Idle;   // 作废校验结果
+        VM.Image.VerifyProgress = 0;
+        ClearImageInfoCard();
+    }
+
+    /// <summary>清空映像信息卡片（DP 默认值 "-"）。</summary>
+    private void ClearImageInfoCard()
+    {
+        ImageInfoCard.MajorVersion = "-";
+        ImageInfoCard.ImageIndex = "-";
+        ImageInfoCard.ImageVersion = "-";
+        ImageInfoCard.FeatureUpdate = "-";
+        ImageInfoCard.Architecture = "-";
+        ImageInfoCard.BuildNumber = "-";
+        ImageInfoCard.ExpandedSize = "-";
+        ImageInfoCard.DateCreated = "-";
+        ImageInfoCard.ImageName = "-";
+        ImageInfoCard.ImageDescription = "-";
+        ImageInfoCard.DisplayDescription = "-";
+        ImageInfoCard.LogoSource = null;
+        UpdateLoadingState(false);
+    }
+
+    // ══════════════════════════════════════════════════════
+    //  映像校验（手动触发，用户控制）
+    // ══════════════════════════════════════════════════════
+
+    private void VerifyButton_Click(object sender, RoutedEventArgs e)
+        => _ = RunVerifyAsync();
+
+    private async System.Threading.Tasks.Task RunVerifyAsync()
+    {
+        if (!VM.Image.HasImage) return;
+
+        VM.Image.VerifyStatus = VerifyStatus.Verifying;
+        VM.Image.VerifyProgress = 0;
+        _verifyCts = new CancellationTokenSource();
 
         try
         {
-            await _wimService.VerifyAsync(path);
-            _verifiedPath = path;
-            VM.Image.ShowVerifyError = false;
+            var progress = new Progress<double>(p => VM.Image.VerifyProgress = p);
+            await _wimService.VerifyAsync(VM.Image.FilePath, progress, _verifyCts.Token);
+            VM.Image.VerifyStatus = VerifyStatus.Succeeded;
+        }
+        catch (OperationCanceledException)
+        {
+            VM.Image.VerifyStatus = VerifyStatus.Idle;
+        }
+        catch (WimVerificationException ex)
+        {
+            VM.Image.VerifyMessage = ex.Message;
+            VM.Image.VerifyStatus = VerifyStatus.NotPass;
+        }
+        catch (WimLibException ex)
+        {
+            VM.Image.VerifyMessage = Wim.GetErrorString(ex.ErrorCode);
+            VM.Image.VerifyStatus = VerifyStatus.Failed;
         }
         catch (Exception ex)
         {
             VM.Image.VerifyMessage = ex.Message;
-            VM.Image.ShowVerifyError = true;
+            VM.Image.VerifyStatus = VerifyStatus.Unknown;
+        }
+        finally
+        {
+            _verifyCts.Dispose();
+            _verifyCts = null;
         }
     }
+
+    private void CancelVerifyButton_Click(object sender, RoutedEventArgs e)
+        => _verifyCts?.Cancel();
+
+    private void VerifySuccessInfoBar_Closed(InfoBar sender, object args)
+        => VM.Image.VerifyStatus = VerifyStatus.Idle;
 
     private void UpdateImageInfoCard(ImageInfo info)
     {
