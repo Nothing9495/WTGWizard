@@ -123,8 +123,19 @@ public sealed class WimService : IWimService
             ct.ThrowIfCancellationRequested();
             try
             {
+                // ① 打开阶段 — 失败原样重抛（WimLibException → 调用方归 Failed）
                 using var wim = ManagedWimLib.Wim.OpenWim(imagePath, OpenFlags.None, OnProgress, null);
-                wim.VerifyWim();
+
+                // ② 校验阶段 — 失败包装为 WimVerificationException（内容损坏 → NotPass）
+                // 排除 AbortedByProgress：取消需穿透到外层转为 OperationCanceledException
+                try { wim.VerifyWim(); }
+                catch (WimLibException ex) when (ex.ErrorCode != ErrorCode.AbortedByProgress)
+                {
+                    _logger.Warn("WimService", "VerifyAsync: Image {ImagePath} failed verification - ({Error}).", imagePath, ex.Message);
+                    // 用 GetErrorString（纯错误码描述，避免 wimlib 全局错误文件残留）；完整上下文已在日志
+                    throw new WimVerificationException(Wim.GetErrorString(ex.ErrorCode), ex);
+                }
+
                 _logger.Info("WimService", "VerifyAsync: Image {ImagePath} passed verification.", imagePath);
 
                 CallbackStatus OnProgress(ProgressMsg msg, object? info, object? ctx)
