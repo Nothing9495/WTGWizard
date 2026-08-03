@@ -306,17 +306,6 @@ DeployTaskId is independent from Worker pipe task names (dism/bcdboot/pwsh/extra
 | Main.Language | `WTGWizard.Main.Language` |
 | Worker | `WTGWizard.Worker` (Commands/Encoding) |
 
-### Unattend → AnsFile
-
-All "Unattend" references have been renamed to "AnsFile" in the current codebase:
-
-| Old | New |
-|-----|-----|
-| `UnattendPath` | `AnsFilePath` |
-| `CustomUnattendEnabled` | `CustomAnsFileEnabled` |
-| `CleanImageUnattend` | `CleanImageAnsFile` |
-| `HasUnattend` | `HasUnattend` (kept for compatibility) |
-
 ### Logging
 
 ```csharp
@@ -383,19 +372,20 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 | Area | Status | Location |
 |------|--------|----------|
 | 5-Step Wizard UI | ✅ Complete | `Pages/Steps/` |
-| TaskPage (full framework) | ✅ Complete | `Pages/TaskPage.xaml` + `.cs`, `UserControls/TaskContentCard.xaml`, `TerminalBox.xaml` |
+| TaskPage (full framework) | ✅ Complete | `Pages/TaskPage.xaml` + `.cs`, `UserControls/TaskContentCard.xaml`, `TerminalBox.xaml`（含 SwitchPresenter 双态） |
 | Disk Services | ✅ Complete | `Shared.Services/DiskServices/` |
 | WIM Service (extract + stages) | ✅ Complete | `Shared.Services/WimService/` |
+| Image Verification (manual, 4-state) | ✅ Complete | `ImageConfigVM.VerifyStatus`（Idle/Verifying/Succeeded/NotPass/Failed/Unknown）+ 三态 InfoBar + 进度/取消 |
+| ImageFileGuard (program-lifetime handle) | ✅ Complete | `Shared.Services/WimService/ImageFileGuard.cs` |
+| WimVerificationException (verify-fail vs open-fail) | ✅ Complete | `Shared.Services/WimService/WimVerificationException.cs` |
 | IPC Protocol | ✅ Complete | `Shared.Common/` |
 | Worker Commands (5/5) | ✅ Complete | `Worker/Commands/` incl. ExtractCommand |
 | Deployment Pipeline (7 steps) | ✅ Complete | `Main.DeploymentCore/Steps/` |
 | Deployment Orchestrator | ✅ Complete | `Main.DeploymentCore/Orchestrator/` |
 | Encoding Adapter | ✅ Complete | `Worker/Encoding/EncodingResolver.cs` |
 | Terminal Buffer + Logging | ✅ Complete | `Shared.Services/TerminalOutputBuffer.cs`, `LoggerService/` |
-| SettingsPage | ⚠️ Stub | `Pages/SettingsPage.xaml` |
-| DiskIOWriter | ⚠️ Stub | `Shared.Services/DiskServices/DiskIOService/DiskIOWriter.cs` |
-| WimService.Cleanup() | ⚠️ Disabled | Commented out in `App.OnMainWindowClosed` (Access Violation) |
-| TaskPage placeholder (SwitchPresenter dual-state) | ⏳ Future | Planned: no-task vs task UI via CommunityToolkit SwitchPresenter |
+| SettingsPage | ✅ Complete | `Pages/SettingsPage.xaml`（Worker `--debug` Toggle，本地化） |
+| DiskIOWriter | ⚠️ Stub | `Shared.Services/DiskServices/DiskIOService/DiskIOWriter.cs` (PInvoke Implementation to replace Powershell disk layout creation script.) |
 
 ---
 
@@ -403,11 +393,11 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 
 1. **XAML Compiler Error WMC9999**: Pre-existing Windows App SDK issue, not caused by code changes. Ignore.
 
-2. **File Locking**: If `dotnet build` fails with file lock errors (MSB3021/MSB3027), close running WTGWizard.Main / devenv instances first. `dotnet build-server shutdown` clears stale build nodes.
+2. **File Locking**: If `dotnet build` fails with file lock errors (MSB3021/MSB3027), stop trying `dotnet build`, tell the user what's happening, then continue/finish the task.
 
 3. **TwoWay Binding Cascade**: `Partitions.Clear()` triggers ComboBox TwoWay binding to set `SelectedPartition = null`. Always save/restore selection before clearing collections.
 
-4. **Tab Activation Double Refresh**: `OnNavigatedTo` + `OnTabActivated` both fire on tab switch. ImageConfigPage caches loaded `(path, index)` to skip redundant `GetImageInfo`/`VerifyWim`.
+4. **Tab Activation Double Refresh**: `OnNavigatedTo` + `OnTabActivated` both fire on tab switch. ImageConfigPage has **no (path, index) cache** — it reloads image info on every return (per design); a `_refreshSeq` guard discards stale async results, and file selection is **event-driven** (`SelectedIndex` change triggers `RefreshImageStateAsync`) to avoid duplicate loads.
 
 5. **Resource Key Format**: `.resx` uses `.` separator, C# uses `_` separator, XAML uses `_` separator.
 
@@ -429,4 +419,8 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 
 14. **`[ObservableProperty]` in Controls**: Does not work in `UserControl`-derived XAML classes (source generator emits nothing; XAML pass2 fails). Use manual INPC + dedup setter helpers.
 
-15. **Temp Cleanup**: `TempFileManager.Dispose` removes Scripts dir (deploy completion); `TempFileManager.CleanupAll()` runs on app close (`App.OnMainWindowClosed`) as crash-leak backstop.
+15. **Temp Cleanup**: `TempFileManager.Dispose` removes Scripts dir (deploy completion); `TempFileManager.CleanupAll()` runs on app close (`App.OnMainWindowClosed`) as crash-leak backstop — checks `Directory.Exists` first (avoids `DirectoryNotFoundException` first-chance noise when the temp dir was never created).
+
+16. **WimService.Cleanup vs VerifyAsync**: `Cleanup()` (called on app close) force-cancels any in-flight `VerifyAsync` via a linked `CancellationTokenSource` and waits up to 10s before `TryGlobalCleanup()` — necessary because wimlib global cleanup during an active verify causes Access Violation. On timeout it skips cleanup (OS reclaims on process exit) rather than risking a crash. The linked-token design means BOTH page-initiated cancel (`_verifyCts`) and Cleanup-forced cancel propagate through the same callback `Abort` path.
+
+17. **ExtractFileAsync semantics**: `targetFilePath` is a FILE path (not a directory). Internally it extracts to the target's parent dir with `ExtractFlags.NoPreserveDirStructure | ExtractFlags.NoAcls`, then `File.Move(overwrite: true)`. Using a bare `ExtractPath(target=filePath, ...)` would create `<filePath>\Windows\Panther\...` with full WIM ACLs.
