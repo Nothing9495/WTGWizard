@@ -30,12 +30,31 @@ public sealed class WimService : IWimService
         },
         mode: LazyThreadSafetyMode.ExecutionAndPublication);
 
+    // ═══ 活动校验跟踪（Cleanup 强制取消用）═══
+    private static readonly object _verifyStateLock = new();
+    private static CancellationTokenSource? _activeVerifyCts;
+    private static Task? _activeVerifyTask;
+
     public static void EnsureInitialized() => _ = _initialized.Value;
 
     public static void Cleanup()
     {
-        if (_initialized.IsValueCreated)
+        if (!_initialized.IsValueCreated) return;
+
+        // 强制取消进行中的 VerifyAsync，并等待其退出（防止 wimlib 全局清理与校验并发导致 Access Violation）
+        Task? verifyTask;
+        lock (_verifyStateLock)
+        {
+            _activeVerifyCts?.Cancel();     // 在 lock 内取消：VerifyAsync 无法同时清引用/Dispose，无 ObjectDisposedException 竞态
+            verifyTask = _activeVerifyTask;
+        }
+
+        if (verifyTask is null || verifyTask.Wait(TimeSpan.FromSeconds(10)))
+        {
+            // 无活动校验，或校验已及时退出（wimlib abort 响应通常毫秒~秒级）→ 安全全局清理
             ManagedWimLib.Wim.TryGlobalCleanup();
+        }
+        // 超时（wimlib 卡死，罕见）：跳过清理，进程退出时 OS 回收资源——宁可不清洗，也不并发崩溃
     }
 
     public static bool IsInitialized => _initialized.IsValueCreated;
@@ -118,13 +137,17 @@ public sealed class WimService : IWimService
         });
     }
 
-    /// <summary>校验映像完整性。失败时抛出异常。</summary>
+    /// <summary>校验映像完整性。失败时抛出异常。支持页面取消与 Cleanup 强制取消（链接令牌）。</summary>
     public async Task VerifyAsync(string imagePath,
         IProgress<double>? progress = null, CancellationToken ct = default)
     {
-        await Task.Run(() =>
+        // 链接令牌：页面 _verifyCts.Cancel() 与 Cleanup 强制 linkedCts.Cancel() 双向传播
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        var token = linkedCts.Token;
+
+        var task = Task.Run(() =>
         {
-            ct.ThrowIfCancellationRequested();
+            token.ThrowIfCancellationRequested();
             _logger.Info("WimService", "VerifyAsync: Verifying {ImagePath}", imagePath);
             var sw = System.Diagnostics.Stopwatch.StartNew();
             try
@@ -147,7 +170,7 @@ public sealed class WimService : IWimService
                 CallbackStatus OnProgress(ProgressMsg msg, object? info, object? ctx)
                 {
                     // 通过返回 Abort 触发 wimlib 内部取消，而非抛异常穿过原生代码边界
-                    if (ct.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                         return CallbackStatus.Abort;
 
                     // 进度仅来自 VERIFY_STREAMS（数据流校验期）——
@@ -164,7 +187,7 @@ public sealed class WimService : IWimService
             catch (WimLibException ex) when (ex.ErrorCode == ErrorCode.AbortedByProgress)
             {
                 _logger.Info("WimService", "VerifyAsync: Verification is aborted by progress.");
-                throw new OperationCanceledException(ct);
+                throw new OperationCanceledException(token);
             }
             // NotPass（内容损坏）已由内层 Warn 记录，避免在此重复记录为 Error
             catch (Exception ex) when (ex is not WimVerificationException)
@@ -172,7 +195,24 @@ public sealed class WimService : IWimService
                 _logger.Error("WimService", "VerifyAsync: Method failed - ({Error}).", ex.Message);
                 throw;
             }
-        }, ct);
+        }, token);
+
+        // 注册活动校验状态（Cleanup 强制取消/等待用）
+        lock (_verifyStateLock)
+        {
+            _activeVerifyCts = linkedCts;
+            _activeVerifyTask = task;
+        }
+
+        try { await task; }
+        finally
+        {
+            lock (_verifyStateLock)
+            {
+                _activeVerifyCts = null;
+                _activeVerifyTask = null;
+            }
+        }
     }
 
     /// <summary>提取映像内指定文件到指定目标文件路径（不保留目录结构、不提取 ACL）。</summary>
