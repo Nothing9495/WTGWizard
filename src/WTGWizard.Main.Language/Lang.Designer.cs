@@ -315,18 +315,18 @@ namespace WTGWizard.Main.Language {
         /// <summary>
         ///   查找类似 WTGWizard will guide you step by step through the process of creating your Windows To Go workstation! 的本地化字符串。
         /// </summary>
-        public static string Page_Welcome_WelcomeMsg_Text {
+        public static string Page_Welcome_WelcomeMsg {
             get {
-                return ResourceManager.GetString("Page.Welcome.WelcomeMsg.Text", resourceCulture);
+                return ResourceManager.GetString("Page.Welcome.WelcomeMsg", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Welcome to WTGWizard👋 的本地化字符串。
         /// </summary>
-        public static string Page_Welcome_WelcomeTitle_Text {
+        public static string Page_Welcome_WelcomeTitle {
             get {
-                return ResourceManager.GetString("Page.Welcome.WelcomeTitle.Text", resourceCulture);
+                return ResourceManager.GetString("Page.Welcome.WelcomeTitle", resourceCulture);
             }
         }
         

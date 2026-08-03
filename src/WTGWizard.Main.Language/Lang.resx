@@ -126,10 +126,10 @@
   <data name="App.NavTabTask.Content" xml:space="preserve">
     <value>Tasks</value>
   </data>
-  <data name="Page.Welcome.WelcomeTitle.Text" xml:space="preserve">
+  <data name="Page.Welcome.WelcomeTitle" xml:space="preserve">
     <value>Welcome to WTGWizard👋</value>
   </data>
-  <data name="Page.Welcome.WelcomeMsg.Text" xml:space="preserve">
+  <data name="Page.Welcome.WelcomeMsg" xml:space="preserve">
     <value>WTGWizard will guide you step by step through the process of creating your Windows To Go workstation!</value>
   </data>
   <data name="Page.Welcome.GoWizard.Content" xml:space="preserve">
