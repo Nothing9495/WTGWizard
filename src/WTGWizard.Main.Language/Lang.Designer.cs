@@ -1597,7 +1597,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Supports .wim and .esd; use the file picker to choose an image 的本地化字符串。
+        ///   查找类似 Use the file picker button to choose an image, supports .wim and .esd image. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_ImageConfig_SelImg_Desc {
             get {

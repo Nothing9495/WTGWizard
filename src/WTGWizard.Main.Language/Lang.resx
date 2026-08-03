@@ -190,7 +190,7 @@
     <value>Select Image File</value>
   </data>
   <data name="Page.WizStep.ImageConfig.SelImg.Desc" xml:space="preserve">
-    <value>Supports .wim and .esd; use the file picker to choose an image</value>
+    <value>Use the file picker button to choose an image, supports .wim and .esd image.</value>
   </data>
   <data name="Page.WizStep.ImageConfig.SelIdx.Header" xml:space="preserve">
     <value>Select Image Index</value>

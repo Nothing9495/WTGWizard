@@ -190,7 +190,7 @@
     <value>选择映像文件</value>
   </data>
   <data name="Page.WizStep.ImageConfig.SelImg.Desc" xml:space="preserve">
-    <value>支持 .wim 和 .esd 格式；使用文件选择器选择映像</value>
+    <value>使用文件选择器按钮选择映像，支持 .wim 和 .esd 格式的映像文件</value>
   </data>
   <data name="Page.WizStep.ImageConfig.SelIdx.Header" xml:space="preserve">
     <value>选择映像索引</value>
