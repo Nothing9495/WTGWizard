@@ -147,6 +147,12 @@
   <data name="UsrCtrl.ImageInfoCard.Loading" xml:space="preserve">
     <value>正在加载镜像信息...</value>
   </data>
+  <data name="UsrCtrl.ImageInfoCard.EmptyHint" xml:space="preserve">
+    <value>选择一个映像文件以开始使用</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.ErrorHint" xml:space="preserve">
+    <value>当前映像不可用，请选择其他映像文件</value>
+  </data>
   <data name="UsrCtrl.ImageInfoCard.NameLabel" xml:space="preserve">
     <value>名称：</value>
   </data>
@@ -325,7 +331,7 @@
     <value>保留分区大小为 0</value>
   </data>
   <data name="InfoBar.ReservedSizeZero.Message" xml:space="preserve">
-    <value>已启用保留分区但容量为 0，请调整分区大小。</value>
+    <value>已启用保留分区但容量为 0，请调整分区大小</value>
   </data>
   <data name="InfoBar.PartNoLetter.ActionBtn" xml:space="preserve">
     <value>打开磁盘管理</value>
@@ -725,5 +731,11 @@
   </data>
   <data name="InfoBar.ImageOpenFailed.Message" xml:space="preserve">
     <value>打开映像失败：{0}</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.EmptyTitle" xml:space="preserve">
+    <value>👀未选择映像</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.ErrorTitle" xml:space="preserve">
+    <value>❌无效映像！</value>
   </data>
 </root>

@@ -27,24 +27,6 @@ public sealed partial class ImageInfoCard : UserControl
         set => SetValue(LogoSourceProperty, value);
     }
 
-    public static readonly DependencyProperty LogoVisibleProperty =
-        DependencyProperty.Register(nameof(LogoVisible), typeof(Visibility), typeof(ImageInfoCard),
-            new PropertyMetadata(Visibility.Collapsed));
-    public Visibility LogoVisible
-    {
-        get => (Visibility)GetValue(LogoVisibleProperty);
-        set => SetValue(LogoVisibleProperty, value);
-    }
-
-    public static readonly DependencyProperty LoadingVisibleProperty =
-        DependencyProperty.Register(nameof(LoadingVisible), typeof(Visibility), typeof(ImageInfoCard),
-            new PropertyMetadata(Visibility.Collapsed));
-    public Visibility LoadingVisible
-    {
-        get => (Visibility)GetValue(LoadingVisibleProperty);
-        set => SetValue(LoadingVisibleProperty, value);
-    }
-
     public static readonly DependencyProperty IsLoadingProperty =
         DependencyProperty.Register(nameof(IsLoading), typeof(bool), typeof(ImageInfoCard),
             new PropertyMetadata(false));
@@ -140,6 +122,15 @@ public sealed partial class ImageInfoCard : UserControl
     {
         get => (string)GetValue(DisplayDescriptionProperty);
         set => SetValue(DisplayDescriptionProperty, value);
+    }
+
+    public static readonly DependencyProperty CardStateProperty =
+        DependencyProperty.Register(nameof(CardState), typeof(ImageInfoCardState), typeof(ImageInfoCard),
+            new PropertyMetadata(ImageInfoCardState.NoImage));
+    public ImageInfoCardState CardState
+    {
+        get => (ImageInfoCardState)GetValue(CardStateProperty);
+        set => SetValue(CardStateProperty, value);
     }
 
 }

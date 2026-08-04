@@ -2,146 +2,239 @@
     x:Class="WTGWizard.UserControls.ImageInfoCard"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cc="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:lang="using:WTGWizard.Main.Language"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:userc="using:WTGWizard.UserControls"
     mc:Ignorable="d">
 
   <UserControl.Resources>
-    <Style x:Key="WinMajorVerTextStyle" TargetType="TextBlock">
-      <Setter Property="FontFamily" Value="Segoe UI Semibold" />
-      <Setter Property="FontSize" Value="28" />
-    </Style>
     <Style x:Key="ImageInfoCaptionTextStyle" BasedOn="{StaticResource CaptionTextBlockStyle}" TargetType="TextBlock">
       <Setter Property="FontSize" Value="14" />
     </Style>
   </UserControl.Resources>
 
-  <Border Padding="24"
+  <Border MinHeight="230"
+          Padding="24"
           Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
           BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
           BorderThickness="1"
           CornerRadius="4">
-    <Grid ColumnSpacing="24">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
+    <Grid>
+      <!--  四态：未选择 / 加载中 / 已选择且正常 / 已选择但打开失败  -->
+      <cc:SwitchPresenter TargetType="userc:ImageInfoCardState" Value="{x:Bind CardState, Mode=OneWay}">
 
-      <!--  Logo  -->
-      <Grid Grid.Row="0" Grid.Column="0"
-            Width="256" Height="144" VerticalAlignment="Top">
-        <Image AutomationProperties.Name="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_Logo}"
-               MaxWidth="256" MaxHeight="144"
-               VerticalAlignment="Center"
-               Source="{x:Bind LogoSource, Mode=OneWay}"
-               Visibility="{x:Bind LogoVisible, Mode=OneWay}" />
-        <Border CornerRadius="8" Visibility="{x:Bind LoadingVisible, Mode=OneWay}">
+        <!--  未选择映像  -->
+        <cc:Case Value="NoImage">
           <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-            <ProgressRing Height="40" Width="40" Foreground="{ThemeResource AccentFillColorDefaultBrush}" IsIndeterminate="True" />
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_Loading}"
-                       HorizontalAlignment="Center"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                       Style="{StaticResource CaptionTextBlockStyle}" />
+            <StackPanel.Transitions>
+              <TransitionCollection>
+                <EntranceThemeTransition IsStaggeringEnabled="False" />
+              </TransitionCollection>
+            </StackPanel.Transitions>
+            <TextBlock HorizontalAlignment="Center" Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_EmptyTitle}" />
+            <TextBlock HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_EmptyHint}" />
           </StackPanel>
-        </Border>
-      </Grid>
+        </cc:Case>
 
-      <!--  信息面板  -->
-      <StackPanel Grid.Row="0" Grid.Column="1"
-                  VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="12">
-        <!--  ═══ 长字段区：全宽，允许换行 ═══  -->
-        <!-- TODO: 长字段区Width自适应 -->
-        <Grid VerticalAlignment="Bottom" ColumnSpacing="16" RowSpacing="4">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-          </Grid.RowDefinitions>
+        <!--  加载中  -->
+        <cc:Case Value="Loading">
+          <Border Background="{ThemeResource ControlSolidFillColorDefaultBrush}" CornerRadius="8">
+            <Border.Transitions>
+              <TransitionCollection>
+                <EntranceThemeTransition IsStaggeringEnabled="False" />
+              </TransitionCollection>
+            </Border.Transitions>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+              <ProgressRing Width="40" Height="40" Foreground="{ThemeResource AccentFillColorDefaultBrush}" IsIndeterminate="True" />
+              <TextBlock HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_Loading}" />
+            </StackPanel>
+          </Border>
+        </cc:Case>
 
-          <!-- Row 0: Name | Description -->
-          <StackPanel Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_NameLabel}" Style="{StaticResource ImageInfoCaptionTextStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Top" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}"
-                        Text="{x:Bind ImageName, Mode=OneWay, FallbackValue='-'}"
-                        TextWrapping="WrapWholeWords" MaxLines="2"
-                        TextTrimming="CharacterEllipsis" />
+        <!--  已选择映像但打开失败  -->
+        <cc:Case Value="Error">
+          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+            <StackPanel.Transitions>
+              <TransitionCollection>
+                <EntranceThemeTransition IsStaggeringEnabled="False" />
+              </TransitionCollection>
+            </StackPanel.Transitions>
+            <TextBlock HorizontalAlignment="Center" Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_ErrorTitle}" />
+            <TextBlock HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_ErrorHint}" />
           </StackPanel>
-          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_DescLabel}" Style="{StaticResource ImageInfoCaptionTextStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Top" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}"
-                         Text="{x:Bind ImageDescription, Mode=OneWay, FallbackValue='-'}"
-                         TextWrapping="WrapWholeWords" MaxLines="3"
-                         TextTrimming="CharacterEllipsis" />
-          </StackPanel>
+        </cc:Case>
 
-          <!-- Row 1: Display Description -->
-          <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_DispDescLabel}" 
-                       Style="{StaticResource ImageInfoCaptionTextStyle}" 
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
-                       VerticalAlignment="Top" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}"
-                       Text="{x:Bind DisplayDescription, Mode=OneWay, FallbackValue='-'}"
-                       MaxWidth="640"
-                       TextWrapping="WrapWholeWords" MaxLines="3"
-                       TextTrimming="CharacterEllipsis" />
-          </StackPanel>
-        </Grid>
+        <!--  已选择映像且正常（信息面板）  -->
+        <cc:Case Value="Normal">
+          <Grid MinWidth="750" MaxWidth="880" HorizontalAlignment="Center" ColumnSpacing="24">
+            <Grid.Transitions>
+              <TransitionCollection>
+                <EntranceThemeTransition IsStaggeringEnabled="False" />
+              </TransitionCollection>
+            </Grid.Transitions>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <!--  ═══ 短字段区：2列 Grid ═══  -->
-        <Grid VerticalAlignment="Bottom" ColumnSpacing="16" RowSpacing="4">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-          </Grid.RowDefinitions>
+            <!--  Logo  -->
+            <Grid Grid.Column="0" Width="256" Height="144" VerticalAlignment="Center">
+              <Image MaxWidth="256"
+                     MaxHeight="144"
+                     VerticalAlignment="Center"
+                     AutomationProperties.Name="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_Logo}"
+                     Source="{x:Bind LogoSource, Mode=OneWay}" />
+            </Grid>
 
-          <!-- Row 0: 索引 | 版本 -->
-          <StackPanel Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_IndexLabel}" Style="{StaticResource ImageInfoCaptionTextStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind ImageIndex, Mode=OneWay, FallbackValue='-'}" />
-          </StackPanel>
-          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_VersionLabel}" Style="{StaticResource ImageInfoCaptionTextStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind ImageVersion, Mode=OneWay, FallbackValue='-'}" />
-          </StackPanel>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Spacing="12">
+              <Grid VerticalAlignment="Bottom" ColumnSpacing="16" RowSpacing="4">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-          <!-- Row 1: 功能更新 | 架构 -->
-          <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_FeatureLabel}" Style="{StaticResource ImageInfoCaptionTextStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind FeatureUpdate, Mode=OneWay, FallbackValue='-'}" />
-          </StackPanel>
-          <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_ArchLabel}" Style="{StaticResource ImageInfoCaptionTextStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind Architecture, Mode=OneWay, FallbackValue='-'}" />
-          </StackPanel>
+                <!--  Row 0: Name | Description  -->
+                <Grid Grid.Row="0" Grid.Column="0" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0"
+                             VerticalAlignment="Top"
+                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                             Style="{StaticResource ImageInfoCaptionTextStyle}"
+                             Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_NameLabel}" />
+                  <TextBlock Grid.Column="1"
+                             MaxLines="2"
+                             Style="{StaticResource ImageInfoCaptionTextStyle}"
+                             Text="{x:Bind ImageName, Mode=OneWay, FallbackValue='-'}"
+                             TextTrimming="CharacterEllipsis"
+                             TextWrapping="WrapWholeWords" />
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="1" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0"
+                             VerticalAlignment="Top"
+                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                             Style="{StaticResource ImageInfoCaptionTextStyle}"
+                             Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_DescLabel}" />
+                  <TextBlock Grid.Column="1"
+                             MaxLines="3"
+                             Style="{StaticResource ImageInfoCaptionTextStyle}"
+                             Text="{x:Bind ImageDescription, Mode=OneWay, FallbackValue='-'}"
+                             TextTrimming="CharacterEllipsis"
+                             TextWrapping="WrapWholeWords" />
+                </Grid>
 
-          <!-- Row 2: 构建号 | 展开大小 -->
-          <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_BuildLabel}" Style="{StaticResource ImageInfoCaptionTextStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind BuildNumber, Mode=OneWay, FallbackValue='-'}" />
-          </StackPanel>
-          <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_SizeLabel}" Style="{StaticResource ImageInfoCaptionTextStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind ExpandedSize, Mode=OneWay, FallbackValue='-'}" />
-          </StackPanel>
+                <!--  Row 1: Display Description  -->
+                <Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0"
+                             VerticalAlignment="Top"
+                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                             Style="{StaticResource ImageInfoCaptionTextStyle}"
+                             Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_DispDescLabel}" />
+                  <TextBlock Grid.Column="1"
+                             MaxLines="3"
+                             Style="{StaticResource ImageInfoCaptionTextStyle}"
+                             Text="{x:Bind DisplayDescription, Mode=OneWay, FallbackValue='-'}"
+                             TextTrimming="CharacterEllipsis"
+                             TextWrapping="WrapWholeWords" />
+                </Grid>
+              </Grid>
 
-          <!-- Row 3: 创建日期 -->
-          <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_DateLabel}" Style="{StaticResource ImageInfoCaptionTextStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <TextBlock Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind DateCreated, Mode=OneWay, FallbackValue='-'}" />
-          </StackPanel>
-        </Grid>
-      </StackPanel>
+              <Grid VerticalAlignment="Bottom" ColumnSpacing="16" RowSpacing="4">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!--  Row 0: 索引 | 版本  -->
+                <Grid Grid.Row="0" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_IndexLabel}" />
+                  <TextBlock Grid.Column="1" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind ImageIndex, Mode=OneWay, FallbackValue='-'}" />
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="1" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_VersionLabel}" />
+                  <TextBlock Grid.Column="1" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind ImageVersion, Mode=OneWay, FallbackValue='-'}" />
+                </Grid>
+
+                <!--  Row 1: 功能更新 | 架构  -->
+                <Grid Grid.Row="1" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_FeatureLabel}" />
+                  <TextBlock Grid.Column="1" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind FeatureUpdate, Mode=OneWay, FallbackValue='-'}" />
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="1" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_ArchLabel}" />
+                  <TextBlock Grid.Column="1" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind Architecture, Mode=OneWay, FallbackValue='-'}" />
+                </Grid>
+
+                <!--  Row 2: 构建号 | 展开大小  -->
+                <Grid Grid.Row="2" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_BuildLabel}" />
+                  <TextBlock Grid.Column="1" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind BuildNumber, Mode=OneWay, FallbackValue='-'}" />
+                </Grid>
+                <Grid Grid.Row="2" Grid.Column="1" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_SizeLabel}" />
+                  <TextBlock Grid.Column="1" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind ExpandedSize, Mode=OneWay, FallbackValue='-'}" />
+                </Grid>
+
+                <!--  Row 3: 创建日期  -->
+                <Grid Grid.Row="3" ColumnSpacing="4">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind lang:Lang.UsrCtrl_ImageInfoCard_DateLabel}" />
+                  <TextBlock Grid.Column="1" Style="{StaticResource ImageInfoCaptionTextStyle}" Text="{x:Bind DateCreated, Mode=OneWay, FallbackValue='-'}" />
+                </Grid>
+              </Grid>
+            </StackPanel>
+          </Grid>
+        </cc:Case>
+      </cc:SwitchPresenter>
     </Grid>
   </Border>
 </UserControl>

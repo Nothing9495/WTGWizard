@@ -12,6 +12,7 @@ using WTGWizard.Main;
 using WTGWizard.Models;
 using ManagedWimLib;
 using WTGWizard.Shared.Services.WimService;
+using WTGWizard.UserControls;
 using WTGWizard.ViewModels;
 
 namespace WTGWizard.Pages.Steps;
@@ -58,6 +59,7 @@ public sealed partial class ImageConfigPage : Page
             VM.Image.OpenErrorMessage = openErr;
             VM.Image.ShowOpenError = true;
             ResetImageState();
+            ImageInfoCard.CardState = ImageInfoCardState.Error;
             return;
         }
 
@@ -75,6 +77,7 @@ public sealed partial class ImageConfigPage : Page
             VM.Image.OpenErrorMessage = ex.Message;
             VM.Image.ShowOpenError = true;
             ResetImageState();
+            ImageInfoCard.CardState = ImageInfoCardState.Error;
             return;
         }
     }
@@ -156,6 +159,7 @@ public sealed partial class ImageConfigPage : Page
         ImageInfoCard.ImageDescription = "-";
         ImageInfoCard.DisplayDescription = "-";
         ImageInfoCard.LogoSource = null;
+        ImageInfoCard.CardState = ImageInfoCardState.NoImage;
         UpdateLoadingState(false);
     }
 
@@ -227,6 +231,7 @@ public sealed partial class ImageConfigPage : Page
         ImageInfoCard.DisplayDescription = info.DisplayDescription;
 
         ImageInfoCard.LogoSource = new BitmapImage(new Uri(GetWinLogoPath(info.BuildNumber)));
+        ImageInfoCard.CardState = ImageInfoCardState.Normal;
     }
 
     private static string GetWinLogoPath(string buildNumber)
@@ -241,7 +246,8 @@ public sealed partial class ImageConfigPage : Page
 
     private void UpdateLoadingState(bool loading)
     {
-        ImageInfoCard.LoadingVisible = loading ? Visibility.Visible : Visibility.Collapsed;
-        ImageInfoCard.LogoVisible = loading ? Visibility.Collapsed : Visibility.Visible;
+        if (loading)
+            ImageInfoCard.CardState = ImageInfoCardState.Loading;
+        // false：不设状态——结束态由各路径显式设置（成功→Normal；失败→NoImage/Error）
     }
 }

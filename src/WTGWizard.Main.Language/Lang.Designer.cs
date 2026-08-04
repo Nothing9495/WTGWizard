@@ -1813,6 +1813,42 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Pick an image file to get started. 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_EmptyHint {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.EmptyHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 👀No image selected. 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_EmptyTitle {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.EmptyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Current image is unavailable. Please pick another image file instead. 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_ErrorHint {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.ErrorHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ❌Invalid image! 的本地化字符串。
+        /// </summary>
+        public static string UsrCtrl_ImageInfoCard_ErrorTitle {
+            get {
+                return ResourceManager.GetString("UsrCtrl.ImageInfoCard.ErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Feature Update: 的本地化字符串。
         /// </summary>
         public static string UsrCtrl_ImageInfoCard_FeatureLabel {

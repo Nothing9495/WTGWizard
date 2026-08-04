@@ -147,6 +147,12 @@
   <data name="UsrCtrl.ImageInfoCard.Loading" xml:space="preserve">
     <value>Loading image info...</value>
   </data>
+  <data name="UsrCtrl.ImageInfoCard.EmptyHint" xml:space="preserve">
+    <value>Pick an image file to get started.</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.ErrorHint" xml:space="preserve">
+    <value>Current image is unavailable. Please pick another image file instead.</value>
+  </data>
   <data name="UsrCtrl.ImageInfoCard.NameLabel" xml:space="preserve">
     <value>Name:</value>
   </data>
@@ -725,5 +731,11 @@ Continue to deploy with this image will cause unexpected problems.</value>
   </data>
   <data name="InfoBar.ImageOpenFailed.Message" xml:space="preserve">
     <value>Failed to open the image: {0}</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.EmptyTitle" xml:space="preserve">
+    <value>👀No image selected.</value>
+  </data>
+  <data name="UsrCtrl.ImageInfoCard.ErrorTitle" xml:space="preserve">
+    <value>❌Invalid image!</value>
   </data>
 </root>
