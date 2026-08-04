@@ -21,7 +21,7 @@
         <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Header}" />
         <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE88E;}">
           <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Click="OnDiskRefreshClick">
+            <Button x:Name="DiskRefreshButton" Click="OnDiskRefreshClick">
               <FontIcon FontSize="14" Glyph="&#xE72C;" />
             </Button>
             <ComboBox x:Name="DiskListComboBox" Width="350" PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Placeholder}" SelectionChanged="OnDiskSelectionChanged">

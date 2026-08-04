@@ -96,7 +96,17 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
 
     private async void OnDiskRefreshClick(object sender, RoutedEventArgs e)
     {
-        await RefreshDiskStateAsync();
+        if (!DiskRefreshButton.IsEnabled) return;
+        DiskRefreshButton.IsEnabled = false;
+        try
+        {
+            await RefreshDiskStateAsync();
+            await Task.Delay(1000);
+        }
+        finally
+        {
+            DiskRefreshButton.IsEnabled = true;
+        }
     }
 
     private async void OnDiskSelectionChanged(object sender, SelectionChangedEventArgs e)
