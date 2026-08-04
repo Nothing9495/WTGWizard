@@ -1,0 +1,99 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ══════════════════════════════════════════════════════
+       AbortButton 集中资源（TaskPage 终止按钮）
+       - 背景三态：系统无 Critical 状态变体，自定义（随主题自适应）
+       - 样式：覆写 AccentButtonStyle 模板，保持 Critical 红色系，
+         hover/pressed/disabled 不显示 accent 特征
+       ══════════════════════════════════════════════════════ -->
+
+  <!--  背景：主红（Normal）  -->
+  <SolidColorBrush x:Key="AbortButtonBackground"
+                   Color="{ThemeResource SystemFillColorCritical}" />
+  <!--  背景：亮红（PointerOver/Pressed，基于 #C42B1C 等比 +10%）  -->
+  <SolidColorBrush x:Key="AbortButtonBackgroundPointerOver" Color="#D82F1F" />
+  <SolidColorBrush x:Key="AbortButtonBackgroundPressed" Color="#D82F1F" />
+
+  <Style x:Key="AbortButtonStyle" TargetType="Button">
+    <Setter Property="Foreground" Value="{ThemeResource AccentButtonForeground}" />
+    <Setter Property="Background" Value="{ThemeResource AbortButtonBackground}" />
+    <Setter Property="BackgroundSizing" Value="OuterBorderEdge" />
+    <Setter Property="BorderBrush" Value="{ThemeResource AccentControlElevationBorderBrush}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <ContentPresenter x:Name="ContentPresenter"
+                            Background="{TemplateBinding Background}"
+                            BackgroundSizing="{TemplateBinding BackgroundSizing}"
+                            Foreground="{TemplateBinding Foreground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            ContentTransitions="{TemplateBinding ContentTransitions}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            AutomationProperties.AccessibilityView="Raw">
+            <ContentPresenter.BackgroundTransition>
+              <BrushTransition Duration="0:0:0.083" />
+            </ContentPresenter.BackgroundTransition>
+
+            <VisualStateManager.VisualStateGroups>
+              <VisualStateGroup x:Name="CommonStates">
+                <VisualState x:Name="Normal" />
+
+                <VisualState x:Name="PointerOver">
+                  <Storyboard>
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AbortButtonBackgroundPointerOver}" />
+                    </ObjectAnimationUsingKeyFrames>
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AccentControlElevationBorderBrush}" />
+                    </ObjectAnimationUsingKeyFrames>
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AccentButtonForegroundPointerOver}" />
+                    </ObjectAnimationUsingKeyFrames>
+                  </Storyboard>
+                </VisualState>
+
+                <VisualState x:Name="Pressed">
+                  <Storyboard>
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AbortButtonBackgroundPressed}" />
+                    </ObjectAnimationUsingKeyFrames>
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ControlFillColorTransparentBrush}" />
+                    </ObjectAnimationUsingKeyFrames>
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AccentButtonForegroundPressed}" />
+                    </ObjectAnimationUsingKeyFrames>
+                  </Storyboard>
+                </VisualState>
+
+                <!--  禁用：对齐官方 Accent 语义（中性灰底 / 透明边框 / OnAccent 对比色）  -->
+                <VisualState x:Name="Disabled">
+                  <Storyboard>
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AccentFillColorDisabledBrush}" />
+                    </ObjectAnimationUsingKeyFrames>
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ControlFillColorTransparentBrush}" />
+                    </ObjectAnimationUsingKeyFrames>
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource TextOnAccentFillColorDisabledBrush}" />
+                    </ObjectAnimationUsingKeyFrames>
+                  </Storyboard>
+                </VisualState>
+              </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+          </ContentPresenter>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>
