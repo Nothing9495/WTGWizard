@@ -11,7 +11,7 @@
       NavigationCacheMode="Required"
       mc:Ignorable="d">
 
-  <ScrollViewer Padding="20,20,20,0">
+  <ScrollViewer Padding="20,20,20,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
     <StackPanel Margin="0,0,0,20" Spacing="32">
       <StackPanel Spacing="3">
         <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Title}" />

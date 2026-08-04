@@ -12,7 +12,7 @@
       mc:Ignorable="d"
       NavigationCacheMode="Required">
 
-  <ScrollViewer Padding="20,20,20,0">
+  <ScrollViewer Padding="20,20,20,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
     <StackPanel Margin="0,0,0,20" Spacing="32">
       <StackPanel Spacing="3">
         <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_Title}"
@@ -116,7 +116,7 @@
             <cc:Case Value="Verifying">
               <StackPanel Orientation="Horizontal" Spacing="10">
                 <TextBlock Text="{x:Bind VM.Image.VerifyProgressDisplay, Mode=OneWay}"
-                           VerticalAlignment="Center" MinWidth="42" />
+                           VerticalAlignment="Center"/>
                 <ProgressBar Value="{x:Bind VM.Image.VerifyProgress, Mode=OneWay}"
                              Maximum="100" Width="150" VerticalAlignment="Center" />
               </StackPanel>

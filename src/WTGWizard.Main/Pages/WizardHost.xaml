@@ -8,7 +8,7 @@
              xmlns:lang="using:WTGWizard.Main.Language"
              mc:Ignorable="d">
 
-  <Grid>
+  <Grid MaxWidth="{StaticResource PageContentMaxWidth}">
     <Grid.RowDefinitions>
       <RowDefinition Height="*" />
       <RowDefinition Height="Auto" />
@@ -24,7 +24,8 @@
     <Border Grid.Row="1"
             Padding="24,12"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            BorderThickness="0,1,0,0"
+            BorderThickness="1,1,1,1"
+            CornerRadius="8,8,8,8"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
       <Grid>
         <Grid.ColumnDefinitions>

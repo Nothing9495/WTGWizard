@@ -27,7 +27,7 @@
 
       <!--  有任务：常规任务界面  -->
       <cc:Case Value="True">
-        <Grid Padding="20" ColumnSpacing="20">
+        <Grid Padding="20" ColumnSpacing="20" MaxWidth="{StaticResource PageContentMaxWidth}">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" MinWidth="280" />
             <ColumnDefinition Width="2*" />
@@ -98,7 +98,7 @@
                                  Opacity="0.5"
                                  Text="{x:Bind lang:Lang.Page_Task_DiskPerf_BusyLabel}" />
                       <TextBlock x:Name="DiskBusyText"
-                                 MinWidth="50"
+                                 MinWidth="70"
                                  VerticalAlignment="Center"
                                  FontFamily="Cascadia Mono"
                                  FontSize="12"
@@ -112,7 +112,7 @@
                                  Opacity="0.5"
                                  Text="{x:Bind lang:Lang.Page_Task_DiskPerf_AvgRespLabel}" />
                       <TextBlock x:Name="DiskAvgRespText"
-                                 MinWidth="80"
+                                 MinWidth="70"
                                  VerticalAlignment="Center"
                                  FontFamily="Cascadia Mono"
                                  FontSize="12"

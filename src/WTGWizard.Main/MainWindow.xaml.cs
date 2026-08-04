@@ -44,6 +44,9 @@ public sealed partial class MainWindow : Window
             AppWindow.Changed += (_, _) => AdjustNavigationViewMargin();
         }
 
+        // 响应式导航：窗口宽度 >= 1300 DIP 时使用 Left 模式，否则 Top
+        RootGrid.SizeChanged += (_, e) => UpdateNavViewPaneMode(e.NewSize.Width);
+
         // 默认选中第一个 Tab
         NavView.SelectedItem = NavView.MenuItems[0];
     }
@@ -91,12 +94,26 @@ public sealed partial class MainWindow : Window
         _currentWindowState = _windowPresenter.State;
     }
 
+    private void UpdateNavViewPaneMode(double width)
+    {
+        var breakpoint = (double)Application.Current.Resources["NavViewPaneBreakpoint"];
+        var mode = width >= breakpoint
+            ? NavigationViewPaneDisplayMode.Left
+            : NavigationViewPaneDisplayMode.Top;
+        var paneToggle = width >= breakpoint
+            ? true : false;
+        if (NavView.PaneDisplayMode == mode) return;
+        NavView.PaneDisplayMode = mode;
+        NavView.IsPaneToggleButtonVisible = paneToggle;
+    }
+
     private void RootGrid_Loaded(object sender, RoutedEventArgs e)
     {
         TitleBarHelper.ApplySystemThemeToCaptionButtons(this, RootGrid.ActualTheme);
         // Window 样式控制
-        WindowHelper.SetWindowSize(this, 1100, 760);
-        WindowHelper.SetWindowMinSize(this, 1100, 680);
+        WindowHelper.SetWindowSize(this, 1150, 800);
+        WindowHelper.SetWindowMinSize(this, 970, 680);
+        UpdateNavViewPaneMode(RootGrid.ActualWidth);
     }
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)

@@ -55,7 +55,7 @@
         <ProgressRing IsActive="{x:Bind IsRunning, Mode=OneWay}"
                       IsIndeterminate="{x:Bind IsIndeterminateMode, Mode=OneWay}"
                       Value="{x:Bind ProgressValue, Mode=OneWay}"
-                      Width="20" Height="20" />
+                      Width="23" Height="23" />
         <!--  完成：绿色勾选  -->
         <FontIcon FontSize="20"
                   Glyph="&#xE8FB;"
