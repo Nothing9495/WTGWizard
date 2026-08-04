@@ -40,7 +40,7 @@
 
         <!--  加载中  -->
         <cc:Case Value="Loading">
-          <Border Background="{ThemeResource ControlSolidFillColorDefaultBrush}" CornerRadius="8">
+          <Border CornerRadius="8">
             <Border.Transitions>
               <TransitionCollection>
                 <EntranceThemeTransition IsStaggeringEnabled="False" />
