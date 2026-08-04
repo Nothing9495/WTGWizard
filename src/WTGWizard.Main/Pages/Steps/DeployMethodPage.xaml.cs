@@ -15,6 +15,8 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
 {
     private readonly IDiskIOService _diskIO = App.Services.GetRequiredService<IDiskIOService>();
     private bool _syncingDiskSelection;
+    private bool _watcherSubscribed;
+    private int _refreshSeq;
     public WizardViewModel VM { get; private set; } = null!;
 
     public DeployMethodPage()
@@ -37,15 +39,13 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
         }
 
         await RefreshDiskStateAsync();
-        _diskIO.DisksChanged += OnDisksChanged;
-        _diskIO.StartWatcher();
+        SubscribeWatcher();
     }
 
     protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
     {
         base.OnNavigatingFrom(e);
-        _diskIO.DisksChanged -= OnDisksChanged;
-        _diskIO.StopWatcher();
+        UnsubscribeWatcher();
     }
 
     // ══════════════════════════════════════════════════════
@@ -54,12 +54,26 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
 
     public void OnTabActivated()
     {
-        _diskIO.DisksChanged += OnDisksChanged;
-        _diskIO.StartWatcher();
+        SubscribeWatcher();
     }
 
     public void OnTabDeactivated()
     {
+        UnsubscribeWatcher();
+    }
+
+    private void SubscribeWatcher()
+    {
+        if (_watcherSubscribed) return;
+        _watcherSubscribed = true;
+        _diskIO.DisksChanged += OnDisksChanged;
+        _diskIO.StartWatcher();
+    }
+
+    private void UnsubscribeWatcher()
+    {
+        if (!_watcherSubscribed) return;
+        _watcherSubscribed = false;
         _diskIO.DisksChanged -= OnDisksChanged;
         _diskIO.StopWatcher();
     }
@@ -183,12 +197,15 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
 
     private async Task RefreshDiskStateAsync()
     {
+        var seq = ++_refreshSeq;
+
         // ── 阶段 0：保存当前选中状态 ──
         var prevDiskId = VM.Method.SelectedDisk?.DeviceId;
         var prevPartNum = VM.Method.SelectedPartition?.PartitionNumber;
 
         // ── 阶段 1：枚举磁盘 ──
         var disks = await _diskIO.EnumerateExternalDisksAsync();
+        if (seq != _refreshSeq) return;
 
         // 就地更新集合
         _syncingDiskSelection = true;
@@ -207,6 +224,7 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
                 VM.Method.SelectedDisk = match;
                 DiskListComboBox.SelectedItem = match;
                 await LoadPartitionsAsync(match.Index);
+                if (seq != _refreshSeq) return;
 
                 // ── 阶段 3：恢复分区选中 ──
                 if (prevPartNum is not null)
@@ -249,7 +267,6 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
     {
         MethodRadioButtons.SelectedIndex = -1;
         VM.Method.Partitions.Clear();
-        InstallPartitionComboBox.Items.Clear();
     }
 
     // InfoBar ActionButton
