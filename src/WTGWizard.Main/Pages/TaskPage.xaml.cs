@@ -279,8 +279,25 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
             FlushPendingOutput(null, EventArgs.Empty);
     }
 
-    private void AbortButton_Click(object sender, RoutedEventArgs e)
+    private async void AbortButton_Click(object sender, RoutedEventArgs e)
     {
-        _cts?.Cancel();
+        var dialog = new ContentDialog
+        {
+            Title = Lang.Page_Task_AbortDialog_Title,
+            Content = Lang.Page_Task_AbortDialog_ContentText,
+            PrimaryButtonText = Lang.Page_Task_AbortDialog_PrimaryButtonText,
+            CloseButtonText = Lang.Page_Task_AbortDialog_CloseButtonText,
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = XamlRoot,
+            RequestedTheme = ActualTheme
+        };
+
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            _cts?.Cancel();
+            AbortButton.IsEnabled = false;
+        }
+
     }
 }

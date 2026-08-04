@@ -591,7 +591,7 @@ This setting is available only on Windows 11 version 26100.8037 and later.</valu
     <value>Start deployment now?</value>
   </data>
   <data name="Page.WizStep.Confirm.DeployDialog.ContentText" xml:space="preserve">
-    <value>Once started, the task cannot be actively terminated!</value>
+    <value>Some operations may cause irreversible damage. Please verify that all configurations are correct before starting deployment!</value>
   </data>
   <data name="Page.WizStep.Confirm.DeployDialog.PrimaryButtonText" xml:space="preserve">
     <value>Confirm</value>
@@ -733,9 +733,39 @@ Continue to deploy with this image will cause unexpected problems.</value>
     <value>Failed to open the image: {0}</value>
   </data>
   <data name="UsrCtrl.ImageInfoCard.EmptyTitle" xml:space="preserve">
-    <value>👀No image selected.</value>
+    <value>👀No Image Selected</value>
   </data>
   <data name="UsrCtrl.ImageInfoCard.ErrorTitle" xml:space="preserve">
-    <value>❌Invalid image!</value>
+    <value>❌Invalid Image!</value>
+  </data>
+  <data name="Page.Settings.AppThemeGroup" xml:space="preserve">
+    <value>Theme Settings</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Header" xml:space="preserve">
+    <value>App Theme</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Desc" xml:space="preserve">
+    <value>Choose the overall appearance of the app.</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Default" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Page.Task.AbortDialog.Title" xml:space="preserve">
+    <value>Abort Deployment?</value>
+  </data>
+  <data name="Page.Task.AbortDialog.ContentText" xml:space="preserve">
+    <value>The current in-progress task will be allowed to complete; the deployment will be terminated before the next task execution.</value>
+  </data>
+  <data name="Page.Task.AbortDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Page.Task.AbortDialog.CloseButtonText" xml:space="preserve">
+    <value>No</value>
   </data>
 </root>

@@ -43,7 +43,8 @@ public sealed partial class ConfirmPage : Page, ITabActivatable
             PrimaryButtonText = Lang.Page_WizStep_Confirm_DeployDialog_PrimaryButtonText,
             CloseButtonText = Lang.Page_WizStep_Confirm_DeployDialog_CloseButtonText,
             DefaultButton = ContentDialogButton.Close,
-            XamlRoot = XamlRoot
+            XamlRoot = XamlRoot,
+            RequestedTheme = ActualTheme
         };
 
         var result = await dialog.ShowAsync();

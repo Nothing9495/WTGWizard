@@ -287,6 +287,60 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Dark 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AppTheme_Dark {
+            get {
+                return ResourceManager.GetString("Page.Settings.AppTheme.Dark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 System 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AppTheme_Default {
+            get {
+                return ResourceManager.GetString("Page.Settings.AppTheme.Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Choose the overall appearance of the app. 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AppTheme_Desc {
+            get {
+                return ResourceManager.GetString("Page.Settings.AppTheme.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 App Theme 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AppTheme_Header {
+            get {
+                return ResourceManager.GetString("Page.Settings.AppTheme.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Light 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AppTheme_Light {
+            get {
+                return ResourceManager.GetString("Page.Settings.AppTheme.Light", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Theme Settings 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AppThemeGroup {
+            get {
+                return ResourceManager.GetString("Page.Settings.AppThemeGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Settings 的本地化字符串。
         /// </summary>
         public static string Page_Settings_Title {
@@ -328,6 +382,42 @@ namespace WTGWizard.Main.Language {
         public static string Page_Task_AbortButton {
             get {
                 return ResourceManager.GetString("Page.Task.AbortButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_AbortDialog_CloseButtonText {
+            get {
+                return ResourceManager.GetString("Page.Task.AbortDialog.CloseButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The current in-progress task will be allowed to complete; the deployment will be terminated before the next task execution. 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_AbortDialog_ContentText {
+            get {
+                return ResourceManager.GetString("Page.Task.AbortDialog.ContentText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Yes 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_AbortDialog_PrimaryButtonText {
+            get {
+                return ResourceManager.GetString("Page.Task.AbortDialog.PrimaryButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Abort Deployment? 的本地化字符串。
+        /// </summary>
+        public static string Page_Task_AbortDialog_Title {
+            get {
+                return ResourceManager.GetString("Page.Task.AbortDialog.Title", resourceCulture);
             }
         }
         
@@ -822,7 +912,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Once started, the task cannot be actively terminated! 的本地化字符串。
+        ///   查找类似 Some operations may cause irreversible damage. Please verify that all configurations are correct before starting deployment! 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_Confirm_DeployDialog_ContentText {
             get {
@@ -1822,7 +1912,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 👀No image selected. 的本地化字符串。
+        ///   查找类似 👀No Image Selected 的本地化字符串。
         /// </summary>
         public static string UsrCtrl_ImageInfoCard_EmptyTitle {
             get {
@@ -1840,7 +1930,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 ❌Invalid image! 的本地化字符串。
+        ///   查找类似 ❌Invalid Image! 的本地化字符串。
         /// </summary>
         public static string UsrCtrl_ImageInfoCard_ErrorTitle {
             get {

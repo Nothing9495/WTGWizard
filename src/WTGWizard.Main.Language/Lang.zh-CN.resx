@@ -591,7 +591,7 @@
     <value>确定开始部署吗？</value>
   </data>
   <data name="Page.WizStep.Confirm.DeployDialog.ContentText" xml:space="preserve">
-    <value>任务一旦开始将无法主动终止！</value>
+    <value>部分操作将导致不可逆的破坏，请在确认一切配置无误后再开始部署！</value>
   </data>
   <data name="Page.WizStep.Confirm.DeployDialog.PrimaryButtonText" xml:space="preserve">
     <value>确定</value>
@@ -737,5 +737,35 @@
   </data>
   <data name="UsrCtrl.ImageInfoCard.ErrorTitle" xml:space="preserve">
     <value>❌无效映像！</value>
+  </data>
+  <data name="Page.Settings.AppThemeGroup" xml:space="preserve">
+    <value>主题设置</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Header" xml:space="preserve">
+    <value>应用主题</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Desc" xml:space="preserve">
+    <value>选择应用程序的整体外观</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Light" xml:space="preserve">
+    <value>亮色</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Dark" xml:space="preserve">
+    <value>暗色</value>
+  </data>
+  <data name="Page.Settings.AppTheme.Default" xml:space="preserve">
+    <value>跟随系统</value>
+  </data>
+  <data name="Page.Task.AbortDialog.Title" xml:space="preserve">
+    <value>要终止部署吗？</value>
+  </data>
+  <data name="Page.Task.AbortDialog.ContentText" xml:space="preserve">
+    <value>正在进行任务会正常结束，部署将在下一个任务开始前终止</value>
+  </data>
+  <data name="Page.Task.AbortDialog.PrimaryButtonText" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="Page.Task.AbortDialog.CloseButtonText" xml:space="preserve">
+    <value>取消</value>
   </data>
 </root>
