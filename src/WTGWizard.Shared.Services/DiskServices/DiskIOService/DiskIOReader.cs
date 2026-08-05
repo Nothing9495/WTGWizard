@@ -69,13 +69,13 @@ internal sealed class DiskIOReader
                 }
                 catch (Exception ex)
                 {
-                    _logger.Warn("DiskIOReader", "EnumerateExternalDisks: Device {Index} failed - ({Error}).", i, ex.Message);
+                    _logger.Warn("DiskIOReader", "EnumerateExternalDisks: Device {Index} failed - ({Error}).", i, ex.ToString());
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.Error("DiskIOReader", "EnumerateExternalDisks: Method failed - ({Error}).", ex.Message);
+            _logger.Error("DiskIOReader", "EnumerateExternalDisks: Method failed - ({Error}).", ex.ToString());
         }
 
         _logger.Info("DiskIOReader", "EnumerateExternalDisks done, enumerated disks: {Count}", disks.Count);
@@ -135,7 +135,7 @@ internal sealed class DiskIOReader
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOReader", "CheckDiskSafety: Method failed - ({Error}).", ex.Message);
+            _logger.Warn("DiskIOReader", "CheckDiskSafety: Method failed - ({Error}).", ex.ToString());
         }
 
         _logger.Info("DiskIOReader", "CheckDiskSafety: Disk {Index} is safe for operations.", targetDiskIndex);
@@ -216,7 +216,7 @@ internal sealed class DiskIOReader
         }
         catch (Exception ex)
         {
-            _logger.Error("DiskIOReader", "GetPartitionsAsync: Method failed - ({Error}).", ex.Message);
+            _logger.Error("DiskIOReader", "GetPartitionsAsync: Method failed - ({Error}).", ex.ToString());
         }
 
         _logger.Info("DiskIOReader", "GetPartitionsAsync: Disk {Index} returned {Count} partitions.", diskIndex, partitions.Count);
@@ -317,7 +317,7 @@ internal sealed class DiskIOReader
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOReader", "GetDriveLayoutEntries: Method failed - ({Error}).", ex.Message);
+            _logger.Warn("DiskIOReader", "GetDriveLayoutEntries: Method failed - ({Error}).", ex.ToString());
         }
 
         return result;
@@ -410,7 +410,7 @@ internal sealed class DiskIOReader
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOReader", "GetVolumeDiskExtents: Method failed - ({Error}).", ex.Message);
+            _logger.Warn("DiskIOReader", "GetVolumeDiskExtents: Method failed - ({Error}).", ex.ToString());
         }
 
         return extents;
@@ -533,7 +533,7 @@ internal sealed class DiskIOReader
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOReader", "QueryDiskInfo: Method failed - ({Error}).", ex.Message);
+            _logger.Warn("DiskIOReader", "QueryDiskInfo: Method failed - ({Error}).", ex.ToString());
             return null;
         }
     }

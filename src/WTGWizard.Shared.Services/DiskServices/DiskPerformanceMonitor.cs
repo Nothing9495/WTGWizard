@@ -129,7 +129,7 @@ public sealed class DiskPerformanceMonitor : IDisposable
                 }
                 catch (Exception ex)
                 {
-                    _logger.Warn("DiskPerformanceMonitor", "Sample failed for disk {DiskNumber}: {Error}", _diskNumber, ex.Message);
+                    _logger.Warn("DiskPerformanceMonitor", "Sample failed for disk {DiskNumber}: {Error}", _diskNumber, ex.ToString());
                 }
             }
         }

@@ -106,7 +106,7 @@ internal sealed class DiskIOWatcher : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error("DiskIOWatcher", "RegisterNotification: Unexpected error while registering {Label} change notification - ({Error}).", label, ex.Message);
+            _logger.Error("DiskIOWatcher", "RegisterNotification: Unexpected error while registering {Label} change notification - ({Error}).", label, ex.ToString());
         }
     }
 
@@ -125,7 +125,7 @@ internal sealed class DiskIOWatcher : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOWatcher", "OnDeviceNotification: Notification callback failed - ({Error}).", ex.Message);
+            _logger.Warn("DiskIOWatcher", "OnDeviceNotification: Notification callback failed - ({Error}).", ex.ToString());
         }
         return Win32Error.ERROR_SUCCESS;
     }
@@ -150,7 +150,7 @@ internal sealed class DiskIOWatcher : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOWatcher", "PollMountPoints: PollMountPoints failed - ({Error}).", ex.Message);
+            _logger.Warn("DiskIOWatcher", "PollMountPoints: PollMountPoints failed - ({Error}).", ex.ToString());
         }
     }
 
@@ -186,7 +186,7 @@ internal sealed class DiskIOWatcher : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Warn("DiskIOWatcher", "TriggerDebounced: Method failed - ({Error}).", ex.Message);
+            _logger.Warn("DiskIOWatcher", "TriggerDebounced: Method failed - ({Error}).", ex.ToString());
         }
     }
 

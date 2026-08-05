@@ -96,7 +96,7 @@ public sealed class WimService : IWimService
             }
             catch (Exception ex)
             {
-                _logger.Error("WimService", "EnumerateIndicesAsync: Method failed - ({ErrorType}: {Error}).", ex.GetType().Name, ex.Message);
+                _logger.Error("WimService", "EnumerateIndicesAsync: Method failed - ({ErrorType}: {Error}).", ex.GetType().Name, ex.ToString());
                 throw;
             }
         });
@@ -131,7 +131,7 @@ public sealed class WimService : IWimService
             }
             catch (Exception ex)
             {
-                _logger.Error("WimService", "GetImageInfo: Method failed - ({Error}).", ex.Message);
+                _logger.Error("WimService", "GetImageInfo: Method failed - ({Error}).", ex.ToString());
                 throw;
             }
         });
@@ -192,7 +192,7 @@ public sealed class WimService : IWimService
             // NotPass（内容损坏）已由内层 Warn 记录，避免在此重复记录为 Error
             catch (Exception ex) when (ex is not WimVerificationException)
             {
-                _logger.Error("WimService", "VerifyAsync: Method failed - ({Error}).", ex.Message);
+                _logger.Error("WimService", "VerifyAsync: Method failed - ({Error}).", ex.ToString());
                 throw;
             }
         }, token);
@@ -242,7 +242,7 @@ public sealed class WimService : IWimService
             }
             catch (Exception ex)
             {
-                _logger.Error("WimService", "ExtractFileAsync: Method failed - ({Error}).", ex.Message);
+                _logger.Error("WimService", "ExtractFileAsync: Method failed - ({Error}).", ex.ToString());
                 throw;
             }
         });
@@ -315,7 +315,7 @@ public sealed class WimService : IWimService
             }
             catch (Exception ex)
             {
-                _logger.Error("WimService", "ExtractImage: Method failed - ({Error}).", ex.Message);
+                _logger.Error("WimService", "ExtractImage: Method failed - ({Error}).", ex.ToString());
                 throw;
             }
         }, ct);
