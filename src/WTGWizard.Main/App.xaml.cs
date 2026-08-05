@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using System;
+using System.Threading.Tasks;
 using WTGWizard.Main.DeploymentCore.Builders;
 using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
@@ -18,7 +19,13 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+
+        // WinUI 未处理异常：记录完整异常后继续运行（避免丢失现场）
         UnhandledException += OnUnhandledException;
+
+        // 进程级致命异常（非 WinUI 通道）与异步任务未观察异常：记录后由系统默认处理
+        AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
+        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -55,10 +62,55 @@ public partial class App : Application
         // TODO: 程序关闭后有概率触发Access violation异常，等待进一步排查。
     }
 
+    /// <summary>
+    /// WinUI 未处理异常：记录完整异常（含堆栈）后继续运行。
+    /// </summary>
     private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
+        try
+        {
+            Services?.GetService<ILoggerService>()?.Error("App",
+                "Unhandled WinUI exception - ({Error}).", e.Exception.ToString());
+        }
+        catch
+        {
+            // 日志不可用时静默（应用即将进入不可靠状态，尽力而为）
+        }
         e.Handled = true;
-        // 未处理异常：可以添加崩溃报告逻辑
+    }
+
+    /// <summary>
+    /// 进程级未处理异常（AppDomain 通道）：记录后不拦截（系统将终止进程）。
+    /// </summary>
+    private void OnAppDomainUnhandledException(object sender, System.UnhandledExceptionEventArgs e)
+    {
+        try
+        {
+            var ex = e.ExceptionObject as Exception;
+            Services?.GetService<ILoggerService>()?.Error("App",
+                "Unhandled AppDomain exception - ({Error}).", ex?.ToString() ?? e.ExceptionObject?.ToString() ?? "Unknown");
+        }
+        catch
+        {
+            // 尽力而为
+        }
+    }
+
+    /// <summary>
+    /// 异步任务未观察异常：记录后标记已观察（避免进程被终止）。
+    /// </summary>
+    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        try
+        {
+            Services?.GetService<ILoggerService>()?.Error("App",
+                "Unobserved task exception - ({Error}).", e.Exception.ToString());
+        }
+        catch
+        {
+            // 尽力而为
+        }
+        e.SetObserved();
     }
     
     private static IServiceProvider ConfigureServices()
