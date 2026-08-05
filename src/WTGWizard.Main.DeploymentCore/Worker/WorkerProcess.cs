@@ -16,6 +16,11 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
 {
     private readonly ILoggerService _logger;
 
+    // 活动任务引用（供 ForceCancelCurrentTask 硬中断）
+    private Process? _activeProcess;
+    private PipeServer? _activeServer;
+    private TaskCompletionSource<WorkerExecutionResult>? _activeTcs;
+
     public WorkerProcess(ILoggerService logger) => _logger = logger;
 
     public async Task<WorkerExecutionResult> ExecuteAsync(
@@ -74,6 +79,10 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
                 return WorkerExecutionResult.Fail(-1, "Failed to start Worker process");
             }
 
+            _activeProcess = process;
+            _activeServer = pipeServer;
+            _activeTcs = tcs;
+
             process.OutputDataReceived += (_, e) =>
             {
                 if (e.Data is not null) TerminalOutputBuffer.Shared.Append(e.Data);
@@ -86,8 +95,18 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
             process.BeginErrorReadLine();
 
             await pipeServer.WaitForConnectionAsync(PipeProtocol.ConnectTimeoutMs, cts.Token);
+            _logger.Debug("WorkerMgr", "Pipe connected, read loop started: {Pipe}", pipeName);
+
+            // 三次握手：等待 Worker 回报 ack（15s 超时）
+            await pipeServer.WaitHandshakeAsync(PipeProtocol.ConnectTimeoutMs, cts.Token);
+            _logger.Debug("WorkerMgr", "Handshake complete: {Pipe}", pipeName);
+
+            // Worker 回报取消确认 → 任务取消完成
+            pipeServer.OnCancel += () => tcs.TrySetResult(WorkerExecutionResult.Cancelled());
 
             var processExitTask = process.WaitForExitAsync();
+
+            // 无限等待 Worker 回报（正常完成/失败/取消/断开）——软取消时当前任务自然跑完
             var result = await tcs.Task;
 
             if (!process.HasExited)
@@ -116,8 +135,37 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         }
         finally
         {
+            _activeProcess = null;
+            _activeServer = null;
+            _activeTcs = null;
             TerminalOutputBuffer.Shared.AppendBlankLine();
         }
+    }
+
+    /// <summary>
+    /// 硬中断当前任务（仅关闭流程调用）— 请求 Worker 主动终止当前任务，
+    /// 15s 未回报则强杀进程树。软取消（AbortButton/新部署覆盖）不应调用此方法。
+    /// </summary>
+    public void ForceCancelCurrentTask()
+    {
+        _activeServer?.SendCancel();
+
+        var proc = _activeProcess;
+        var tcs = _activeTcs;
+        if (proc is null || tcs is null) return;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await tcs.Task.WaitAsync(TimeSpan.FromSeconds(15));
+            }
+            catch (TimeoutException)
+            {
+                _logger.Error("WorkerMgr", "Worker did not exit after cancellation request, killing process tree");
+                KillProcessTree(proc);
+            }
+        });
     }
 
     private static string FindExe()

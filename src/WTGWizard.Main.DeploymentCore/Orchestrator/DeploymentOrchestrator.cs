@@ -122,6 +122,11 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
         _tempFiles.Dispose();
     }
 
+    /// <summary>
+    /// 硬中断当前任务（仅关闭流程调用）— 委托给 WorkerProcess。
+    /// </summary>
+    public void ForceCancelCurrentTask() => _worker.ForceCancelCurrentTask();
+
     private async Task ResolveDriveLettersAsync()
     {
         uint diskNum = (uint)_currentConfig.DiskSelectedId;
