@@ -129,10 +129,10 @@ public sealed partial class MainWindow : Window
 
         var dialog = new ContentDialog
         {
-            Title = WTGWizard.Main.Language.Lang.Dialog_CloseWhileDeploying_Title,
-            Content = WTGWizard.Main.Language.Lang.Dialog_CloseWhileDeploying_ContentText,
-            PrimaryButtonText = WTGWizard.Main.Language.Lang.Dialog_CloseWhileDeploying_PrimaryButtonText,
-            CloseButtonText = WTGWizard.Main.Language.Lang.Dialog_CloseWhileDeploying_CloseButtonText,
+            Title = WTGWizard.Main.Language.Lang.App_Dialog_CloseWhileDeploying_Title,
+            Content = WTGWizard.Main.Language.Lang.App_Dialog_CloseWhileDeploying_ContentText,
+            PrimaryButtonText = WTGWizard.Main.Language.Lang.App_Dialog_CloseWhileDeploying_PrimaryButtonText,
+            CloseButtonText = WTGWizard.Main.Language.Lang.App_Dialog_CloseWhileDeploying_CloseButtonText,
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = RootGrid.XamlRoot,
             RequestedTheme = RootGrid.ActualTheme

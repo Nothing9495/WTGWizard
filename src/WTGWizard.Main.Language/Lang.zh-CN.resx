@@ -768,16 +768,16 @@
   <data name="Page.Task.AbortDialog.CloseButtonText" xml:space="preserve">
     <value>取消</value>
   </data>
-  <data name="Dialog.CloseWhileDeploying.Title" xml:space="preserve">
+  <data name="App.Dialog.CloseWhileDeploying.Title" xml:space="preserve">
     <value>部署中关闭程序？</value>
   </data>
-  <data name="Dialog.CloseWhileDeploying.ContentText" xml:space="preserve">
+  <data name="App.Dialog.CloseWhileDeploying.ContentText" xml:space="preserve">
     <value>关闭程序将强制终止正在进行的部署，已造成的修改不可逆，这可能会导致不同程度的软硬件异常！</value>
   </data>
-  <data name="Dialog.CloseWhileDeploying.PrimaryButtonText" xml:space="preserve">
+  <data name="App.Dialog.CloseWhileDeploying.PrimaryButtonText" xml:space="preserve">
     <value>仍然关闭</value>
   </data>
-  <data name="Dialog.CloseWhileDeploying.CloseButtonText" xml:space="preserve">
+  <data name="App.Dialog.CloseWhileDeploying.CloseButtonText" xml:space="preserve">
     <value>取消</value>
   </data>
 </root>
