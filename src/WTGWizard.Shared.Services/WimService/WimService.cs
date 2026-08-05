@@ -49,12 +49,31 @@ public sealed class WimService : IWimService
             verifyTask = _activeVerifyTask;
         }
 
-        if (verifyTask is null || verifyTask.Wait(TimeSpan.FromSeconds(10)))
+        if (verifyTask is null)
         {
-            // 无活动校验，或校验已及时退出（wimlib abort 响应通常毫秒~秒级）→ 安全全局清理
+            // 无活动校验 → 安全全局清理
+            ManagedWimLib.Wim.TryGlobalCleanup();
+            return;
+        }
+
+        try
+        {
+            if (verifyTask.Wait(TimeSpan.FromSeconds(10)))
+            {
+                // 校验已及时退出（wimlib abort 响应通常毫秒~秒级）→ 安全全局清理
+                ManagedWimLib.Wim.TryGlobalCleanup();
+            }
+            // 超时（wimlib 卡死，罕见）：跳过清理，进程退出时 OS 回收资源——宁可不清洗，也不并发崩溃
+        }
+        catch (AggregateException ex) when (ex.InnerException is OperationCanceledException)
+        {
+            // 取消是预期路径（Cleanup 主动 Cancel）：任务已退出，安全全局清理
             ManagedWimLib.Wim.TryGlobalCleanup();
         }
-        // 超时（wimlib 卡死，罕见）：跳过清理，进程退出时 OS 回收资源——宁可不清洗，也不并发崩溃
+        catch (AggregateException)
+        {
+            // 校验任务异常结束：跳过全局清理，进程退出时 OS 回收
+        }
     }
 
     public static bool IsInitialized => _initialized.IsValueCreated;
