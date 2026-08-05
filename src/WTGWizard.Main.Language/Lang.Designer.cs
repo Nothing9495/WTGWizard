@@ -422,6 +422,42 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Close While Deploying? 的本地化字符串。
+        /// </summary>
+        public static string Dialog_CloseWhileDeploying_Title {
+            get {
+                return ResourceManager.GetString("Dialog.CloseWhileDeploying.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Closing the app will forcibly terminate the ongoing deployment. Changes already applied are irreversible and may cause various degrees of hardware or software issues! 的本地化字符串。
+        /// </summary>
+        public static string Dialog_CloseWhileDeploying_ContentText {
+            get {
+                return ResourceManager.GetString("Dialog.CloseWhileDeploying.ContentText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Close Anyway 的本地化字符串。
+        /// </summary>
+        public static string Dialog_CloseWhileDeploying_PrimaryButtonText {
+            get {
+                return ResourceManager.GetString("Dialog.CloseWhileDeploying.PrimaryButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cancel 的本地化字符串。
+        /// </summary>
+        public static string Dialog_CloseWhileDeploying_CloseButtonText {
+            get {
+                return ResourceManager.GetString("Dialog.CloseWhileDeploying.CloseButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Avg Resp. 的本地化字符串。
         /// </summary>
         public static string Page_Task_DiskPerf_AvgRespLabel {

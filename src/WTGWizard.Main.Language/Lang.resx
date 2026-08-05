@@ -768,4 +768,16 @@ Continue to deploy with this image will cause unexpected problems.</value>
   <data name="Page.Task.AbortDialog.CloseButtonText" xml:space="preserve">
     <value>No</value>
   </data>
+  <data name="Dialog.CloseWhileDeploying.Title" xml:space="preserve">
+    <value>Close While Deploying?</value>
+  </data>
+  <data name="Dialog.CloseWhileDeploying.ContentText" xml:space="preserve">
+    <value>Closing the app will forcibly terminate the ongoing deployment. Changes already applied are irreversible and may cause various degrees of hardware or software issues!</value>
+  </data>
+  <data name="Dialog.CloseWhileDeploying.PrimaryButtonText" xml:space="preserve">
+    <value>Close Anyway</value>
+  </data>
+  <data name="Dialog.CloseWhileDeploying.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
 </root>

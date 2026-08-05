@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -31,6 +32,11 @@ public sealed partial class WizardViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(CanGoForward))]
     public partial bool IsDeploying { get; set; }
     [ObservableProperty] public partial string CurrentStepTitle { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 关闭钩子 — TaskPage 部署运行时注册，MainWindow 关闭流程调用（解耦页面/窗口）。
+    /// </summary>
+    public Func<Task>? StopDeploymentForClose { get; set; }
 
     public bool CanGoBack => CurrentStep > 0 && !IsDeploying;
     public bool CanGoForward => CurrentStep < MaxStep && IsCurrentStepValid;

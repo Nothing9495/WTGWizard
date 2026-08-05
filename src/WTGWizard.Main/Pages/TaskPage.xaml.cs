@@ -19,6 +19,7 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private DeploymentOrchestrator? _orchestrator;
+    private Task? _deploymentTask;
     private DiskPerformanceMonitor? _diskMonitor;
     private readonly object _syncRoot = new();
     private CancellationTokenSource? _cts;
@@ -93,7 +94,8 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
         // ── 新的 orchestrator：完全重置 ──
         HasDeployment = true;
         PrepareNewDeployment(incoming);
-        _ = RunDeploymentAsync();
+        _deploymentTask = RunDeploymentAsync();
+        VM.StopDeploymentForClose = StopForAppCloseAsync;
     }
 
     private void PrepareNewDeployment(DeploymentOrchestrator incoming)
@@ -137,7 +139,28 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
             _cts?.Dispose();
             _cts = null;
             VM.IsDeploying = false;
+            VM.StopDeploymentForClose = null;
             _orchestrator?.Dispose();
+            _deploymentTask = null;
+        }
+    }
+
+    /// <summary>
+    /// 应用关闭时强制终止部署（MainWindow 关闭流程调用）。
+    /// 软取消（不再启动新 step）+ 硬中断当前任务（SendCancel），等待部署线程收尾。
+    /// </summary>
+    public async Task StopForAppCloseAsync()
+    {
+        _cts?.Cancel();
+        _orchestrator?.ForceCancelCurrentTask();
+        if (_deploymentTask is null) return;
+        try
+        {
+            await _deploymentTask.WaitAsync(TimeSpan.FromSeconds(10));
+        }
+        catch (TimeoutException)
+        {
+            // 部署线程未及时收尾：进程退出时 OS 回收
         }
     }
 

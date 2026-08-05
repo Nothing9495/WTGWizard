@@ -33,7 +33,12 @@ public partial class App : Application
     private void OnMainWindowClosed(object sender, WindowEventArgs args)
     {
         // 应用关闭时的清理逻辑
-        // TODO: WimService.Cleanup(); 补充对VerifyAsync的Cancel操作
+        // 兜底：强制终止残留 Worker 进程（异常路径防泄漏，正常路径已由关闭流程处理）
+        foreach (var w in System.Diagnostics.Process.GetProcessesByName("WTGWizard.Worker"))
+        {
+            try { w.Kill(entireProcessTree: true); } catch { /* best effort */ }
+        }
+
         WimService.Cleanup();
 
         var logger = Services.GetService<ILoggerService>();

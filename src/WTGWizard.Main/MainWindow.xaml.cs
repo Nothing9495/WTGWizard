@@ -44,6 +44,9 @@ public sealed partial class MainWindow : Window
             AppWindow.Changed += (_, _) => AdjustNavigationViewMargin();
         }
 
+        // 部署进行中关闭窗口：拦截 + 警告 + 强制终止（详见 OnAppWindowClosing）
+        AppWindow.Closing += OnAppWindowClosing;
+
         // 响应式导航：窗口宽度 >= 1300 DIP 时使用 Left 模式，否则 Top
         RootGrid.SizeChanged += (_, e) => UpdateNavViewPaneMode(e.NewSize.Width);
 
@@ -114,6 +117,34 @@ public sealed partial class MainWindow : Window
         WindowHelper.SetWindowSize(this, 1150, 800);
         WindowHelper.SetWindowMinSize(this, 970, 680);
         UpdateNavViewPaneMode(RootGrid.ActualWidth);
+    }
+
+    /// <summary>
+    /// 部署进行中关闭窗口：拦截首次关闭 → 警告对话框 → 确认后强制终止部署 → 二次关闭放行。
+    /// </summary>
+    private async void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
+    {
+        if (!_vm.IsDeploying) return;
+        args.Cancel = true;
+
+        var dialog = new ContentDialog
+        {
+            Title = WTGWizard.Main.Language.Lang.Dialog_CloseWhileDeploying_Title,
+            Content = WTGWizard.Main.Language.Lang.Dialog_CloseWhileDeploying_ContentText,
+            PrimaryButtonText = WTGWizard.Main.Language.Lang.Dialog_CloseWhileDeploying_PrimaryButtonText,
+            CloseButtonText = WTGWizard.Main.Language.Lang.Dialog_CloseWhileDeploying_CloseButtonText,
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = RootGrid.XamlRoot,
+            RequestedTheme = RootGrid.ActualTheme
+        };
+
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+            return;
+
+        if (_vm.StopDeploymentForClose is { } stop)
+            await stop();
+
+        Close();
     }
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
