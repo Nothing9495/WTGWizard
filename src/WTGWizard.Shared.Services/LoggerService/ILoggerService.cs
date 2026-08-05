@@ -20,6 +20,12 @@ public interface ILoggerService
     /// <summary>致命错误日志。</summary>
     void Fatal(string category, string message, params object?[] args);
 
+    /// <summary>输出会话启动标记（分隔线 + 环境信息）。</summary>
+    void LogSessionStart(string appName);
+
+    /// <summary>输出会话结束标记（分隔线 + 尾部空行，分隔日志段）。</summary>
+    void LogSessionEnd(string appName);
+
     /// <summary>关闭日志服务，排空队列。</summary>
     void Shutdown();
 }

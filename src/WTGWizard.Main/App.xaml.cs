@@ -24,6 +24,7 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         Services = ConfigureServices();
+        Services.GetService<ILoggerService>()?.LogSessionStart("WTGWizard.Main");
         _window = new MainWindow();
         MainWindow = _window as MainWindow;
         _window.Closed += OnMainWindowClosed;
@@ -42,6 +43,7 @@ public partial class App : Application
         WimService.Cleanup();
 
         var logger = Services.GetService<ILoggerService>();
+        logger?.LogSessionEnd("WTGWizard.Main");
         logger?.Shutdown();
 
         // 清理临时目录（部署中断残留兜底）

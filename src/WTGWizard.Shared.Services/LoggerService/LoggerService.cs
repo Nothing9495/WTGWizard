@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Serilog;
 
 namespace WTGWizard.Shared.Services.Logger;
@@ -68,6 +69,27 @@ public sealed class LoggerService : ILoggerService, IDisposable
 
     public void Fatal(string category, string message, params object?[] args)
         => _logger.ForContext("Category", category).Fatal(message, args);
+
+    private const string SessionDivider = "═══════════════════════════════════════════════";
+
+    public void LogSessionStart(string appName)
+    {
+        _logger.Information(SessionDivider);
+        _logger.Information("{App} session started.",
+            appName);
+        _logger.Information("OS: {Os}, Runtime: {Runtime}, Arch: {Arch}", 
+            Environment.OSVersion.VersionString,
+            RuntimeInformation.FrameworkDescription,
+            RuntimeInformation.OSArchitecture);
+        _logger.Information(SessionDivider);
+    }
+
+    public void LogSessionEnd(string appName)
+    {
+        _logger.Information(SessionDivider);
+        _logger.Information("{App} session ended", appName);
+        _logger.Information(SessionDivider + "\n");
+    }
 
     public void Shutdown()
     {
