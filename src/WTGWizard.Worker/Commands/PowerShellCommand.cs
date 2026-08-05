@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using WTGWizard.Shared.Services.Logger;
 
 namespace WTGWizard.Worker.Commands;
 
@@ -12,9 +13,10 @@ internal static class PowerShellCommand
     /// 执行 PowerShell 脚本命令。
     /// </summary>
     /// <param name="args">命令参数（--script, --pipe）。</param>
+    /// <param name="logger">日志服务（由 Program 传入，共享实例）。</param>
     /// <param name="ct">取消令牌。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args, CancellationToken ct)
+    public static int Run(string[] args, ILoggerService logger, CancellationToken ct)
     {
         string scriptPath = CommandArgs.GetArg(args, "--script");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
@@ -54,6 +56,7 @@ internal static class PowerShellCommand
         }
         catch (Exception ex)
         {
+            logger.Error("PowerShellCommand", "PowerShell script failed - ({Error}).", ex.ToString());
             pipe.WriteFailed("pwsh", 1, $"Error executing PowerShell script: {ex.Message}");
             return 1;
         }

@@ -28,6 +28,7 @@ static class Program
         var stderrWriter = new System.IO.StreamWriter(stderrStream, new System.Text.UTF8Encoding(false)) { AutoFlush = true };
         Console.SetError(stderrWriter);
 
+        logService.LogSessionStart("WTGWizard.Worker");
         logService.Info("Worker", "Worker started, PID: {Pid}", Environment.ProcessId);
 
         WorkerDebug.Initialize(args);
@@ -47,26 +48,31 @@ static class Program
             Console.Error.WriteLine("  dism       --args \"<dism_args>\" --pipe <name>");
             Console.Error.WriteLine("  bcdboot    --args \"<bcdboot_args>\" --pipe <name>");
             Console.Error.WriteLine("  filecopy   --src <path> --dst <path> --pipe <name>");
+            logService.LogSessionEnd("WTGWizard.Worker");
             return 1;
         }
 
+        int exitCode;
         try
         {
-            return args[0].ToLowerInvariant() switch
+            exitCode = args[0].ToLowerInvariant() switch
             {
                 "extract" => ExtractCommand.Run(args[1..], logService, WorkerCancellation.Token),
-                "pwsh" => PowerShellCommand.Run(args[1..], WorkerCancellation.Token),
-                "dism" => DismCommand.Run(args[1..], WorkerCancellation.Token),
-                "bcdboot" => BcdbootCommand.Run(args[1..], WorkerCancellation.Token),
-                "filecopy" => FileCopyCommand.Run(args[1..], WorkerCancellation.Token),
+                "pwsh" => PowerShellCommand.Run(args[1..], logService, WorkerCancellation.Token),
+                "dism" => DismCommand.Run(args[1..], logService, WorkerCancellation.Token),
+                "bcdboot" => BcdbootCommand.Run(args[1..], logService, WorkerCancellation.Token),
+                "filecopy" => FileCopyCommand.Run(args[1..], logService, WorkerCancellation.Token),
                 _ => throw new ArgumentException($"Unknown command: {args[0]}")
             };
         }
         catch (Exception ex)
         {
-            logService.Error("Worker", "Unhandled exception: {ErrorMessage}", ex.Message);
+            logService.Error("Worker", "Unhandled exception: {ErrorMessage}", ex.ToString());
             Console.Error.WriteLine(ex.Message);
-            return 1;
+            exitCode = 1;
         }
+
+        logService.LogSessionEnd("WTGWizard.Worker");
+        return exitCode;
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using WTGWizard.Shared.Services.Logger;
 
 namespace WTGWizard.Worker.Commands;
 
@@ -12,9 +13,10 @@ internal static class FileCopyCommand
     /// 执行文件复制命令。
     /// </summary>
     /// <param name="args">命令参数（--src, --dst, --pipe）。</param>
+    /// <param name="logger">日志服务（由 Program 传入，共享实例）。</param>
     /// <param name="ct">取消令牌（检查点式）。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args, CancellationToken ct)
+    public static int Run(string[] args, ILoggerService logger, CancellationToken ct)
     {
         string src = CommandArgs.GetArg(args, "--src");
         string dst = CommandArgs.GetArg(args, "--dst");
@@ -57,6 +59,7 @@ internal static class FileCopyCommand
         }
         catch (Exception ex)
         {
+            logger.Error("FileCopyCommand", "File copy failed - ({Error}).", ex.ToString());
             pipe.WriteFailed("filecopy", 1, $"Error copying file: {ex.Message}");
             return 1;
         }

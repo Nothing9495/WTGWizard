@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using WTGWizard.Shared.Services.Logger;
 
 namespace WTGWizard.Worker.Commands;
 
@@ -12,9 +13,10 @@ internal static class DismCommand
     /// 执行 DISM 命令。
     /// </summary>
     /// <param name="args">命令参数（--args, --pipe）。</param>
+    /// <param name="logger">日志服务（由 Program 传入，共享实例）。</param>
     /// <param name="ct">取消令牌。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args, CancellationToken ct)
+    public static int Run(string[] args, ILoggerService logger, CancellationToken ct)
     {
         string dismArgs = CommandArgs.GetArg(args, "--args");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
@@ -43,6 +45,7 @@ internal static class DismCommand
         }
         catch (Exception ex)
         {
+            logger.Error("DismCommand", "DISM failed - ({Error}).", ex.ToString());
             pipe.WriteFailed("dism", 1, $"Error executing DISM: {ex.Message}");
             return 1;
         }

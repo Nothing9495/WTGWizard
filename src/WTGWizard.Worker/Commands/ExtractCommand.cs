@@ -85,6 +85,7 @@ internal static class ExtractCommand
         }
         catch (Exception ex)
         {
+            logger.Error("ExtractCommand", "Extract failed - ({Error}).", ex.ToString());
             pipe.WriteFailed("extract", 1, $"Extract failed: {ex.Message}");
             return 1;
         }
