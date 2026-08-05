@@ -54,11 +54,11 @@ static class Program
         {
             return args[0].ToLowerInvariant() switch
             {
-                "extract" => ExtractCommand.Run(args[1..], logService),
-                "pwsh" => PowerShellCommand.Run(args[1..]),
-                "dism" => DismCommand.Run(args[1..]),
-                "bcdboot" => BcdbootCommand.Run(args[1..]),
-                "filecopy" => FileCopyCommand.Run(args[1..]),
+                "extract" => ExtractCommand.Run(args[1..], logService, WorkerCancellation.Token),
+                "pwsh" => PowerShellCommand.Run(args[1..], WorkerCancellation.Token),
+                "dism" => DismCommand.Run(args[1..], WorkerCancellation.Token),
+                "bcdboot" => BcdbootCommand.Run(args[1..], WorkerCancellation.Token),
+                "filecopy" => FileCopyCommand.Run(args[1..], WorkerCancellation.Token),
                 _ => throw new ArgumentException($"Unknown command: {args[0]}")
             };
         }

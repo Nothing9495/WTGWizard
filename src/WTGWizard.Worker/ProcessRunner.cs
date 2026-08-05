@@ -17,8 +17,9 @@ internal static class ProcessRunner
     /// <param name="fileName">可执行文件路径。</param>
     /// <param name="arguments">命令行参数。</param>
     /// <param name="timeoutMs">超时毫秒数，0 表示不超时。</param>
+    /// <param name="ct">取消令牌：取消时终止整个进程树并抛 OperationCanceledException。</param>
     /// <returns>进程退出码。</returns>
-    public static int Run(string fileName, string arguments, int timeoutMs = 0)
+    public static int Run(string fileName, string arguments, int timeoutMs = 0, CancellationToken ct = default)
     {
         var encoding = EncodingResolver.Resolve(fileName);
         WorkerDebug.Write($"Process: file={fileName}, args={arguments}, timeout={timeoutMs}ms, encoding={encoding.WebName}");
@@ -71,6 +72,16 @@ internal static class ProcessRunner
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
+        // 取消：终止整个进程树
+        using var cancelReg = ct.Register(() =>
+        {
+            if (!process.HasExited)
+            {
+                WorkerDebug.Write($"Process cancelled, killing tree: {fileName}");
+                process.Kill(entireProcessTree: true);
+            }
+        });
+
         if (timeoutMs > 0)
         {
             if (!exited.Wait(TimeSpan.FromMilliseconds(timeoutMs)))
@@ -84,6 +95,8 @@ internal static class ProcessRunner
         {
             exited.Wait();
         }
+
+        ct.ThrowIfCancellationRequested();
 
         outputDone.Wait(TimeSpan.FromSeconds(2));
 

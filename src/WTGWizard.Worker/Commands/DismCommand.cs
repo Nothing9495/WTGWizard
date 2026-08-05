@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace WTGWizard.Worker.Commands;
 
@@ -11,8 +12,9 @@ internal static class DismCommand
     /// 执行 DISM 命令。
     /// </summary>
     /// <param name="args">命令参数（--args, --pipe）。</param>
+    /// <param name="ct">取消令牌。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args)
+    public static int Run(string[] args, CancellationToken ct)
     {
         string dismArgs = CommandArgs.GetArg(args, "--args");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
@@ -25,7 +27,7 @@ internal static class DismCommand
 
         try
         {
-            int exitCode = ProcessRunner.Run("dism.exe", dismArgs, timeoutMs);
+            int exitCode = ProcessRunner.Run("dism.exe", dismArgs, timeoutMs, ct);
 
             if (exitCode == 0)
                 pipe.WriteCompleted("dism", 0);
@@ -33,6 +35,11 @@ internal static class DismCommand
                 pipe.WriteFailed("dism", exitCode, $"DISM failed with exit code {exitCode}");
 
             return exitCode;
+        }
+        catch (OperationCanceledException)
+        {
+            pipe.WriteCancel();
+            return 1;
         }
         catch (Exception ex)
         {

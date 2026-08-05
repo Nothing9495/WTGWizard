@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace WTGWizard.Worker.Commands;
 
@@ -11,8 +12,9 @@ internal static class PowerShellCommand
     /// 执行 PowerShell 脚本命令。
     /// </summary>
     /// <param name="args">命令参数（--script, --pipe）。</param>
+    /// <param name="ct">取消令牌。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args)
+    public static int Run(string[] args, CancellationToken ct)
     {
         string scriptPath = CommandArgs.GetArg(args, "--script");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
@@ -35,7 +37,8 @@ internal static class PowerShellCommand
             int exitCode = ProcessRunner.Run(
                 "powershell.exe",
                 $"-ExecutionPolicy Bypass -File \"{scriptPath}\"",
-                timeoutMs);
+                timeoutMs,
+                ct);
 
             if (exitCode == 0)
                 pipe.WriteCompleted("pwsh", 0);
@@ -43,6 +46,11 @@ internal static class PowerShellCommand
                 pipe.WriteFailed("pwsh", exitCode, $"PowerShell script failed with exit code {exitCode}");
 
             return exitCode;
+        }
+        catch (OperationCanceledException)
+        {
+            pipe.WriteCancel();
+            return 1;
         }
         catch (Exception ex)
         {

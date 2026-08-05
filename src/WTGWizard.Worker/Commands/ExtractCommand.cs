@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using WTGWizard.Shared.Services.Logger;
 using WTGWizard.Shared.Services.WimService;
@@ -25,8 +26,9 @@ internal static class ExtractCommand
     /// </summary>
     /// <param name="args">命令参数（--wim, --index, --target, --pipe）。</param>
     /// <param name="logger">日志服务（由 Program 传入，共享实例）。</param>
+    /// <param name="ct">取消令牌（wimlib 回调 Abort 优雅中止）。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args, ILoggerService logger)
+    public static int Run(string[] args, ILoggerService logger, CancellationToken ct)
     {
         string wimPath = CommandArgs.GetArg(args, "--wim");
         int index = int.Parse(CommandArgs.GetArg(args, "--index"));
@@ -71,10 +73,15 @@ internal static class ExtractCommand
                     // 通道 2: stdout 阶段消息（低频，每阶段一次，去重）
                     if (loggedStages.Add(s) && StageMessages.TryGetValue(s, out var msg))
                         Console.WriteLine(msg);
-                }).GetAwaiter().GetResult();
+                }, ct).GetAwaiter().GetResult();
 
             pipe.WriteCompleted("extract", 0);
             return 0;
+        }
+        catch (OperationCanceledException)
+        {
+            pipe.WriteCancel();
+            return 1;
         }
         catch (Exception ex)
         {

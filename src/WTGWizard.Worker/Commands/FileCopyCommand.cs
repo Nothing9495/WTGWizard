@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace WTGWizard.Worker.Commands;
 
@@ -11,8 +12,9 @@ internal static class FileCopyCommand
     /// 执行文件复制命令。
     /// </summary>
     /// <param name="args">命令参数（--src, --dst, --pipe）。</param>
+    /// <param name="ct">取消令牌（检查点式）。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args)
+    public static int Run(string[] args, CancellationToken ct)
     {
         string src = CommandArgs.GetArg(args, "--src");
         string dst = CommandArgs.GetArg(args, "--dst");
@@ -39,11 +41,19 @@ internal static class FileCopyCommand
                 Console.WriteLine($"Created directory: {dstDir}");
             }
 
+            // 检查点取消：复制前后各检查一次
+            ct.ThrowIfCancellationRequested();
             System.IO.File.Copy(src, dst, overwrite: true);
+            ct.ThrowIfCancellationRequested();
             Console.WriteLine($"Copied: {src} -> {dst}");
 
             pipe.WriteCompleted("filecopy", 0);
             return 0;
+        }
+        catch (OperationCanceledException)
+        {
+            pipe.WriteCancel();
+            return 1;
         }
         catch (Exception ex)
         {
