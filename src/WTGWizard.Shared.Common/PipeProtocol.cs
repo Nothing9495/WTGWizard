@@ -19,6 +19,10 @@ public static class PipeProtocol
     public const string TaskFailed = "task_failed";
     public const string TaskCancel = "task_cancel";
 
+    // ── 握手消息类型（Main → Worker 三次握手中的控制消息）──
+    public const string HandshakeReady = "ready";
+    public const string HandshakeAck = "ack";
+
     // ── Pipe 名称 ──
     public static string GeneratePipeName()
         => $"WTGWizardWorker_{Environment.ProcessId}";
@@ -47,6 +51,12 @@ public static class PipeProtocol
 
     public static string BuildCancel()
         => $"{{\"type\":\"{TaskCancel}\"}}";
+
+    public static string BuildReady()
+        => $"{{\"type\":\"{HandshakeReady}\"}}";
+
+    public static string BuildAck()
+        => $"{{\"type\":\"{HandshakeAck}\"}}";
 
     // ── JSON 字符串转义 ──
     public static string Escape(string s)

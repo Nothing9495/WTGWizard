@@ -7,7 +7,7 @@ namespace WTGWizard.Shared.Common;
 
 /// <summary>
 /// Pipe 协议读取器 — 从 NamedPipe 读取 JSON 消息并分发事件。
-/// 单向通信（子→主），无 cancel/ping。
+/// 双向通信：子→主为任务消息，主→子为控制消息（task_cancel）。
 /// </summary>
 public sealed class PipeReader : IDisposable
 {
@@ -28,6 +28,15 @@ public sealed class PipeReader : IDisposable
 
     /// <summary>Pipe 断开事件。</summary>
     public event Action? OnDisconnected;
+
+    /// <summary>收到取消指令（主 → 子）。</summary>
+    public event Action? OnCancelRequested;
+
+    /// <summary>收到握手 ready（主 → 子）。</summary>
+    public event Action? OnReady;
+
+    /// <summary>收到握手 ack（子 → 主）。</summary>
+    public event Action? OnAck;
 
     public PipeReader(PipeStream pipe)
     {
@@ -108,7 +117,15 @@ public sealed class PipeReader : IDisposable
                     break;
 
                 case PipeProtocol.TaskCancel:
-                    // 占位，未来双向通信时使用
+                    OnCancelRequested?.Invoke();
+                    break;
+
+                case PipeProtocol.HandshakeReady:
+                    OnReady?.Invoke();
+                    break;
+
+                case PipeProtocol.HandshakeAck:
+                    OnAck?.Invoke();
                     break;
             }
         }
