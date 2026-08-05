@@ -65,7 +65,8 @@ public sealed class PipeWriter : IDisposable
     }
 
     public void WriteRunning(string task, string? description = null) => Send(PipeProtocol.BuildRunning(task, description));
-    public void WriteProgress(string task, double percent) => Send(PipeProtocol.BuildProgress(task, percent));
+    public void WriteProgress(string task, double percent)
+        => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildProgress(task, percent)), _ct, WriteTimeoutMs, "progress", throwOnTimeout: true, logDetail: false);
     public void WriteCompleted(string task, int returnCode) => Send(PipeProtocol.BuildCompleted(task, returnCode));
     public void WriteFailed(string task, int returnCode, string? message = null) => Send(PipeProtocol.BuildFailed(task, returnCode, message));
     public void WriteCancel() => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildCancel() + PipeProtocol.NewLine),
@@ -103,8 +104,9 @@ public sealed class PipeWriter : IDisposable
     /// <summary>
     /// 统一写入路径：可取消（任务消息）/ 不可取消（取消确认，token 已取消时仍须送达）。
     /// 超时/失败时 Dispose 中断 NtWriteFile 阻塞兜底。
+    /// logDetail=false 用于高频消息（如进度），跳过明细日志；异常路径日志始终保留。
     /// </summary>
-    private void Write(byte[] bytes, CancellationToken ct, int timeoutMs, string tag, bool throwOnTimeout)
+    private void Write(byte[] bytes, CancellationToken ct, int timeoutMs, string tag, bool throwOnTimeout, bool logDetail = true)
     {
         lock (_lock)
         {
@@ -114,7 +116,7 @@ public sealed class PipeWriter : IDisposable
 
             try
             {
-                DebugLog?.Invoke($"Pipe: {tag} {bytes.Length} bytes");
+                if (logDetail) DebugLog?.Invoke($"Pipe: {tag} {bytes.Length} bytes");
                 var writeTask = pipe.WriteAsync(bytes, ct).AsTask();
 
                 if (!writeTask.Wait(TimeSpan.FromMilliseconds(timeoutMs)))
@@ -128,7 +130,7 @@ public sealed class PipeWriter : IDisposable
 
                 writeTask.GetAwaiter().GetResult();
                 pipe.Flush();
-                DebugLog?.Invoke($"Pipe: {tag} completed");
+                if (logDetail) DebugLog?.Invoke($"Pipe: {tag} completed");
             }
             catch (OperationCanceledException)
             {
