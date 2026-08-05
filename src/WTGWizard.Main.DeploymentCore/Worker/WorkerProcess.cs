@@ -123,13 +123,13 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         }
         catch (TimeoutException ex)
         {
-            _logger.Error("WorkerMgr", "Connection timeout: {Msg}", ex.Message);
+            _logger.Error("WorkerMgr", "Connection timeout: {Msg}", ex.ToString());
             KillProcessTree(process);
             return WorkerExecutionResult.Fail(-1, ex.Message);
         }
         catch (Exception ex)
         {
-            _logger.Error("WorkerMgr", "Unexpected error: {Msg}", ex.Message);
+            _logger.Error("WorkerMgr", "Unexpected error: {Msg}", ex.ToString());
             KillProcessTree(process);
             return WorkerExecutionResult.Fail(-1, ex.Message);
         }

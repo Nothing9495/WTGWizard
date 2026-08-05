@@ -75,15 +75,21 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
 
     public async Task<DeploymentResult> StartAsync(CancellationToken ct = default)
     {
+        _logger.Info("Orchestrator", "Deployment started, total tasks: {Count}", _tasks.Count);
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+
         try
         {
             foreach (var step in _pipeline.Steps)
             {
                 if (!step.ShouldRun(_currentConfig))
                 {
+                    _logger.Debug("Orchestrator", "Task skipped: {TaskId}", step.TaskId.Value);
                     _subject.OnNext(new(step.TaskId, DeployTaskStatus.Skipped, 0));
                     continue;
                 }
+
+                _logger.Info("Orchestrator", "Task started: {TaskId}", step.TaskId.Value);
 
                 using var ctx = new StepContext(_currentConfig, _worker,
                     _commands, _tempFiles, _logger);
@@ -102,16 +108,31 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
                 var result = await step.ExecuteAsync(ctx, ct);
 
                 if (!result.IsSuccess)
+                {
+                    _logger.Error("Orchestrator", "Task failed: {TaskId} - {Error}", step.TaskId.Value,
+                        result.ErrorMessage ?? "Unknown error");
                     return DeploymentResult.Failed(step.TaskId, result.ErrorMessage ?? "Unknown error");
+                }
+
+                _logger.Info("Orchestrator", "Task completed: {TaskId}", step.TaskId.Value);
 
                 if (step.TaskId == DeployTaskId.CreateDiskLayout)
                     await ResolveDriveLettersAsync();
             }
 
+            _logger.Info("Orchestrator", "Deployment completed successfully in {Elapsed:F1}s.", sw.Elapsed.TotalSeconds);
             return DeploymentResult.Ok();
         }
-        catch (OperationCanceledException) { return DeploymentResult.Cancelled(); }
-        catch (Exception ex) { return DeploymentResult.Failed(null, ex.Message); }
+        catch (OperationCanceledException)
+        {
+            _logger.Warn("Orchestrator", "Deployment cancelled after {Elapsed:F1}s.", sw.Elapsed.TotalSeconds);
+            return DeploymentResult.Cancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Orchestrator", "Deployment failed after {Elapsed:F1}s - ({Error}).", sw.Elapsed.TotalSeconds, ex.ToString());
+            return DeploymentResult.Failed(null, ex.Message);
+        }
     }
 
     public void Dispose()
