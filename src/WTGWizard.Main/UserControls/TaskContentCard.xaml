@@ -26,7 +26,7 @@
       <FontIcon Grid.Column="0"
                 Margin="16"
                 FontSize="20"
-                Glyph="&#xF7EC;"
+                Glyph="&#xE9F5;"
                 Foreground="{StaticResource AccentFillColorDefaultBrush}" />
 
       <!--  文本区域  -->
