@@ -780,4 +780,13 @@
   <data name="App.Dialog.CloseWhileDeploying.CloseButtonText" xml:space="preserve">
     <value>取消</value>
   </data>
+  <data name="App.Dialog.DebugBuild.Title" xml:space="preserve">
+    <value>调试版本</value>
+  </data>
+  <data name="App.Dialog.DebugBuild.ContentText" xml:space="preserve">
+    <value>您正在运行 WTGWizard 的调试版本。此版本仅供测试使用，可能出现功能异常或造成数据损坏。如需稳定使用，请运行发布版本</value>
+  </data>
+  <data name="App.Dialog.DebugBuild.CloseButtonText" xml:space="preserve">
+    <value>确定</value>
+  </data>
 </root>

@@ -780,4 +780,13 @@ Continue to deploy with this image will cause unexpected problems.</value>
   <data name="App.Dialog.CloseWhileDeploying.CloseButtonText" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="App.Dialog.DebugBuild.Title" xml:space="preserve">
+    <value>Debug Build</value>
+  </data>
+  <data name="App.Dialog.DebugBuild.ContentText" xml:space="preserve">
+    <value>You are running a debug build. This version is intended for testing only and may behave unexpectedly or damage data. For stable use, please run a release build.</value>
+  </data>
+  <data name="App.Dialog.DebugBuild.CloseButtonText" xml:space="preserve">
+    <value>OK</value>
+  </data>
 </root>

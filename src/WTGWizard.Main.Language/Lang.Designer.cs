@@ -97,6 +97,33 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 OK 的本地化字符串。
+        /// </summary>
+        public static string App_Dialog_DebugBuild_CloseButtonText {
+            get {
+                return ResourceManager.GetString("App.Dialog.DebugBuild.CloseButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 You are running a debug build. This version is intended for testing only and may behave unexpectedly or damage data. For stable use, please run a release build. 的本地化字符串。
+        /// </summary>
+        public static string App_Dialog_DebugBuild_ContentText {
+            get {
+                return ResourceManager.GetString("App.Dialog.DebugBuild.ContentText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Debug Build 的本地化字符串。
+        /// </summary>
+        public static string App_Dialog_DebugBuild_Title {
+            get {
+                return ResourceManager.GetString("App.Dialog.DebugBuild.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Tasks 的本地化字符串。
         /// </summary>
         public static string App_NavTabTask_Content {

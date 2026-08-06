@@ -117,7 +117,28 @@ public sealed partial class MainWindow : Window
         WindowHelper.SetWindowSize(this, 1150, 800);
         WindowHelper.SetWindowMinSize(this, 970, 680);
         UpdateNavViewPaneMode(RootGrid.ActualWidth);
+#if DEBUG
+        ShowDebugBuildWarning();
+#endif
     }
+
+    /// <summary>
+    /// 调试版本启动警告：仅 DEBUG 构建编译，提示用户当前为测试版本。
+    /// </summary>
+    private async void ShowDebugBuildWarning()
+    {
+        var dialog = new ContentDialog
+        {
+            Title = WTGWizard.Main.Language.Lang.App_Dialog_DebugBuild_Title,
+            Content = WTGWizard.Main.Language.Lang.App_Dialog_DebugBuild_ContentText,
+            CloseButtonText = WTGWizard.Main.Language.Lang.App_Dialog_DebugBuild_CloseButtonText,
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = RootGrid.XamlRoot,
+            RequestedTheme = RootGrid.ActualTheme
+        };
+        await dialog.ShowAsync();
+    }
+
 
     /// <summary>
     /// 部署进行中关闭窗口：拦截首次关闭 → 警告对话框 → 确认后强制终止部署 → 二次关闭放行。
