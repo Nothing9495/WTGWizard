@@ -12,9 +12,9 @@
       mc:Ignorable="d"
       NavigationCacheMode="Required">
 
-  <ScrollViewer Padding="20,20,20,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
-    <StackPanel Margin="0,0,0,20" Spacing="32">
-      <StackPanel Spacing="3">
+  <ScrollViewer Padding="36,40,36,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
+    <StackPanel Spacing="32">
+      <StackPanel Spacing="4">
         <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_Title}"
          Style="{ThemeResource TitleTextBlockStyle}" />
         <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_Desc}"
@@ -74,7 +74,7 @@
         <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelImg_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelImg_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xF012;}">
-          <StackPanel Orientation="Horizontal" Spacing="10">
+          <StackPanel Orientation="Horizontal" Spacing="8">
             <uc:FilePickerControl x:Name="ImageFilePicker"
                                   FileTypeFilter=".wim;.esd"
                                   FileSelected="ImageFilePicker_FileSelected" 

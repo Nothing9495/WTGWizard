@@ -17,10 +17,7 @@
 
   <Border MinHeight="230"
           Padding="24"
-          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-          BorderThickness="1"
-          CornerRadius="4">
+          Style="{StaticResource CardBorderStyle}">
     <Grid>
       <!--  四态：未选择 / 加载中 / 已选择且正常 / 已选择但打开失败  -->
       <cc:SwitchPresenter TargetType="userc:ImageInfoCardState" Value="{x:Bind CardState, Mode=OneWay}">

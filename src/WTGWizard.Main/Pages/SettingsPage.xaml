@@ -11,9 +11,9 @@
     xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
 
-    <Grid>
-    <ScrollViewer Padding="20,20,20,0" MaxWidth="{StaticResource PageContentMaxWidth}">
-      <StackPanel Margin="0,0,0,20" Spacing="32">
+  <Grid>
+    <ScrollViewer Padding="36,40,36,0" MaxWidth="{StaticResource PageContentMaxWidth}">
+      <StackPanel Spacing="32">
         <StackPanel Spacing="3">
           <TextBlock Text="{x:Bind lang:Lang.Page_Settings_Title}"
                      Style="{ThemeResource TitleTextBlockStyle}" />

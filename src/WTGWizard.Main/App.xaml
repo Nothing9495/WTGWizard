@@ -12,6 +12,14 @@
       <!-- XAML Constants -->
       <x:Double x:Key="PageContentMaxWidth">1200</x:Double>
       <x:Double x:Key="NavViewPaneBreakpoint">1350</x:Double>
+
+      <!-- 通用卡片外观：Card 主题背景/描边/圆角 4，供页面 Border 引用 -->
+      <Style x:Key="CardBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+      </Style>
     </ResourceDictionary>
   </Application.Resources>
 </Application>

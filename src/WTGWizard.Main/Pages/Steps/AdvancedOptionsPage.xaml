@@ -12,7 +12,7 @@
       NavigationCacheMode="Required">
 
   <ScrollViewer Padding="36,40,36,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
-    <StackPanel Margin="0,0,0,20" Spacing="32">
+    <StackPanel Spacing="32">
       <StackPanel Spacing="4">
         <!-- 标题 -->
         <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_AdvOptions_Title}"
@@ -35,7 +35,7 @@
                          Description="{x:Bind lang:Lang.Page_WizStep_AdvOptions_DriverPath_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xE8B7;}"
                          IsEnabled="{x:Bind VM.Advanced.DriverEnabled, Mode=OneWay}">
-          <StackPanel Orientation="Horizontal" Spacing="10">
+          <StackPanel Orientation="Horizontal" Spacing="8">
             <uc:FolderPickerControl x:Name="DriversFolderPicker"
                                     VerticalAlignment="Center"
                                     FolderSelected="OnDriverFolderSelected">
@@ -63,7 +63,7 @@
         <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_AdvOptions_AnsFile_Header}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xE946;}">
           <cc:SettingsCard.Content>
-            <StackPanel Orientation="Horizontal" Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
               <InfoBadge x:Name="AnsFileBadge"
                          Style="{x:Bind VM.Advanced.AnsFileBadgeStyle, Mode=OneWay}"/>
               <TextBlock Text="{x:Bind VM.Advanced.AnsFileExistsDisplay, Mode=OneWay}"/>
