@@ -220,7 +220,7 @@ public sealed partial class ImageConfigPage : Page
     {
         ImageInfoCard.MajorVersion = info.MajorVersion.ToString();
         ImageInfoCard.ImageIndex = info.Index.ToString();
-        ImageInfoCard.ImageVersion = info.FeatureVersion;
+        ImageInfoCard.ImageVersion = info.Sku;
         ImageInfoCard.FeatureUpdate = info.FeatureVersion;
         ImageInfoCard.Architecture = info.Architecture;
         ImageInfoCard.BuildNumber = info.BuildNumber;
