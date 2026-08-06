@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using ManagedWimLib;
+using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
 
 namespace WTGWizard.Shared.Services.WimService;
@@ -369,7 +370,7 @@ public sealed class WimService : IWimService
             DisplayDescription: xml.DisplayDesc,
             MajorVersion: majorVer, FeatureVersion: featureVer,
             Sku: xml.Sku, Architecture: arch, BuildNumber: buildStr,
-            ExpandedSizeGB: double.TryParse(xml.ExpandedSize, out var sz) ? Math.Round(sz / WimConstants.BytesPerGiB, 2) : 0,
+            ExpandedSizeGB: double.TryParse(xml.ExpandedSize, out var sz) ? Math.Round(sz / DiskConstants.BytesPerGiB, 2) : 0,
             DateCreated: xml.DateCreated,
             AnsFilePaths: ansFilePaths);
     }

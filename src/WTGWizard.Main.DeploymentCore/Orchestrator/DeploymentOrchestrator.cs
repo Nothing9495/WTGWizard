@@ -11,7 +11,6 @@ using WTGWizard.Main.DeploymentCore.Worker;
 using WTGWizard.Main.Language;
 using WTGWizard.Shared.Services.DiskServices;
 using WTGWizard.Shared.Services.Logger;
-using static WTGWizard.Main.DeploymentCore.Models.DeploymentConstants;
 
 namespace WTGWizard.Main.DeploymentCore.Orchestrator;
 
@@ -154,8 +153,8 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
 
         if (_currentConfig.IsCleanInstall)
         {
-            char esp = await _driveLetter.QueryActualDriveLetterAsync(diskNum, CleanInstallEspPartNum);
-            char os = await _driveLetter.QueryActualDriveLetterAsync(diskNum, CleanInstallOsPartNum);
+            char esp = await _driveLetter.QueryActualDriveLetterAsync(diskNum, DiskConstants.CleanInstallEspPartNum);
+            char os = await _driveLetter.QueryActualDriveLetterAsync(diskNum, DiskConstants.CleanInstallOsPartNum);
             _currentConfig = _currentConfig with { EspDriveLetter = esp, OsDriveLetter = os };
         }
         else if (_currentConfig.SelectedPartitionDriveLetter is { } letter)
@@ -181,7 +180,7 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
         _logger.Debug("DeployConfig", "[ImageInfo] Index={Idx}, Arch={Arch}, Build={Build}, Expand={Exp}GB",
             c.ImageSelectedIndex, c.ImageWindowsArch, c.ImageWinBuildNum, c.ImageExpandedSize);
 
-        string diskSizeGib = (c.DiskSizeBytes / DeploymentConstants.BytesPerGiB).ToString("F1");
+        string diskSizeGib = (c.DiskSizeBytes / DiskConstants.BytesPerGiB).ToString("F1");
         _logger.Debug("DeployConfig", "[TargetDisk] Disk #{Id}, {Size}GiB", c.DiskSelectedId, diskSizeGib);
 
         if (c.IsCleanInstall)

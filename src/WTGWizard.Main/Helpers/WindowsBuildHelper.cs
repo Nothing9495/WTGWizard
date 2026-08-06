@@ -1,4 +1,4 @@
-using static WTGWizard.Models.Constants;
+using static WTGWizard.Models.WinBuildConstants;
 
 namespace WTGWizard.Helpers;
 

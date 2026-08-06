@@ -15,7 +15,14 @@
 ```
 src/
 ├── WTGWizard.Main/            # WinUI 3 主应用 (WinExe)
-├── WTGWizard.Main.Language/   # 本地化资源 (.resx)
+│   ├── Pages/                 #   MainWindow, TaskPage, WizardHost, SettingsPage, Steps/
+│   ├── ViewModels/            #   WizardViewModel + 5 子 VM
+│   ├── UserControls/          #   TaskContentCard, TerminalBox, ImageInfoCard, File/FolderPicker
+│   ├── Helpers/               #   TitleBarHelper, WindowHelper, WindowsBuildHelper
+│   ├── Models/                #   WinBuildConstants.cs（构建号阈值）
+│   ├── Messages/              #   NavigateToPageMessage
+│   └── Styles/                #   AbortButtonResources.xaml（TaskPage 局部引用）
+├── WTGWizard.Main.Language/   # 本地化资源 (.resx) + Localization.cs 访问器
 ├── WTGWizard.Main.DeploymentCore/  # 部署引擎（模型/步骤/编排器/Worker 桥接）
 ├── WTGWizard.Shared.Services/ # 核心服务：磁盘、WIM、日志、终端缓冲
 ├── WTGWizard.Shared.Common/   # Named Pipe IPC 协议
@@ -64,6 +71,14 @@ dotnet publish src/WTGWizard.Main -c Release -r "win-x64" -o "build" -p:Platform
 
 **Entry Point**: `App.xaml.cs` → `OnLaunched()` → DI setup → `MainWindow`
 
+**Helpers/**: `TitleBarHelper` (custom title bar), `WindowHelper` (window sizing/centering), `WindowsBuildHelper` (BootEx build-number threshold check — `MeetsBootExThreshold` via `BuildMajor*`/`BuildRevisionThreshold` from `Models/WinBuildConstants.cs`)
+
+**Models/**: `WinBuildConstants.cs` — UI 侧唯一常量类（Windows 构建号阈值：`BuildMajor26100`/`BuildMajor26200`/`BuildRevisionThreshold`，仅供 WindowsBuildHelper）。磁盘/部署常量不在此处（见 DiskConstants/DeploymentConstants）。
+
+**Messages/**: `NavigateToPageMessage` — WeakReferenceMessenger 跨页导航（发送到 MainWindow → Frame 切换）
+
+**Debug-Build Warning**: `RootGrid_Loaded` 末尾 `#if DEBUG ShowDebugBuildWarning()` → ContentDialog（每次 DEBUG 启动弹出，本地化键 `App.Dialog.DebugBuild.*`）
+
 **5-Step Wizard** (`Pages/Steps/`):
 
 | Step | Page | Purpose |
@@ -90,22 +105,25 @@ dotnet publish src/WTGWizard.Main -c Release -r "win-x64" -o "build" -p:Platform
 
 | Directory | Responsibility |
 |-----------|---------------|
-| `Models/` | `DeploymentConfig`, `DeployTaskId` (verb-object: `CreateDiskLayout`, `ApplySysSettings`...), `DeployTaskItem`, `TaskUpdate`, `StepResult`, `WorkerCommand` |
-| `Contracts/` | `IDeploymentOrchestrator`, `IDeploymentStep` (+`TitleKey`/`DescriptionKey`), `IWorkerProcess`, `IStepContext`, `IDeploymentPipeline` |
+| `Models/` | `DeploymentConfig`, `DeploymentConstants`（部署执行参数唯一来源：Worker 命令超时 Timeout*Ms）, `DeployTaskId` (verb-object), `DeployTaskItem`, `TaskUpdate`, `StepResult`, `WorkerCommand`, `DeploymentResult`, `DeployTaskStatus`, `WorkerExecutionResult` |
+| `Contracts/` | `IDeploymentOrchestrator`, `IDeploymentStep` (+`TitleKey`/`DescriptionKey`), `IWorkerProcess`, `IStepContext`, `IDeploymentPipeline`, `IAnswerFileProvider` |
 | `Orchestrator/` | `DeploymentOrchestrator` (pipeline + `DiskNumber` + localized task list), `StepContext`, `DeploymentPipeline`, `DeploymentStepBase` |
-| `Steps/` | 7 steps: `CreateDiskLayout`, `ExtractImage`, `IntegrateDrivers`, `ImportAnswerFile`, `ApplySysSettings`, `CreateBootFiles`, `RemoveDriveLetters` |
-| `Worker/` | `WorkerProcess` (UTF-8 stdout/stderr read → `TerminalOutputBuffer`), `WorkerCommandFactory`, `CommandBuilder` |
+| `Steps/` | 7 steps（类名以行为命名，TaskId 用 verb-object——映射见 DeployTaskId 表）: `PartitionStep`, `ExtractStep`, `DriverStep`, `ImportAnsFileStep`, `ApplyWtgStep`, `BcdbootStep`, `CleanupStep` |
+| `Worker/` | `WorkerProcess` (UTF-8 stdout/stderr read → `TerminalOutputBuffer`), `WorkerCommandFactory`, `CommandBuilder`, `WorkerSettings` |
 | `Builders/` | `DiskScriptBuilder` (PowerShell scripts, forces `[Console]::OutputEncoding=UTF8`), `AnswerFileGenerator`, `TempFileManager` |
 
 ### WTGWizard.Shared.Services — Service Layer
 
 | Service | Purpose |
 |---------|---------|
-| `DiskIOService` | Disk enumeration (SetupAPI), partition queries, safety checks, device monitoring |
-| `DriveLetterService` | Two-phase drive letter assignment |
-| `WimService` (namespace `WTGWizard.Shared.Services.WimService`) | WIM operations via ManagedWimLib — **single wimlib load point** (`Wim.GlobalInit`); `ExtractImageAsync` reports progress **only on EXTRACT_STREAMS** messages (stage messages via `WimExtractStage` callback) |
+| `DiskIOService` | Disk enumeration (SetupAPI), partition queries, safety checks, device monitoring — split into `DiskIOReader` / `DiskIOWriter`（⚠️ PInvoke 重写中,见 TODO）/ `DiskIOWatcher` |
+| `DriveLetterService` | Two-phase drive letter assignment（fallback chains 见 `Models/DiskConstants.cs`） |
+| `DiskPerformanceMonitor` | Disk perf counters (TaskPage toolbar) |
+| `WimService` (namespace `WTGWizard.Shared.Services.WimService`) | WIM operations via ManagedWimLib — **single wimlib load point** (`Wim.GlobalInit`); `ExtractImageAsync` reports progress **only on EXTRACT_STREAMS** messages (stage messages via `WimExtractStage` callback); `DiskConstants.BytesPerGiB` |
 | `LoggerService` | Serilog: Debug sink + optional File sink (day rolling, `fileNameTemplate`, retains 7 days) |
 | `TerminalOutputBuffer` | Thread-safe snapshot buffer (Worker stdout writes, TaskPage reads; skips snapshot build when no subscribers) |
+
+**Disk Models** (`DiskServices/Models/`): `DiskBasicInfo`, `PartitionBasicInfo`, `DiskConstants`（磁盘物理布局**唯一来源**：GPT GUID（Guid + PS 字符串）、分区布局参数、CleanInstall 固定分区号、盘符回退链、EFI 尺寸范围；预留项供 DiskIOWriter PInvoke 使用）
 
 ### WTGWizard.Shared.Common — IPC Protocol
 
@@ -128,6 +146,8 @@ Entry point: `Program.cs` → parse command → dispatch to handler
 | `filecopy` | ✅ | File copy operations |
 | `extract` | ✅ | WIM extraction via `SharedServices.WimService` (progress on EXTRACT_STREAMS; stage messages + 5s-throttled progress via stdout) |
 
+**Files**: `Commands/` (5 command classes + `CommandArgs`), `Encoding/EncodingResolver.cs`, `ProcessRunner.cs`, `PipeHelper.cs`（复用 `Shared.Common.PipeWriter` + 三次握手）, `WorkerCancellation.cs`, `WorkerDebug.cs`, `Models/WorkerResult.cs`
+
 **Encoding** (`Encoding/EncodingResolver.cs`): per-executable output decoding — PowerShell = UTF-8 (scripts force it), DISM/BCDBoot = system OEM code page (adaptive: zh-CN 936 / en-US 437 / ja-JP 932). Worker stdout/stderr are UTF-8 (stream-wrapped, no `Console.OutputEncoding` dependency).
 
 **Logging**: `LoggerService(enableFile: true, fileNameTemplate: "WTGWorker-.log")` — Worker system logs (Serilog, day rolling, retains 7). No tee mirror: operation messages go only to stdout/stderr pipes → TerminalBox. Worker cleans nothing manually (Serilog handles retention).
@@ -137,6 +157,7 @@ Entry point: `Program.cs` → parse command → dispatch to handler
 - `Lang.resx` — English (default)
 - `Lang.zh-CN.resx` — Chinese (Simplified)
 - `Lang.Designer.cs` — Auto-generated strongly-typed accessor
+- `Localization.cs` — ResourceManager accessor (`GetString(name[, culture])`), runtime lookups without Designer
 - All UI strings are localized
 - Task title/desc keys use verb-object naming: `Task.CreateDiskLayout.Title` / `Task.CreateDiskLayout.Desc` (`.Desc.Esp` / `.Desc.EspOs` variants for RemoveDriveLetters)
 
@@ -220,7 +241,7 @@ WeakReferenceMessenger.Default.Register<NavigateToPageMessage>(this, (r, m) => {
 
 ### IPC Protocol
 
-Newline-delimited JSON over Named Pipes:
+Newline-delimited JSON over Named Pipes — **every message must end with `PipeProtocol.NewLine`** (`ReadLine()` frames on `\n`)：
 
 ```json
 {"type":"task_progress","task":"extract","percent":45.2}
@@ -272,15 +293,15 @@ XAML bindings use the C# property name:
 
 ### DeployTaskId Naming (verb-object)
 
-| Field | Value | TitleKey |
-|-------|-------|----------|
-| `CreateDiskLayout` | create-disk-layout | Task.CreateDiskLayout.Title |
-| `ExtractImage` | extract-image | Task.ExtractImage.Title |
-| `IntegrateDrivers` | integrate-drivers | Task.IntegrateDrivers.Title |
-| `ImportAnswerFile` | import-answer-file | Task.ImportAnswerFile.Title |
-| `ApplySysSettings` | apply-sys-settings | Task.ApplySysSettings.Title |
-| `CreateBootFiles` | create-boot-files | Task.CreateBootFiles.Title |
-| `RemoveDriveLetters` | remove-drive-letters | Task.RemoveDriveLetters.Title |
+| Step 类 | Field | Value | TitleKey |
+|---------|-------|-------|----------|
+| `PartitionStep` | `CreateDiskLayout` | create-disk-layout | Task.CreateDiskLayout.Title |
+| `ExtractStep` | `ExtractImage` | extract-image | Task.ExtractImage.Title |
+| `DriverStep` | `IntegrateDrivers` | integrate-drivers | Task.IntegrateDrivers.Title |
+| `ImportAnsFileStep` | `ImportAnswerFile` | import-answer-file | Task.ImportAnswerFile.Title |
+| `ApplyWtgStep` | `ApplySysSettings` | apply-sys-settings | Task.ApplySysSettings.Title |
+| `BcdbootStep` | `CreateBootFiles` | create-boot-files | Task.CreateBootFiles.Title |
+| `CleanupStep` | `RemoveDriveLetters` | remove-drive-letters | Task.RemoveDriveLetters.Title |
 
 DeployTaskId is independent from Worker pipe task names (dism/bcdboot/pwsh/extract/filecopy).
 
@@ -353,7 +374,7 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 
 ### Adding a New Deployment Step
 
-1. Create `Steps/{Name}Step.cs` implementing `IDeploymentStep` (`TaskId` verb-object, `TitleKey`/`DescriptionKey`)
+1. Create `Steps/{Name}Step.cs` implementing `IDeploymentStep` (class name = behavior, `TaskId` = verb-object per DeployTaskId table above)
 2. Add resource keys `Task.{VerbObject}.Title` / `Task.{VerbObject}.Desc` to `Lang.resx` + `Lang.zh-CN.resx` + `Lang.Designer.cs`
 3. Register in `WizardViewModel.StartDeploy()` pipeline via `AddStep<{Name}Step>()`
 
@@ -385,7 +406,10 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 | Encoding Adapter | ✅ Complete | `Worker/Encoding/EncodingResolver.cs` |
 | Terminal Buffer + Logging | ✅ Complete | `Shared.Services/TerminalOutputBuffer.cs`, `LoggerService/` |
 | SettingsPage | ✅ Complete | `Pages/SettingsPage.xaml`（Worker `--debug` Toggle，本地化） |
+| Global CardBorderStyle | ✅ Complete | `App.xaml`（`CardBorderStyle`，供 ConfirmPage/ImageInfoCard/WizardHost 复用） |
+| Debug Build Dialog | ✅ Complete | `MainWindow.xaml.cs`（`#if DEBUG` 启动弹窗，键 `App.Dialog.DebugBuild.*`） |
 | DiskIOWriter | ⚠️ Stub | `Shared.Services/DiskServices/DiskIOService/DiskIOWriter.cs` (PInvoke Implementation to replace Powershell disk layout creation script.) |
+| 常量收敛（三份重叠） | ✅ Resolved | `WinBuildConstants`（UI 构建阈值）/ `DeploymentConstants`（Worker 超时）/ `DiskConstants`（磁盘布局唯一来源）——见 Pitfall 18 |
 
 ---
 
@@ -424,3 +448,5 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 16. **WimService.Cleanup vs VerifyAsync**: `Cleanup()` (called on app close) force-cancels any in-flight `VerifyAsync` via a linked `CancellationTokenSource` and waits up to 10s before `TryGlobalCleanup()` — necessary because wimlib global cleanup during an active verify causes Access Violation. On timeout it skips cleanup (OS reclaims on process exit) rather than risking a crash. The linked-token design means BOTH page-initiated cancel (`_verifyCts`) and Cleanup-forced cancel propagate through the same callback `Abort` path.
 
 17. **ExtractFileAsync semantics**: `targetFilePath` is a FILE path (not a directory). Internally it extracts to the target's parent dir with `ExtractFlags.NoPreserveDirStructure | ExtractFlags.NoAcls`, then `File.Move(overwrite: true)`. Using a bare `ExtractPath(target=filePath, ...)` would create `<filePath>\Windows\Panther\...` with full WIM ACLs.
+
+18. **常量三处重叠（已收敛）**: 历史上 GPT GUID/分区布局/回退链/超时在 `Main/Models/Constants.cs`、`DeploymentCore/Models/DeploymentConstants.cs`、`Shared.Services/DiskServices/Models/DiskConstants.cs` 三处重复定义（部分重叠）。2026-08-06 已收敛为三个单一来源：**`DiskConstants`**（磁盘物理布局唯一来源，Main/DeploymentCore 均可引用）、**`DeploymentConstants`**（仅 Worker 命令超时 Timeout*Ms）、**`WinBuildConstants`**（仅 Windows 构建号阈值）。新增磁盘/部署常量按此归属；旧文件 `Constants.cs`/`WimConstants.cs` 已删除，`DiskConstants` 中为 DiskIOWriter PInvoke 预留的项标注 `reserved` 注释。

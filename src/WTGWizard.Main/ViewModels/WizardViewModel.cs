@@ -192,8 +192,8 @@ public sealed partial class WizardViewModel : ObservableObject
 
         if (Method.IsCleanInstall)
         {
-            espVolumeId = DeploymentConstants.CleanInstallEspPartNum;
-            osDriveVolumeId = DeploymentConstants.CleanInstallOsPartNum;
+            espVolumeId = DiskConstants.CleanInstallEspPartNum;
+            osDriveVolumeId = DiskConstants.CleanInstallOsPartNum;
         }
         else
         {

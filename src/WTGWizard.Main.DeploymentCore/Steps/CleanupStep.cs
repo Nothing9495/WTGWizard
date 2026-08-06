@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using WTGWizard.Main.DeploymentCore.Builders;
 using WTGWizard.Main.DeploymentCore.Models;
+using WTGWizard.Shared.Services.DiskServices;
 using static WTGWizard.Main.DeploymentCore.Models.DeploymentConstants;
 
 namespace WTGWizard.Main.DeploymentCore.Steps;
@@ -19,9 +20,9 @@ public sealed class CleanupStep : Contracts.IDeploymentStep
         ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Running, 0));
 
         uint espPartNum = ctx.Config.IsCleanInstall
-            ? CleanInstallEspPartNum : ctx.Config.EspVolumeId;
+            ? DiskConstants.CleanInstallEspPartNum : ctx.Config.EspVolumeId;
         uint osPartNum = ctx.Config.IsCleanInstall
-            ? CleanInstallOsPartNum : ctx.Config.OsDriveVolumeId;
+            ? DiskConstants.CleanInstallOsPartNum : ctx.Config.OsDriveVolumeId;
 
         ctx.Logger.Debug("Cleanup", "Removing letters: ESP=#{Esp}, OS=#{Os}, AutoRemoveOs={Auto}",
             espPartNum, osPartNum, ctx.Config.AutoRemoveOsDriveLetter);

@@ -9,7 +9,6 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using WTGWizard.Helpers;
 using WTGWizard.Main;
-using WTGWizard.Models;
 using ManagedWimLib;
 using WTGWizard.Shared.Services.WimService;
 using WTGWizard.UserControls;

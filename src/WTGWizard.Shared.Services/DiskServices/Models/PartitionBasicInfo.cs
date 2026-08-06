@@ -10,8 +10,6 @@ public sealed record PartitionBasicInfo(
     string? DriveLetter,
     string? VolumeLabel)
 {
-    private const double BytesPerGiB = 1073741824.0;
-
     /// <summary>ComboBox 显示文本。</summary>
     public string DisplayName
     {
@@ -19,7 +17,7 @@ public sealed record PartitionBasicInfo(
         {
             var letter = string.IsNullOrEmpty(DriveLetter) ? "?" : DriveLetter;
             var label = string.IsNullOrWhiteSpace(VolumeLabel) ? "No Label" : VolumeLabel;
-            var sizeGiB = Size / BytesPerGiB;
+            var sizeGiB = Size / DiskConstants.BytesPerGiB;
             return $"{letter}: {label} ({sizeGiB:F2} GiB)";
         }
     }

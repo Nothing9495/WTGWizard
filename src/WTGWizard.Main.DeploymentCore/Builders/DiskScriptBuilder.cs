@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using WTGWizard.Main.DeploymentCore.Models;
-using static WTGWizard.Main.DeploymentCore.Models.DeploymentConstants;
+using static WTGWizard.Shared.Services.DiskServices.DiskConstants;
 
 namespace WTGWizard.Main.DeploymentCore.Builders;
 
