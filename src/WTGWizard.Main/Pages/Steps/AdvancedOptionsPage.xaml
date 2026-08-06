@@ -11,9 +11,9 @@
       mc:Ignorable="d"
       NavigationCacheMode="Required">
 
-  <ScrollViewer Padding="20,20,20,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
+  <ScrollViewer Padding="36,40,36,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
     <StackPanel Margin="0,0,0,20" Spacing="32">
-      <StackPanel Spacing="3">
+      <StackPanel Spacing="4">
         <!-- 标题 -->
         <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_AdvOptions_Title}"
                    Style="{ThemeResource TitleTextBlockStyle}" />
@@ -74,10 +74,10 @@
                        TextWrapping="Wrap"/>
           </cc:SettingsCard.Description>
         </cc:SettingsCard>
-        <InfoBar Title="{x:Bind lang:Lang.Page_WizStep_AdvOptions_AnsFile_Header}"
+        <InfoBar Title="{x:Bind lang:Lang.InfoBar_InImageAnsFile_Title}"
                  IsClosable="False"
                  IsOpen="{x:Bind VM.Image.HasUnattend, Mode=OneWay}"
-                 Message="{x:Bind lang:Lang.Page_WizStep_AdvOptions_AnsFile_InfoBar}"
+                 Message="{x:Bind lang:Lang.InfoBar_InImageAnsFile_Message}"
                  Severity="Informational" />
         <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_AdvOptions_ExtractAnsFile_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_AdvOptions_ExtractAnsFile_Desc}"

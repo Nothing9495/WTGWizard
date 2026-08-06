@@ -417,14 +417,11 @@
     <value>应答文件设置</value>
   </data>
   <data name="Page.WizStep.AdvOptions.AnsFile.Header" xml:space="preserve">
-    <value>映像内已有应答文件！</value>
+    <value>应答文件指示器</value>
   </data>
   <data name="Page.WizStep.AdvOptions.AnsFile.Desc" xml:space="preserve">
     <value>指示当前映像中是否包含了应答文件。
 找到的路径：{0}</value>
-  </data>
-  <data name="Page.WizStep.AdvOptions.AnsFile.InfoBar" xml:space="preserve">
-    <value>当前映像中已包含应答文件，导入应答文件将覆盖映像中的配置。如果你需要使用新的应答文件，请开启”清理映像中的应答文件“</value>
   </data>
   <data name="Page.WizStep.AdvOptions.AnsFile.NoImage" xml:space="preserve">
     <value>未选择映像文件</value>
@@ -788,5 +785,11 @@
   </data>
   <data name="App.Dialog.DebugBuild.CloseButtonText" xml:space="preserve">
     <value>确定</value>
+  </data>
+  <data name="InfoBar.InImageAnsFile.Title" xml:space="preserve">
+    <value>映像内已有应答文件！</value>
+  </data>
+  <data name="InfoBar.InImageAnsFile.Message" xml:space="preserve">
+    <value>当前映像中已包含应答文件，导入应答文件将覆盖映像中的配置。如果你需要使用新的应答文件，请开启”清理映像中的应答文件“</value>
   </data>
 </root>

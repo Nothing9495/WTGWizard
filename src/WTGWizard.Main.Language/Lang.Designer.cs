@@ -106,7 +106,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 You are running a debug build. This version is intended for testing only and may behave unexpectedly or damage data. For stable use, please run a release build. 的本地化字符串。
+        ///   查找类似 You are running a debug build of WTGWizard. This version is intended for testing only and may behave unexpectedly or damage data. For stable use, please run a release build. 的本地化字符串。
         /// </summary>
         public static string App_Dialog_DebugBuild_ContentText {
             get {
@@ -283,6 +283,25 @@ namespace WTGWizard.Main.Language {
         public static string InfoBar_ImageVerificationUnknown_Title {
             get {
                 return ResourceManager.GetString("InfoBar.ImageVerificationUnknown.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Current image already contains an answer file. Importing a new answer file will overwrite the existing configuration.
+        ///Enable &quot;Clear in-image answer files&quot; option if you want to use a new answer file. 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_InImageAnsFile_Message {
+            get {
+                return ResourceManager.GetString("InfoBar.InImageAnsFile.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 In-image Answer File! 的本地化字符串。
+        /// </summary>
+        public static string InfoBar_InImageAnsFile_Title {
+            get {
+                return ResourceManager.GetString("InfoBar.InImageAnsFile.Title", resourceCulture);
             }
         }
         
@@ -630,21 +649,11 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 In-image Answer File! 的本地化字符串。
+        ///   查找类似 Answer File Indicator 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_AdvOptions_AnsFile_Header {
             get {
                 return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFile.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Current image already contains an answer file. Importing a new answer file will overwrite the existing configuration.
-        ///Enable &quot;Clear in-image answer files&quot; option if you want to use a new answer file. 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_AdvOptions_AnsFile_InfoBar {
-            get {
-                return ResourceManager.GetString("Page.WizStep.AdvOptions.AnsFile.InfoBar", resourceCulture);
             }
         }
         

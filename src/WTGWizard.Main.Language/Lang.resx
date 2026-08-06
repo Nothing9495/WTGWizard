@@ -417,15 +417,11 @@ Incorrect drivers path will lead to a failure of deployment.</value>
     <value>Answer File Settings</value>
   </data>
   <data name="Page.WizStep.AdvOptions.AnsFile.Header" xml:space="preserve">
-    <value>In-image Answer File!</value>
+    <value>Answer File Indicator</value>
   </data>
   <data name="Page.WizStep.AdvOptions.AnsFile.Desc" xml:space="preserve">
     <value>Indicates whether the current image contains an answer file.
 Found path: {0}</value>
-  </data>
-  <data name="Page.WizStep.AdvOptions.AnsFile.InfoBar" xml:space="preserve">
-    <value>Current image already contains an answer file. Importing a new answer file will overwrite the existing configuration.
-Enable "Clear in-image answer files" option if you want to use a new answer file.</value>
   </data>
   <data name="Page.WizStep.AdvOptions.AnsFile.NoImage" xml:space="preserve">
     <value>No image file selected</value>
@@ -784,9 +780,16 @@ Continue to deploy with this image will cause unexpected problems.</value>
     <value>Debug Build</value>
   </data>
   <data name="App.Dialog.DebugBuild.ContentText" xml:space="preserve">
-    <value>You are running a debug build. This version is intended for testing only and may behave unexpectedly or damage data. For stable use, please run a release build.</value>
+    <value>You are running a debug build of WTGWizard. This version is intended for testing only and may behave unexpectedly or damage data. For stable use, please run a release build.</value>
   </data>
   <data name="App.Dialog.DebugBuild.CloseButtonText" xml:space="preserve">
     <value>OK</value>
+  </data>
+  <data name="InfoBar.InImageAnsFile.Title" xml:space="preserve">
+    <value>In-image Answer File!</value>
+  </data>
+  <data name="InfoBar.InImageAnsFile.Message" xml:space="preserve">
+    <value>Current image already contains an answer file. Importing a new answer file will overwrite the existing configuration.
+Enable "Clear in-image answer files" option if you want to use a new answer file.</value>
   </data>
 </root>
