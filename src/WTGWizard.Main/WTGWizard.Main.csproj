@@ -48,7 +48,6 @@
   <ItemGroup>
     <Content Include="Assets\WinLogo\*.png" CopyToOutputDirectory="PreserveNewest" />
 	<Content Include="Assets\AppLogo.ico" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="Native\x64\libwim-15.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
   </ItemGroup>
 
 	<Target Name="CopyWorkerOutput" AfterTargets="Build">

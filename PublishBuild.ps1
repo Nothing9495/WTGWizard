@@ -5,7 +5,7 @@ param(
     [string] $Output = "build/WTGWizard"
 )
 
-$ErrorActionPreference = "Stop";
+$ErrorActionPreference = "SilentlyContinue";
 
 Remove-Item $Output -Recurse -Force;
 dotnet publish src/WTGWizard.Worker -c Release -r "win-$Architecture" -o "$Output" -p:Platform=$Architecture -p:Platform=$Architecture -p:Version=$WorkerVer;

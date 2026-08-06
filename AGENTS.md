@@ -403,7 +403,7 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 
 6. **Worker Process**: Worker is NOT a project reference. It's copied via MSBuild targets. Don't add it as a `<ProjectReference>`.
 
-7. **Native Library**: `libwim-15.dll` must be in `{output}/Native/x64/`. Configured via `<CopyToOutputDirectory>` in Main's `.csproj`. Worker loads it through `WimService.EnsureInitialized` (same path).
+7. **Native Library**: `libwim-15.dll` is copied from the NuGet cache (`$(PkgManagedWimLib)\runtimes\win-x64\native\`) to `{output}/runtimes/win-x64/native/` via `<None CopyToOutputDirectory>` in `Shared.Services.csproj` (`ManagedWimLib` PackageReference has `GeneratePathProperty="true"`). ProjectReferences propagate it to Main and Worker outputs automatically. `WimService` loads it via `Path.Combine(AppContext.BaseDirectory, "runtimes", "win-x64", "native", "libwim-15.dll")`. Don't keep a copy under `Native/x64/`.
 
 8. **AOT Compatibility**: Pipe protocol uses hand-rolled JSON (no System.Text.Json source generators). Don't introduce reflection-based serialization.
 

@@ -24,7 +24,7 @@ public sealed class WimService : IWimService
     private static readonly Lazy<bool> _initialized = new(
         valueFactory: () =>
         {
-            var libPath = Path.Combine(AppContext.BaseDirectory, "Native\\x64\\libwim-15.dll");
+            var libPath = Path.Combine(AppContext.BaseDirectory, "runtimes", "win-x64", "native", "libwim-15.dll");
             ManagedWimLib.Wim.GlobalInit(libPath);
             return true;
         },
