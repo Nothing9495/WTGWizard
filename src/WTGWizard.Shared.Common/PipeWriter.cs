@@ -66,7 +66,7 @@ public sealed class PipeWriter : IDisposable
 
     public void WriteRunning(string task, string? description = null) => Send(PipeProtocol.BuildRunning(task, description));
     public void WriteProgress(string task, double percent)
-        => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildProgress(task, percent)), _ct, WriteTimeoutMs, "progress", throwOnTimeout: true, logDetail: false);
+        => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildProgress(task, percent) + PipeProtocol.NewLine), _ct, WriteTimeoutMs, "progress", throwOnTimeout: true, logDetail: false);
     public void WriteCompleted(string task, int returnCode) => Send(PipeProtocol.BuildCompleted(task, returnCode));
     public void WriteFailed(string task, int returnCode, string? message = null) => Send(PipeProtocol.BuildFailed(task, returnCode, message));
     public void WriteCancel() => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildCancel() + PipeProtocol.NewLine),
