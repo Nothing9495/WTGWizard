@@ -485,6 +485,9 @@
     <value>创建引导时，使用 CA 2023 签名的引导程序二进制文件
 该设置仅对 Windows 11 26100.8037 及以上可用</value>
   </data>
+  <data name="Page.WizStep.Confirm.StartDeployButton" xml:space="preserve">
+    <value>开始部署</value>
+  </data>
   <data name="Page.WizStep.Confirm.Title" xml:space="preserve">
     <value>确认部署</value>
   </data>

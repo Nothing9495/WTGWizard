@@ -1371,6 +1371,15 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Start Deployment 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_StartDeployButton {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.StartDeployButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Deplyment Summary 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_Confirm_SummaryCard_Title {

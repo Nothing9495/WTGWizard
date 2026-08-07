@@ -14,6 +14,7 @@
     <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
   </Page.Resources>
 
+  <Grid>
   <ScrollViewer Grid.Row="0" MaxWidth="{ThemeResource PageContentMaxWidth}" Padding="36,40,36,0">
 
     <StackPanel Spacing="4">
@@ -399,4 +400,23 @@
       </cc:WrapPanel>
     </StackPanel>
   </ScrollViewer>
+
+    <!-- 悬浮开始部署按钮：叠加层，不随滚动 -->
+    <Button x:Name="FloatingStartDeployButton"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
+            Margin="0,0,28,28"
+            Padding="20,10"
+            CornerRadius="20"
+            Style="{ThemeResource AccentButtonStyle}"
+            Shadow="{StaticResource SharedShadow}"
+            Translation="0,0,16"
+            IsEnabled="{x:Bind Display.IsStartDeployEnabled, Mode=OneWay}"
+            Click="StartDeploy_Click">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <FontIcon Glyph="&#xE768;" FontSize="16" />
+        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_Confirm_StartDeployButton}" FontSize="14" />
+      </StackPanel>
+    </Button>
+  </Grid>
 </Page>

@@ -35,6 +35,9 @@
         <Setter Property="Opacity" Value="0.7" />
         <Setter Property="VerticalAlignment" Value="Center" />
       </Style>
+
+      <!-- 悬浮元素投影（配合 Translation 使用） -->
+      <ThemeShadow x:Key="SharedShadow" />
     </ResourceDictionary>
   </Application.Resources>
 </Application>

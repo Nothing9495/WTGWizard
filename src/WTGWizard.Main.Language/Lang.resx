@@ -484,6 +484,9 @@ Found path: {0}</value>
     <value>Use the CA 2023-signed boot binaries for boot creation.
 This setting is available only on Windows 11 version 26100.8037 and later.</value>
   </data>
+  <data name="Page.WizStep.Confirm.StartDeployButton" xml:space="preserve">
+    <value>Start Deployment</value>
+  </data>
   <data name="Page.WizStep.Confirm.Title" xml:space="preserve">
     <value>Confirm</value>
   </data>
