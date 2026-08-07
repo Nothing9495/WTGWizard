@@ -491,98 +491,8 @@
   <data name="Page.WizStep.Confirm.Desc" xml:space="preserve">
     <value>检查部署配置摘要，确认后开始部署</value>
   </data>
-  <data name="Page.WizStep.Confirm.StartDeployGroup" xml:space="preserve">
-    <value>开始部署</value>
-  </data>
-  <data name="Page.WizStep.Confirm.StartDeploy.Header" xml:space="preserve">
-    <value>开始部署</value>
-  </data>
-  <data name="Page.WizStep.Confirm.StartDeploy.Desc" xml:space="preserve">
-    <value>确认所有配置无误后，点击"开始部署"按钮即可开始部署</value>
-  </data>
-  <data name="Page.WizStep.Confirm.StartDeployButton" xml:space="preserve">
-    <value>开始部署</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ImageInfoGroup" xml:space="preserve">
-    <value>映像信息</value>
-  </data>
-  <data name="Page.WizStep.Confirm.DeployMethodGroup" xml:space="preserve">
-    <value>部署配置</value>
-  </data>
-  <data name="Page.WizStep.Confirm.MethodType.Header" xml:space="preserve">
-    <value>部署方式</value>
-  </data>
-  <data name="Page.WizStep.Confirm.TargetDisk.Header" xml:space="preserve">
-    <value>目标磁盘</value>
-  </data>
-  <data name="Page.WizStep.Confirm.TargetPartition.Header" xml:space="preserve">
-    <value>目标分区</value>
-  </data>
-  <data name="Page.WizStep.Confirm.PartitionConfig.Header" xml:space="preserve">
-    <value>分区布局</value>
-  </data>
-  <data name="Page.WizStep.Confirm.EspSize.Header" xml:space="preserve">
-    <value>引导分区容量</value>
-  </data>
-  <data name="Page.WizStep.Confirm.OsSize.Header" xml:space="preserve">
-    <value>系统分区容量</value>
-  </data>
-  <data name="Page.WizStep.Confirm.OsLabel.Header" xml:space="preserve">
-    <value>系统分区卷标</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ReservedVolSize.Header" xml:space="preserve">
-    <value>保留分区容量</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ReservedVolFs.Header" xml:space="preserve">
-    <value>保留分区文件系统</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ReservedVolLabel.Header" xml:space="preserve">
-    <value>保留分区卷标</value>
-  </data>
-  <data name="Page.WizStep.Confirm.DeployOptionsGroup" xml:space="preserve">
-    <value>部署选项</value>
-  </data>
-  <data name="Page.WizStep.Confirm.HideLocalDisks.Header" xml:space="preserve">
-    <value>隐藏本地磁盘</value>
-  </data>
-  <data name="Page.WizStep.Confirm.PreventEncryption.Header" xml:space="preserve">
-    <value>阻止设备加密</value>
-  </data>
-  <data name="Page.WizStep.Confirm.NoDefaultDriveLetter.Header" xml:space="preserve">
-    <value>系统分区不分配默认盘符</value>
-  </data>
-  <data name="Page.WizStep.Confirm.RemoveOsDriveLetter.Header" xml:space="preserve">
-    <value>移除系统分区盘符</value>
-  </data>
-  <data name="Page.WizStep.Confirm.UseDismToDeploy.Header" xml:space="preserve">
-    <value>使用 DISM 部署 Windows</value>
-  </data>
-  <data name="Page.WizStep.Confirm.AdvancedGroup" xml:space="preserve">
-    <value>高级设置</value>
-  </data>
-  <data name="Page.WizStep.Confirm.DriversIntegration.Header" xml:space="preserve">
-    <value>集成驱动程序</value>
-  </data>
-  <data name="Page.WizStep.Confirm.DriversPath.Header" xml:space="preserve">
-    <value>驱动程序路径</value>
-  </data>
-  <data name="Page.WizStep.Confirm.UnsignedDrivers.Header" xml:space="preserve">
-    <value>导入未签名的驱动程序</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ImportAnswerFile.Header" xml:space="preserve">
-    <value>导入应答文件</value>
-  </data>
-  <data name="Page.WizStep.Confirm.AnswerFilePath.Header" xml:space="preserve">
-    <value>应答文件位置</value>
-  </data>
-  <data name="Page.WizStep.Confirm.CleanAnsFile.Header" xml:space="preserve">
-    <value>清理映像中的应答文件</value>
-  </data>
-  <data name="Page.WizStep.Confirm.BootVerbose.Header" xml:space="preserve">
-    <value>bcdboot 详细输出</value>
-  </data>
-  <data name="Page.WizStep.Confirm.BootEx.Header" xml:space="preserve">
-    <value>使用更新的引导文件二进制文件</value>
+  <data name="Page.WizStep.Confirm.DetailInfoGroup" xml:space="preserve">
+    <value>详细信息</value>
   </data>
   <data name="Page.WizStep.Confirm.DeployDialog.Title" xml:space="preserve">
     <value>确定开始部署吗？</value>
@@ -745,10 +655,10 @@
     <value>选择应用程序的整体外观</value>
   </data>
   <data name="Page.Settings.AppTheme.Light" xml:space="preserve">
-    <value>亮色</value>
+    <value>浅色主题</value>
   </data>
   <data name="Page.Settings.AppTheme.Dark" xml:space="preserve">
-    <value>暗色</value>
+    <value>深色主题</value>
   </data>
   <data name="Page.Settings.AppTheme.Default" xml:space="preserve">
     <value>跟随系统</value>
@@ -791,5 +701,128 @@
   </data>
   <data name="InfoBar.InImageAnsFile.Message" xml:space="preserve">
     <value>当前映像中已包含应答文件，导入应答文件将覆盖映像中的配置。如果你需要使用新的应答文件，请开启”清理映像中的应答文件“</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Title" xml:space="preserve">
+    <value>部署摘要</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag1" xml:space="preserve">
+    <value>隐藏本地磁盘</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag2" xml:space="preserve">
+    <value>阻止设备加密</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag3" xml:space="preserve">
+    <value>集成驱动程序</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag4" xml:space="preserve">
+    <value>导入应答文件</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag5" xml:space="preserve">
+    <value>使用 CA 2023 签名的引导程序</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.Enabled" xml:space="preserve">
+    <value>已启用</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.Disabled" xml:space="preserve">
+    <value>未启用</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.Title" xml:space="preserve">
+    <value>映像信息</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageFile" xml:space="preserve">
+    <value>映像文件</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageIndex" xml:space="preserve">
+    <value>映像索引</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageName" xml:space="preserve">
+    <value>映像名称</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageSKU" xml:space="preserve">
+    <value>系统版本</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageFeatureUpd" xml:space="preserve">
+    <value>功能版本</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageArchitecture" xml:space="preserve">
+    <value>系统架构</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageBuildVer" xml:space="preserve">
+    <value>构建号</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.TargetDisk" xml:space="preserve">
+    <value>目标磁盘</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.InstallationType" xml:space="preserve">
+    <value>部署方式</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.EspSize" xml:space="preserve">
+    <value>引导分区容量</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.OsSize" xml:space="preserve">
+    <value>系统分区容量</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.OsLabel" xml:space="preserve">
+    <value>系统分区卷标</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedSize" xml:space="preserve">
+    <value>保留分区容量</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedLabel" xml:space="preserve">
+    <value>保留分区卷标</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedFs" xml:space="preserve">
+    <value>保留分区文件系统</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.TargetPartition" xml:space="preserve">
+    <value>目标分区</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.Title" xml:space="preserve">
+    <value>部署选项</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.HideLocalDisks" xml:space="preserve">
+    <value>隐藏本地磁盘</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.PreventBDE" xml:space="preserve">
+    <value>阻止设备加密</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.NoDefaultDriveLetter" xml:space="preserve">
+    <value>系统分区无默认盘符</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.AutoRemoveOSLetter" xml:space="preserve">
+    <value>移除系统分区盘符</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.UseDismToDeploy" xml:space="preserve">
+    <value>使用 DISM 部署</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.Title" xml:space="preserve">
+    <value>高级选项</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.DriversIntegration" xml:space="preserve">
+    <value>集成驱动程序</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.DriversPath" xml:space="preserve">
+    <value>驱动程序位置</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.AllowUnsignedDrv" xml:space="preserve">
+    <value>导入未签名驱动程序</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.ImportAnsFile" xml:space="preserve">
+    <value>导入应答文件</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.AnsFilePath" xml:space="preserve">
+    <value>目标应答文件</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.CleanAnsFile" xml:space="preserve">
+    <value>清理映像内应答文件</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.bcdbootVerbose" xml:space="preserve">
+    <value>bcdboot 详细输出</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.EnableBootEx" xml:space="preserve">
+    <value>更新的引导程序</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.Title" xml:space="preserve">
+    <value>部署方式</value>
   </data>
 </root>

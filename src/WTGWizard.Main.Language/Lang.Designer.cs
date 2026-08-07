@@ -930,51 +930,6 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Advanced Settings 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_AdvancedGroup {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.AdvancedGroup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Answer File Location 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_AnswerFilePath_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.AnswerFilePath.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Use Updated Boot File Binaries 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_BootEx_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.BootEx.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 bcdboot Verbose Output 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_BootVerbose_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.BootVerbose.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Clean Up Answer File in Image 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_CleanAnsFile_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.CleanAnsFile.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Cancel 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_Confirm_DeployDialog_CloseButtonText {
@@ -1011,24 +966,6 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Deployment Method 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_DeployMethodGroup {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.DeployMethodGroup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Deployment Options 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_DeployOptionsGroup {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.DeployOptionsGroup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Review deployment configuration summary, then start deployment. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_Confirm_Desc {
@@ -1038,56 +975,326 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Integrate Drivers 的本地化字符串。
+        ///   查找类似 Details 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_DriversIntegration_Header {
+        public static string Page_WizStep_Confirm_DetailInfoGroup {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.DriversIntegration.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.DetailInfoGroup", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 Driver Path 的本地化字符串。
+        ///   查找类似 Allow Unsigned Drivers 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_DriversPath_Header {
+        public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_AllowUnsignedDrv {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.DriversPath.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.AdvancedOptions.AllowUnsignedDrv", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 ESP partition size 的本地化字符串。
+        ///   查找类似 Answer File Path 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_EspSize_Header {
+        public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_AnsFilePath {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.EspSize.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.AdvancedOptions.AnsFilePath", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 Hide Local Disks 的本地化字符串。
+        ///   查找类似 bcdboot Verbose Logging 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_HideLocalDisks_Header {
+        public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_bcdbootVerbose {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.HideLocalDisks.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.AdvancedOptions.bcdbootVerbose", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 Image Information 的本地化字符串。
+        ///   查找类似 Clear In-Image Answer Files 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_ImageInfoGroup {
+        public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_CleanAnsFile {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.ImageInfoGroup", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.AdvancedOptions.CleanAnsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Drivers Integration 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_DriversIntegration {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.AdvancedOptions.DriversIntegration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Drivers Path 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_DriversPath {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.AdvancedOptions.DriversPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Updated Boot Binaries 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_EnableBootEx {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.AdvancedOptions.EnableBootEx", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Import Answer File 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_ImportAnswerFile_Header {
+        public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_ImportAnsFile {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.ImportAnswerFile.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.AdvancedOptions.ImportAnsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Advanced Options 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_Title {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.AdvancedOptions.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ESP Volume Size 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_EspSize {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.EspSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Installation Type 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_InstallationType {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.InstallationType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 OS Volume Label 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_OsLabel {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.OsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 OS Volume Size 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_OsSize {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.OsSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reserved Vol. FS. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_ReservedFs {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedFs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reserved Vol. Label 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_ReservedLabel {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reserved Vol. Size 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_ReservedSize {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Target Disk 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_TargetDisk {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.TargetDisk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Target Partition 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_TargetPartition {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.TargetPartition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Deployment Method 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployMethod_Title {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployMethod.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Remove OS Drive Letter 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployOptions_AutoRemoveOSLetter {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployOptions.AutoRemoveOSLetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Hide Local Disks 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployOptions_HideLocalDisks {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployOptions.HideLocalDisks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No Drive Letter for OS 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployOptions_NoDefaultDriveLetter {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployOptions.NoDefaultDriveLetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Prevent Device Encryption 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployOptions_PreventBDE {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployOptions.PreventBDE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Deployment Options 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployOptions_Title {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployOptions.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Install by DISM 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_DeployOptions_UseDismToDeploy {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.DeployOptions.UseDismToDeploy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Disabled 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_Disabled {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.Disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Enabled 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_Enabled {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Architecture 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_ImageConfig_ImageArchitecture {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.ImageConfig.ImageArchitecture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Build 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_ImageConfig_ImageBuildVer {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.ImageConfig.ImageBuildVer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Feature Version 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_ImageConfig_ImageFeatureUpd {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.ImageConfig.ImageFeatureUpd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image File 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_ImageConfig_ImageFile {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.ImageConfig.ImageFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image Index 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_ImageConfig_ImageIndex {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.ImageConfig.ImageIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image Name 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_ImageConfig_ImageName {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.ImageConfig.ImageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 SKU 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_ImageConfig_ImageSKU {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.ImageConfig.ImageSKU", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Image Information 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_InfoCard_ImageConfig_Title {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.InfoCard.ImageConfig.Title", resourceCulture);
             }
         }
         
@@ -1101,38 +1308,11 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Deployment method 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_MethodType_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.MethodType.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Install to Partition 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_Confirm_MethodType_Partition {
             get {
                 return ResourceManager.GetString("Page.WizStep.Confirm.MethodType.Partition", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 No Default Drive Letter 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_NoDefaultDriveLetter_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.NoDefaultDriveLetter.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 OS volume label 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_OsLabel_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.OsLabel.Header", resourceCulture);
             }
         }
         
@@ -1146,119 +1326,56 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 OS partition size 的本地化字符串。
+        ///   查找类似 Hide Local Disks 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_OsSize_Header {
+        public static string Page_WizStep_Confirm_SummaryCard_Tag1 {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.OsSize.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Partition Layout 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_PartitionConfig_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.PartitionConfig.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.SummaryCard.Tag1", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Prevent Device Encryption 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_PreventEncryption_Header {
+        public static string Page_WizStep_Confirm_SummaryCard_Tag2 {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.PreventEncryption.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.SummaryCard.Tag2", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 Remove OS Drive Letter 的本地化字符串。
+        ///   查找类似 Integrate Drivers 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_RemoveOsDriveLetter_Header {
+        public static string Page_WizStep_Confirm_SummaryCard_Tag3 {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.RemoveOsDriveLetter.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.SummaryCard.Tag3", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 Reserved partition file system 的本地化字符串。
+        ///   查找类似 Import Answer File 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_ReservedVolFs_Header {
+        public static string Page_WizStep_Confirm_SummaryCard_Tag4 {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.ReservedVolFs.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.SummaryCard.Tag4", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 Reserved partition label 的本地化字符串。
+        ///   查找类似 Use Updated Boot File Binaries 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_ReservedVolLabel_Header {
+        public static string Page_WizStep_Confirm_SummaryCard_Tag5 {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.ReservedVolLabel.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.SummaryCard.Tag5", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 Reserved partition size 的本地化字符串。
+        ///   查找类似 Deplyment Summary 的本地化字符串。
         /// </summary>
-        public static string Page_WizStep_Confirm_ReservedVolSize_Header {
+        public static string Page_WizStep_Confirm_SummaryCard_Title {
             get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.ReservedVolSize.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 After confirming that all settings are correct, click the &quot;Start Deployment&quot; button to begin deployment. 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_StartDeploy_Desc {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.StartDeploy.Desc", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Start Deployment 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_StartDeploy_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.StartDeploy.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Start Deployment 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_StartDeployButton {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.StartDeployButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Start Deployment 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_StartDeployGroup {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.StartDeployGroup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Target Disk 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_TargetDisk_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.TargetDisk.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Target Partition 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_TargetPartition_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.TargetPartition.Header", resourceCulture);
+                return ResourceManager.GetString("Page.WizStep.Confirm.SummaryCard.Title", resourceCulture);
             }
         }
         
@@ -1272,24 +1389,6 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Import Unsigned Drivers 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_UnsignedDrivers_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.UnsignedDrivers.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Deploy Windows using DISM 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_UseDismToDeploy_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.UseDismToDeploy.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Clean Install 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployMethod_CleanInstall {
@@ -1299,7 +1398,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Select disk and deployment method. 的本地化字符串。
+        ///   查找类似 Select a disk and installation method. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployMethod_Desc {
             get {
@@ -1335,7 +1434,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Deployment Method 的本地化字符串。
+        ///   查找类似 Installation Type 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployMethod_Method_Header {
             get {
@@ -1560,7 +1659,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Deploy Method 的本地化字符串。
+        ///   查找类似 Deployment Method 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployMethod_Title {
             get {

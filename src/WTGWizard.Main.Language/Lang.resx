@@ -217,10 +217,10 @@
     <value>Image Verification Failed</value>
   </data>
   <data name="Page.WizStep.DeployMethod.Title" xml:space="preserve">
-    <value>Deploy Method</value>
+    <value>Deployment Method</value>
   </data>
   <data name="Page.WizStep.DeployMethod.Desc" xml:space="preserve">
-    <value>Select disk and deployment method.</value>
+    <value>Select a disk and installation method.</value>
   </data>
   <data name="Page.WizStep.DeployMethod.SelDisk.Header" xml:space="preserve">
     <value>Select Disk</value>
@@ -232,7 +232,7 @@
     <value>Select a disk</value>
   </data>
   <data name="Page.WizStep.DeployMethod.Method.Header" xml:space="preserve">
-    <value>Deployment Method</value>
+    <value>Installation Type</value>
   </data>
   <data name="Page.WizStep.DeployMethod.Method.Desc" xml:space="preserve">
     <value>Choose whether to perform a clean installation or install to a specific partition.</value>
@@ -490,98 +490,8 @@ This setting is available only on Windows 11 version 26100.8037 and later.</valu
   <data name="Page.WizStep.Confirm.Desc" xml:space="preserve">
     <value>Review deployment configuration summary, then start deployment.</value>
   </data>
-  <data name="Page.WizStep.Confirm.StartDeployGroup" xml:space="preserve">
-    <value>Start Deployment</value>
-  </data>
-  <data name="Page.WizStep.Confirm.StartDeploy.Header" xml:space="preserve">
-    <value>Start Deployment</value>
-  </data>
-  <data name="Page.WizStep.Confirm.StartDeploy.Desc" xml:space="preserve">
-    <value>After confirming that all settings are correct, click the "Start Deployment" button to begin deployment.</value>
-  </data>
-  <data name="Page.WizStep.Confirm.StartDeployButton" xml:space="preserve">
-    <value>Start Deployment</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ImageInfoGroup" xml:space="preserve">
-    <value>Image Information</value>
-  </data>
-  <data name="Page.WizStep.Confirm.DeployMethodGroup" xml:space="preserve">
-    <value>Deployment Method</value>
-  </data>
-  <data name="Page.WizStep.Confirm.MethodType.Header" xml:space="preserve">
-    <value>Deployment method</value>
-  </data>
-  <data name="Page.WizStep.Confirm.TargetDisk.Header" xml:space="preserve">
-    <value>Target Disk</value>
-  </data>
-  <data name="Page.WizStep.Confirm.TargetPartition.Header" xml:space="preserve">
-    <value>Target Partition</value>
-  </data>
-  <data name="Page.WizStep.Confirm.PartitionConfig.Header" xml:space="preserve">
-    <value>Partition Layout</value>
-  </data>
-  <data name="Page.WizStep.Confirm.EspSize.Header" xml:space="preserve">
-    <value>ESP partition size</value>
-  </data>
-  <data name="Page.WizStep.Confirm.OsSize.Header" xml:space="preserve">
-    <value>OS partition size</value>
-  </data>
-  <data name="Page.WizStep.Confirm.OsLabel.Header" xml:space="preserve">
-    <value>OS volume label</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ReservedVolSize.Header" xml:space="preserve">
-    <value>Reserved partition size</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ReservedVolFs.Header" xml:space="preserve">
-    <value>Reserved partition file system</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ReservedVolLabel.Header" xml:space="preserve">
-    <value>Reserved partition label</value>
-  </data>
-  <data name="Page.WizStep.Confirm.DeployOptionsGroup" xml:space="preserve">
-    <value>Deployment Options</value>
-  </data>
-  <data name="Page.WizStep.Confirm.HideLocalDisks.Header" xml:space="preserve">
-    <value>Hide Local Disks</value>
-  </data>
-  <data name="Page.WizStep.Confirm.PreventEncryption.Header" xml:space="preserve">
-    <value>Prevent Device Encryption</value>
-  </data>
-  <data name="Page.WizStep.Confirm.NoDefaultDriveLetter.Header" xml:space="preserve">
-    <value>No Default Drive Letter</value>
-  </data>
-  <data name="Page.WizStep.Confirm.RemoveOsDriveLetter.Header" xml:space="preserve">
-    <value>Remove OS Drive Letter</value>
-  </data>
-  <data name="Page.WizStep.Confirm.UseDismToDeploy.Header" xml:space="preserve">
-    <value>Deploy Windows using DISM</value>
-  </data>
-  <data name="Page.WizStep.Confirm.AdvancedGroup" xml:space="preserve">
-    <value>Advanced Settings</value>
-  </data>
-  <data name="Page.WizStep.Confirm.DriversIntegration.Header" xml:space="preserve">
-    <value>Integrate Drivers</value>
-  </data>
-  <data name="Page.WizStep.Confirm.DriversPath.Header" xml:space="preserve">
-    <value>Driver Path</value>
-  </data>
-  <data name="Page.WizStep.Confirm.UnsignedDrivers.Header" xml:space="preserve">
-    <value>Import Unsigned Drivers</value>
-  </data>
-  <data name="Page.WizStep.Confirm.ImportAnswerFile.Header" xml:space="preserve">
-    <value>Import Answer File</value>
-  </data>
-  <data name="Page.WizStep.Confirm.AnswerFilePath.Header" xml:space="preserve">
-    <value>Answer File Location</value>
-  </data>
-  <data name="Page.WizStep.Confirm.CleanAnsFile.Header" xml:space="preserve">
-    <value>Clean Up Answer File in Image</value>
-  </data>
-  <data name="Page.WizStep.Confirm.BootVerbose.Header" xml:space="preserve">
-    <value>bcdboot Verbose Output</value>
-  </data>
-  <data name="Page.WizStep.Confirm.BootEx.Header" xml:space="preserve">
-    <value>Use Updated Boot File Binaries</value>
+  <data name="Page.WizStep.Confirm.DetailInfoGroup" xml:space="preserve">
+    <value>Details</value>
   </data>
   <data name="Page.WizStep.Confirm.DeployDialog.Title" xml:space="preserve">
     <value>Start deployment now?</value>
@@ -791,5 +701,128 @@ Continue to deploy with this image will cause unexpected problems.</value>
   <data name="InfoBar.InImageAnsFile.Message" xml:space="preserve">
     <value>Current image already contains an answer file. Importing a new answer file will overwrite the existing configuration.
 Enable "Clear in-image answer files" option if you want to use a new answer file.</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Title" xml:space="preserve">
+    <value>Deplyment Summary</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag1" xml:space="preserve">
+    <value>Hide Local Disks</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag2" xml:space="preserve">
+    <value>Prevent Device Encryption</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag3" xml:space="preserve">
+    <value>Integrate Drivers</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag4" xml:space="preserve">
+    <value>Import Answer File</value>
+  </data>
+  <data name="Page.WizStep.Confirm.SummaryCard.Tag5" xml:space="preserve">
+    <value>Use Updated Boot File Binaries</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.Title" xml:space="preserve">
+    <value>Image Information</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageFile" xml:space="preserve">
+    <value>Image File</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageIndex" xml:space="preserve">
+    <value>Image Index</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageName" xml:space="preserve">
+    <value>Image Name</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageSKU" xml:space="preserve">
+    <value>SKU</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageFeatureUpd" xml:space="preserve">
+    <value>Feature Version</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageArchitecture" xml:space="preserve">
+    <value>Architecture</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.ImageBuildVer" xml:space="preserve">
+    <value>Build</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.TargetDisk" xml:space="preserve">
+    <value>Target Disk</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.InstallationType" xml:space="preserve">
+    <value>Installation Type</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.EspSize" xml:space="preserve">
+    <value>ESP Volume Size</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.OsSize" xml:space="preserve">
+    <value>OS Volume Size</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.OsLabel" xml:space="preserve">
+    <value>OS Volume Label</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedSize" xml:space="preserve">
+    <value>Reserved Vol. Size</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedLabel" xml:space="preserve">
+    <value>Reserved Vol. Label</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedFs" xml:space="preserve">
+    <value>Reserved Vol. FS.</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.Title" xml:space="preserve">
+    <value>Deployment Options</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.HideLocalDisks" xml:space="preserve">
+    <value>Hide Local Disks</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.PreventBDE" xml:space="preserve">
+    <value>Prevent Device Encryption</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.NoDefaultDriveLetter" xml:space="preserve">
+    <value>No Drive Letter for OS</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.AutoRemoveOSLetter" xml:space="preserve">
+    <value>Remove OS Drive Letter</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.UseDismToDeploy" xml:space="preserve">
+    <value>Install by DISM</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.Title" xml:space="preserve">
+    <value>Advanced Options</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.DriversIntegration" xml:space="preserve">
+    <value>Drivers Integration</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.DriversPath" xml:space="preserve">
+    <value>Drivers Path</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.AllowUnsignedDrv" xml:space="preserve">
+    <value>Allow Unsigned Drivers</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.ImportAnsFile" xml:space="preserve">
+    <value>Import Answer File</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.AnsFilePath" xml:space="preserve">
+    <value>Answer File Path</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.CleanAnsFile" xml:space="preserve">
+    <value>Clear In-Image Answer Files</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.bcdbootVerbose" xml:space="preserve">
+    <value>bcdboot Verbose Logging</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.AdvancedOptions.EnableBootEx" xml:space="preserve">
+    <value>Updated Boot Binaries</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.Title" xml:space="preserve">
+    <value>Deployment Method</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.Disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.TargetPartition" xml:space="preserve">
+    <value>Target Partition</value>
   </data>
 </root>
