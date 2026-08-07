@@ -20,7 +20,6 @@
                      FontFamily="Cascadia Code, Consolas, Microsoft YaHei UI, monospace"
                      FontSize="13"
                      TextWrapping="{x:Bind TerminalTextWrapping, Mode=OneWay}"
-                     Foreground="{x:Bind Foreground, Mode=OneWay}"
                      Margin="0,0,0,13" />
     </ScrollViewer>
   </Border>
