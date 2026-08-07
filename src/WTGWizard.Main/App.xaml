@@ -20,6 +20,21 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="4" />
       </Style>
+
+      <!-- 确认页详情卡片：CardBorderStyle + 固定尺寸 -->
+      <Style x:Key="DetailCardStyle" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
+        <Setter Property="Width" Value="375" />
+        <Setter Property="MinHeight" Value="162" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Padding" Value="16" />
+      </Style>
+
+      <!-- 卡片标题行文本（图标旁的 Caption，等效 CaptionTextBlockStyle + Opacity 0.7） -->
+      <Style x:Key="CardHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Opacity" Value="0.7" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+      </Style>
     </ResourceDictionary>
   </Application.Resources>
 </Application>
