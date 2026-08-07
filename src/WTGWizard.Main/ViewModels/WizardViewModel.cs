@@ -251,7 +251,7 @@ public sealed partial class WizardViewModel : ObservableObject
             PreventDeviceEncryption = Options.PreventDeviceEncryption,
 
             // ── BCDBoot ──
-            EnableBootEx = Advanced.EnableBootEx,
+            EnableBootEx = Advanced.IsBootExAvailable && Advanced.EnableBootEx,
             EnableBootVerbose = Advanced.EnableBootVerbose,
         };
     }

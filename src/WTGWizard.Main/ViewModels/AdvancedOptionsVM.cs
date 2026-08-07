@@ -39,7 +39,11 @@ public sealed partial class AdvancedOptionsVM : ObservableObject
 
     // ═══ 变更通知链 ═══
 
-    partial void OnImageBuildNumberChanged(string? value) => OnPropertyChanged(nameof(IsBootExAvailable));
+    partial void OnImageBuildNumberChanged(string? value)
+    {
+        OnPropertyChanged(nameof(IsBootExAvailable));
+        if (!IsBootExAvailable) EnableBootEx = false;
+    }
 
     partial void OnDriverEnabledChanged(bool value) => OnPropertyChanged(nameof(IsValid));
     partial void OnDriverPathChanged(string? value) => OnPropertyChanged(nameof(IsValid));
