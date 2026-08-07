@@ -182,4 +182,19 @@ public sealed partial class DeployMethodVM : ObservableObject
     {
         UpdateReservedVolSize();
     }
+
+    partial void OnEnableReservedVolChanged(bool value)
+    {
+        if (value)
+        {
+            // 启用：按当前 OS 容量推导保留卷容量
+            UpdateReservedVolSize();
+        }
+        else
+        {
+            // 关闭：OS 恢复满容量，保留卷归零
+            ReservedVolSize = 0;
+            OsDriveSize = MaxOsDriveSize;
+        }
+    }
 }

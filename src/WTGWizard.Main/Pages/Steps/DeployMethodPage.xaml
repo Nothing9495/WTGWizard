@@ -97,6 +97,7 @@
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <NumberBox x:Name="OsSizeBox"
                            MinWidth="120"
+                           Value="{x:Bind VM.Method.OsDriveSize, Mode=OneWay}"
                            IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}"
                            Maximum="{x:Bind VM.Method.MaxOsDriveSize, Mode=OneWay}"
                            Minimum="{x:Bind VM.Image.ImageExpandedSizeGB, Mode=OneWay}"
