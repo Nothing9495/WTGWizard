@@ -50,9 +50,9 @@ public sealed partial class DeployMethodVM : ObservableObject
     [NotifyPropertyChangedFor(nameof(ShowReservedSizeWarning))]
     [NotifyPropertyChangedFor(nameof(IsValid))]
     [NotifyPropertyChangedFor(nameof(ReservedSizeDisplay))]
-    public partial double ReservedDriveSize { get; set; }
-    [ObservableProperty] public partial string ReservedDriveLabel { get; set; } = "Reserved";
-    [ObservableProperty] public partial string ReservedDriveFs { get; set; } = "ntfs";
+    public partial double ReservedVolSize { get; set; }
+    [ObservableProperty] public partial string ReservedVolLabel { get; set; } = "Reserved";
+    [ObservableProperty] public partial string ReservedVolFs { get; set; } = "ntfs";
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowReservedSizeWarning))]
     [NotifyPropertyChangedFor(nameof(IsValid))]
@@ -72,14 +72,14 @@ public sealed partial class DeployMethodVM : ObservableObject
     public bool CanToggleNoDefaultDriveLetter => IsDiskSelected && SelectedDisk?.MediaType != "Removable Media";
 
     /// <summary>保留分区有效：未启用或计算容量不为 0。</summary>
-    public bool IsReservedValid => !EnableReservedVol || ReservedDriveSize > 0;
+    public bool IsReservedValid => !EnableReservedVol || ReservedVolSize > 0;
 
     /// <summary>保留分区大小警告。</summary>
     public bool ShowReservedSizeWarning => IsDiskSelected && IsCleanInstall
-        && EnableReservedVol && ReservedDriveSize == 0;
+        && EnableReservedVol && ReservedVolSize == 0;
 
     /// <summary>保留分区大小显示文本。</summary>
-    public string ReservedSizeDisplay => ReservedDriveSize.ToString("F2");
+    public string ReservedSizeDisplay => ReservedVolSize.ToString("F2");
 
     public bool IsValid => IsDiskSelected
         && DiskSafetyError is null
@@ -96,9 +96,9 @@ public sealed partial class DeployMethodVM : ObservableObject
         EfiPartSize = 300;
         OsDriveLabel = "OS";
         EnableReservedVol = false;
-        ReservedDriveSize = 0;
-        ReservedDriveLabel = "Reserved";
-        ReservedDriveFs = "ntfs";
+        ReservedVolSize = 0;
+        ReservedVolLabel = "Reserved";
+        ReservedVolFs = "ntfs";
     }
 
     /// <summary>更新最大 OS 分区容量。</summary>
@@ -112,15 +112,15 @@ public sealed partial class DeployMethodVM : ObservableObject
     }
 
     /// <summary>更新保留卷大小。</summary>
-    public void UpdateReservedDriveSize()
+    public void UpdateReservedVolSize()
     {
         if (!EnableReservedVol)
         {
-            ReservedDriveSize = 0;
+            ReservedVolSize = 0;
             return;
         }
         var osGB = OsDriveSize;
-        ReservedDriveSize = Math.Max(0, Math.Round(MaxOsDriveSize - osGB, 2));
+        ReservedVolSize = Math.Max(0, Math.Round(MaxOsDriveSize - osGB, 2));
     }
 
     // ═══ 变更通知链 ═══
@@ -166,10 +166,10 @@ public sealed partial class DeployMethodVM : ObservableObject
         UpdateMaxOsDriveSize();
         var delta = oldMax - MaxOsDriveSize; // ESP 增加时为正值，减少时为负值
 
-        if (EnableReservedVol && ReservedDriveSize > 0)
+        if (EnableReservedVol && ReservedVolSize > 0)
         {
             // 保留卷 > 0：从保留卷中扣除/归还
-            ReservedDriveSize = Math.Max(0, ReservedDriveSize - delta);
+            ReservedVolSize = Math.Max(0, ReservedVolSize - delta);
         }
         else
         {
@@ -180,6 +180,6 @@ public sealed partial class DeployMethodVM : ObservableObject
 
     partial void OnOsDriveSizeChanged(double value)
     {
-        UpdateReservedDriveSize();
+        UpdateReservedVolSize();
     }
 }
