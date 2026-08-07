@@ -198,7 +198,7 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
     private void OnReservedFsSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (ReservedFsComboBox.SelectedItem is ComboBoxItem item && item.Tag is string fs)
-            VM.Method.ReservedDriveFs = fs;
+            VM.Method.ReservedVolFs = fs;
     }
 
     // ══════════════════════════════════════════════════════

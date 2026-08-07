@@ -143,7 +143,7 @@
             </cc:SettingsCard>
             <!--  保留卷卷标  -->
             <cc:SettingsCard x:Name="ReservedLabelCard" Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Header}" IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}">
-              <TextBox MinWidth="151" PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Placeholder}" Text="{x:Bind VM.Method.ReservedDriveLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+              <TextBox MinWidth="151" PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Placeholder}" Text="{x:Bind VM.Method.ReservedVolLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </cc:SettingsCard>
           </cc:SettingsExpander.Items>
         </cc:SettingsExpander>
