@@ -37,7 +37,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          global-json-file: global.json
 
       # 版本去 v 由工作流处理（tag 如 v1.2.3-preview1 → 1.2.3-preview1）
       - name: Publish release build
