@@ -24,6 +24,28 @@ function New-Package([string] $sourceDir, [string] $suffix) {
     Write-Host "  Removed staging directory '$sourceDir'"
 }
 
+# ── 产物 hash 校验（打包前）──
+function Show-ArtifactHashes([string] $sourceDir) {
+    $files = Get-ChildItem -LiteralPath $sourceDir -File |
+    Where-Object { $_.Name -like "WTGWizard.*" } | Sort-Object Name
+    if (-not $files) {
+        Write-Host "  WARNING: no WTGWizard.* artifacts found in '$sourceDir'"
+        return
+    }
+    Write-Host ""
+    Write-Host "=========== ARTIFACTS HASHES (SHA256) =========="
+    $rows = foreach ($f in $files) {
+        [PSCustomObject]@{
+            Name   = $f.Name
+            SHA256 = (Get-FileHash -LiteralPath $f.FullName -Algorithm SHA256).Hash
+        }
+    }
+    $rows | Format-Table -AutoSize
+    Write-Host "=========== ========================= =========="
+    Write-Host ""
+}
+
+
 # ── dotnet publish 封装（退出码检查 + 日志）──
 function Invoke-DotNetPublish([string] $project, [string] $label, [string[]] $publishArgs) {
     Write-Host "  -> Publishing $label ($project)"
@@ -55,6 +77,7 @@ Remove-Item "$Output/WTGWizard.*.pdb" -Force
 Write-Host "  Removed PDB files from '$Output'"
 
 if ($ZipTag) {
+    Show-ArtifactHashes $Output
     New-Package $Output "";
 } else {
     Write-Host "  (ZipTag empty - skipped packaging)"
@@ -73,6 +96,7 @@ Remove-Item "$Output/WTGWizard.*.pdb" -Force
 Write-Host "  Removed PDB files from '$Output'"
 
 if ($ZipTag) {
+    Show-ArtifactHashes $Output
     New-Package $Output "-with-runtimes";
 } else {
     Write-Host "  (ZipTag empty - skipped packaging)"
