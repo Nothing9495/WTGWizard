@@ -3,32 +3,27 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using WTGWizard.Main.DeploymentCore.Models;
+using WTGWizard.Main.DeploymentCore.Orchestrator;
 using WTGWizard.Main.DeploymentCore.Worker;
 
 namespace WTGWizard.Main.DeploymentCore.Steps;
 
-public sealed class ImportAnsFileStep : Contracts.IDeploymentStep
+public sealed class ImportAnsFileStep : DeploymentStepBase
 {
-    public DeployTaskId TaskId => DeployTaskId.ImportAnswerFile;
-    public string TitleKey => "Task.ImportAnswerFile.Title";
-    public string DescriptionKey => "Task.ImportAnswerFile.Desc";
-    public bool ShouldRun(DeploymentConfig config)
+    public override DeployTaskId TaskId => DeployTaskId.ImportAnswerFile;
+    public override string TitleKey => "Task.ImportAnswerFile.Title";
+    public override string DescriptionKey => "Task.ImportAnswerFile.Desc";
+    public override bool ShouldRun(DeploymentConfig config)
         => config.CustomAnsFileEnabled && !string.IsNullOrWhiteSpace(config.AnsFilePath);
 
-    public async Task<StepResult> ExecuteAsync(Contracts.IStepContext ctx, CancellationToken ct)
+    protected override async Task<StepResult> ExecuteCoreAsync(Contracts.IStepContext ctx, CancellationToken ct)
     {
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Running, 0));
-
         if (string.IsNullOrWhiteSpace(ctx.Config.OsDriveLetter.ToString()) || ctx.Config.OsDriveLetter == '\0')
-        {
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
             return StepResult.Fail("osApplyDir is not resolved — partition step may not have run");
-        }
 
         if (!File.Exists(ctx.Config.AnsFilePath))
         {
             ctx.Logger.Error("ImportAns", "Answer file not found: {Path}", ctx.Config.AnsFilePath);
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
             return StepResult.Fail($"Answer file not found: {ctx.Config.AnsFilePath}");
         }
 
@@ -49,12 +44,8 @@ public sealed class ImportAnsFileStep : Contracts.IDeploymentStep
         var result = await ctx.ExecuteWorkerAsync(cmd, ct: ct);
 
         if (!result.Success)
-        {
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
             return StepResult.Fail(result.ErrorMessage ?? "Answer file copy failed");
-        }
 
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Completed, 100));
         return StepResult.Ok();
     }
 

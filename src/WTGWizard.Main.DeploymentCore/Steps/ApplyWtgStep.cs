@@ -3,34 +3,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using WTGWizard.Main.DeploymentCore.Builders;
 using WTGWizard.Main.DeploymentCore.Models;
+using WTGWizard.Main.DeploymentCore.Orchestrator;
 using WTGWizard.Main.DeploymentCore.Worker;
 using static WTGWizard.Main.DeploymentCore.Models.DeploymentConstants;
 
 namespace WTGWizard.Main.DeploymentCore.Steps;
 
-public sealed class ApplyWtgStep : Contracts.IDeploymentStep
+public sealed class ApplyWtgStep : DeploymentStepBase
 {
-    public DeployTaskId TaskId => DeployTaskId.ApplySysSettings;
-    public string TitleKey => "Task.ApplySysSettings.Title";
-    public string DescriptionKey => "Task.ApplySysSettings.Desc";
-    public bool ShouldRun(DeploymentConfig config)
+    public override DeployTaskId TaskId => DeployTaskId.ApplySysSettings;
+    public override string TitleKey => "Task.ApplySysSettings.Title";
+    public override string DescriptionKey => "Task.ApplySysSettings.Desc";
+    public override bool ShouldRun(DeploymentConfig config)
         => config.HideLocalDisks || config.PreventDeviceEncryption;
 
-    public async Task<StepResult> ExecuteAsync(Contracts.IStepContext ctx, CancellationToken ct)
+    protected override async Task<StepResult> ExecuteCoreAsync(Contracts.IStepContext ctx, CancellationToken ct)
     {
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Running, 0));
-
         if (string.IsNullOrWhiteSpace(ctx.Config.OsDriveLetter.ToString()) || ctx.Config.OsDriveLetter == '\0')
-        {
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
             return StepResult.Fail("osApplyDir is not resolved — partition step may not have run");
-        }
 
         string? unattendFile = AnswerFileGenerator.GenerateAndSave(ctx.Config);
         if (unattendFile is null)
         {
             ctx.Logger.Debug("ApplyWtg", "No WTG settings to apply");
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Completed, 100));
             return StepResult.Ok();
         }
 
@@ -41,12 +36,8 @@ public sealed class ApplyWtgStep : Contracts.IDeploymentStep
         var result = await ctx.ExecuteWorkerAsync(cmd, ct: ct);
 
         if (!result.Success)
-        {
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
             return StepResult.Fail(result.ErrorMessage ?? "Apply WTG settings failed");
-        }
 
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Completed, 100));
         return StepResult.Ok();
     }
 

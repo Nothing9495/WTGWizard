@@ -2,26 +2,22 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WTGWizard.Main.DeploymentCore.Models;
+using WTGWizard.Main.DeploymentCore.Orchestrator;
 using WTGWizard.Main.DeploymentCore.Worker;
 
 namespace WTGWizard.Main.DeploymentCore.Steps;
 
-public sealed class ExtractStep : Contracts.IDeploymentStep
+public sealed class ExtractStep : DeploymentStepBase
 {
-    public DeployTaskId TaskId => DeployTaskId.ExtractImage;
-    public string TitleKey => "Task.ExtractImage.Title";
-    public string DescriptionKey => "Task.ExtractImage.Desc";
-    public bool ShouldRun(DeploymentConfig config) => true;
+    public override DeployTaskId TaskId => DeployTaskId.ExtractImage;
+    public override string TitleKey => "Task.ExtractImage.Title";
+    public override string DescriptionKey => "Task.ExtractImage.Desc";
+    public override bool ShouldRun(DeploymentConfig config) => true;
 
-    public async Task<StepResult> ExecuteAsync(Contracts.IStepContext ctx, CancellationToken ct)
+    protected override async Task<StepResult> ExecuteCoreAsync(Contracts.IStepContext ctx, CancellationToken ct)
     {
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Running, 0));
-
         if (string.IsNullOrWhiteSpace(ctx.Config.OsDriveLetter.ToString()) || ctx.Config.OsDriveLetter == '\0')
-        {
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
             return StepResult.Fail("osApplyDir is not resolved — partition step may not have run");
-        }
 
         string osApplyDir = $"{ctx.Config.OsDriveLetter}:\\";
         ctx.Logger.Debug("Extract", "Extracting to: {Dir}", osApplyDir);
@@ -33,10 +29,7 @@ public sealed class ExtractStep : Contracts.IDeploymentStep
             var cmd = new WorkerCommand("dism", $"--args \"{EscapeArg(dismArgs)}\"");
             var result = await ctx.ExecuteWorkerAsync(cmd, ct: ct);
             if (!result.Success)
-            {
-                ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
                 return StepResult.Fail(result.ErrorMessage ?? "Extract failed");
-            }
         }
         else
         {
@@ -46,13 +39,9 @@ public sealed class ExtractStep : Contracts.IDeploymentStep
             var result = await ctx.ExecuteWorkerAsync(cmd,
                 new Progress<double>(p => ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Running, p))), ct);
             if (!result.Success)
-            {
-                ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
                 return StepResult.Fail(result.ErrorMessage ?? "Extract failed");
-            }
         }
 
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Completed, 100));
         return StepResult.Ok();
     }
 

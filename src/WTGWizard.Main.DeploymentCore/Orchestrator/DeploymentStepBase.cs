@@ -5,6 +5,10 @@ using WTGWizard.Main.DeploymentCore.Models;
 
 namespace WTGWizard.Main.DeploymentCore.Orchestrator;
 
+/// <summary>
+/// 步骤执行基类 — 任务终态（Completed/Failed/Cancelled）的唯一发布者。
+/// 子类只发布 Running/进度，不发布终态，保证任务卡状态与部署语义一致。
+/// </summary>
 public abstract class DeploymentStepBase : Contracts.IDeploymentStep
 {
     public abstract DeployTaskId TaskId { get; }
@@ -20,10 +24,33 @@ public abstract class DeploymentStepBase : Contracts.IDeploymentStep
         try
         {
             var result = await ExecuteCoreAsync(ctx, ct);
-            ctx.Publish(result.IsSuccess
-                ? new TaskUpdate(TaskId, DeployTaskStatus.Completed, 100)
-                : new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
+
+            // 终态唯一发布：已完成优先（无论是否请求过取消），未完成 + 取消 → Cancelled
+            if (result.IsSuccess)
+            {
+                ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Completed, 100));
+            }
+            else if (ct.IsCancellationRequested)
+            {
+                ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Cancelled, 0));
+            }
+            else if (result.NonFatal)
+            {
+                ctx.Logger.Warn("Step", "Non-fatal failure in {TaskId}: {Error}", TaskId.Value, result.ErrorMessage);
+                ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Completed, 100));
+            }
+            else
+            {
+                ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
+            }
+
             return result;
+        }
+        catch (OperationCanceledException)
+        {
+            // 取消不属于任务失败：标记后重抛，由 Orchestrator 转为 Cancelled 结局
+            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Cancelled, 0));
+            throw;
         }
         catch (Exception ex)
         {

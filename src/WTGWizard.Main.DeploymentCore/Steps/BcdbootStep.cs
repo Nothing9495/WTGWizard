@@ -2,27 +2,23 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WTGWizard.Main.DeploymentCore.Models;
+using WTGWizard.Main.DeploymentCore.Orchestrator;
 using WTGWizard.Main.DeploymentCore.Worker;
 using static WTGWizard.Main.DeploymentCore.Models.DeploymentConstants;
 
 namespace WTGWizard.Main.DeploymentCore.Steps;
 
-public sealed class BcdbootStep : Contracts.IDeploymentStep
+public sealed class BcdbootStep : DeploymentStepBase
 {
-    public DeployTaskId TaskId => DeployTaskId.CreateBootFiles;
-    public string TitleKey => "Task.CreateBootFiles.Title";
-    public string DescriptionKey => "Task.CreateBootFiles.Desc";
-    public bool ShouldRun(DeploymentConfig config) => true;
+    public override DeployTaskId TaskId => DeployTaskId.CreateBootFiles;
+    public override string TitleKey => "Task.CreateBootFiles.Title";
+    public override string DescriptionKey => "Task.CreateBootFiles.Desc";
+    public override bool ShouldRun(DeploymentConfig config) => true;
 
-    public async Task<StepResult> ExecuteAsync(Contracts.IStepContext ctx, CancellationToken ct)
+    protected override async Task<StepResult> ExecuteCoreAsync(Contracts.IStepContext ctx, CancellationToken ct)
     {
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Running, 0));
-
         if (string.IsNullOrWhiteSpace(ctx.Config.OsDriveLetter.ToString()) || ctx.Config.OsDriveLetter == '\0')
-        {
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
             return StepResult.Fail("osApplyDir is not resolved — partition step may not have run");
-        }
 
         string bcdArgs = CommandBuilder.BuildBcdbootArgs($"{ctx.Config.OsDriveLetter}:\\",
             ctx.Config.EspDriveLetter, ctx.Config.EnableBootEx, ctx.Config.EnableBootVerbose);
@@ -33,12 +29,8 @@ public sealed class BcdbootStep : Contracts.IDeploymentStep
         var result = await ctx.ExecuteWorkerAsync(cmd, ct: ct);
 
         if (!result.Success)
-        {
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
             return StepResult.Fail(result.ErrorMessage ?? "BCDBoot failed");
-        }
 
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Completed, 100));
         return StepResult.Ok();
     }
 

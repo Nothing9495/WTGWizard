@@ -3,22 +3,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using WTGWizard.Main.DeploymentCore.Builders;
 using WTGWizard.Main.DeploymentCore.Models;
+using WTGWizard.Main.DeploymentCore.Orchestrator;
 using WTGWizard.Shared.Services.DiskServices;
 using static WTGWizard.Main.DeploymentCore.Models.DeploymentConstants;
 
 namespace WTGWizard.Main.DeploymentCore.Steps;
 
-public sealed class CleanupStep : Contracts.IDeploymentStep
+public sealed class CleanupStep : DeploymentStepBase
 {
-    public DeployTaskId TaskId => DeployTaskId.RemoveDriveLetters;
-    public string TitleKey => "Task.RemoveDriveLetters.Title";
-    public string DescriptionKey => "Task.RemoveDriveLetters.Desc.Esp";
-    public bool ShouldRun(DeploymentConfig config) => true;
+    public override DeployTaskId TaskId => DeployTaskId.RemoveDriveLetters;
+    public override string TitleKey => "Task.RemoveDriveLetters.Title";
+    public override string DescriptionKey => "Task.RemoveDriveLetters.Desc.Esp";
+    public override bool ShouldRun(DeploymentConfig config) => true;
 
-    public async Task<StepResult> ExecuteAsync(Contracts.IStepContext ctx, CancellationToken ct)
+    protected override async Task<StepResult> ExecuteCoreAsync(Contracts.IStepContext ctx, CancellationToken ct)
     {
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Running, 0));
-
         uint espPartNum = ctx.Config.IsCleanInstall
             ? DiskConstants.CleanInstallEspPartNum : ctx.Config.EspVolumeId;
         uint osPartNum = ctx.Config.IsCleanInstall
@@ -38,12 +37,11 @@ public sealed class CleanupStep : Contracts.IDeploymentStep
 
         if (!result.Success)
         {
+            // 非致命失败：盘符移除失败不终止部署，任务以 Completed 呈现 + 警告日志
             ctx.Logger.Warn("Cleanup", "Cleanup script exited with: {Msg}", result.ErrorMessage);
-            ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Failed, 0));
-            return StepResult.Ok();
+            return StepResult.NonFatalFail(result.ErrorMessage ?? "Cleanup failed");
         }
 
-        ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Completed, 100));
         return StepResult.Ok();
     }
 
