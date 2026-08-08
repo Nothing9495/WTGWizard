@@ -1,0 +1,18 @@
+name: Build WTGWizard (tag push)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  run-dotnet-build:
+    uses: ./.github/workflows/dotnet-build.yml
+    secrets: inherit
+    with:
+      upload-artifact: true
+      upload-tag: ${{ github.ref_name }}
+      main-version: ${{ github.ref_name }}
+      worker-version: '1.0.0'
+      # 三段构建号后含 preview 字样 → 作为 Pre-release 发布
+      is-prerelease: ${{ contains(github.ref_name, 'preview') }}

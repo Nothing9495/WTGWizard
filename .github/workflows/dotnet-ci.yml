@@ -1,0 +1,16 @@
+name: Build WTGWizard (CI)
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '*.md'
+      - '.git*'
+
+jobs:
+  run-dotnet-build:
+    uses: ./.github/workflows/dotnet-build.yml
+    secrets: inherit
+    with:
+      upload-artifact: false

@@ -1,0 +1,13 @@
+name: Build WTGWizard (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-dotnet-build:
+    uses: ./.github/workflows/dotnet-build.yml
+    secrets: inherit
+    with:
+      is-prerelease: true
+      upload-artifact: true
+      upload-tag: Manual-Build-${{ github.run_id }}
