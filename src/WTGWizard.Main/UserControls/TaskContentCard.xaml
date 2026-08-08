@@ -66,6 +66,11 @@
                   Glyph="&#xEDAE;"
                   Foreground="Red"
                   Visibility="{x:Bind ShowFailedIcon, Mode=OneWay}" />
+        <!--  取消：黄色暂停  -->
+        <FontIcon FontSize="24"
+                  Glyph="&#xE733;"
+                  Foreground="DarkGoldenrod"
+                  Visibility="{x:Bind ShowCancelledIcon, Mode=OneWay}" />
       </Grid>
     </Grid>
 

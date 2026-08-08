@@ -83,11 +83,13 @@ public sealed partial class TaskContentCard : UserControl, INotifyPropertyChange
     private bool _isIndeterminateMode;
     private Visibility _showCompletedIcon = Visibility.Collapsed;
     private Visibility _showFailedIcon = Visibility.Collapsed;
+    private Visibility _showCancelledIcon = Visibility.Collapsed;
 
     public bool IsRunning => _isRunning;
     public bool IsIndeterminateMode => _isIndeterminateMode;
     public Visibility ShowCompletedIcon => _showCompletedIcon;
     public Visibility ShowFailedIcon => _showFailedIcon;
+    public Visibility ShowCancelledIcon => _showCancelledIcon;
 
     private static void OnStatusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
@@ -110,6 +112,8 @@ public sealed partial class TaskContentCard : UserControl, INotifyPropertyChange
             Status == DeployTaskStatus.Completed ? Visibility.Visible : Visibility.Collapsed);
         SetVisibility(ref _showFailedIcon, nameof(ShowFailedIcon),
             Status == DeployTaskStatus.Failed ? Visibility.Visible : Visibility.Collapsed);
+        SetVisibility(ref _showCancelledIcon, nameof(ShowCancelledIcon),
+            Status == DeployTaskStatus.Cancelled ? Visibility.Visible : Visibility.Collapsed);
     }
 
     private void SetBool(ref bool field, string propertyName, bool value)
