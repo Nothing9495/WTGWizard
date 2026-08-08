@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- 统一源码路径映射：本地与 CI 产物内嵌路径一致，确定性哈希可复现 -->
+    <PathMap>$(MSBuildThisFileDirectory)=src/</PathMap>
+  </PropertyGroup>
+</Project>
