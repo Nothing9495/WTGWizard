@@ -9,5 +9,6 @@ public enum DeployTaskStatus
     Running,
     Completed,
     Failed,
+    Cancelled,
     Skipped
 }
