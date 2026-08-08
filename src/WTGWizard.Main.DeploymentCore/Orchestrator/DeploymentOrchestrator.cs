@@ -81,6 +81,16 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
         {
             foreach (var step in _pipeline.Steps)
             {
+                // 步骤间即时取消检查：Abort 后当前任务自然结束，下一循环立即响应；
+                // 仅"下一任务"（当前循环 step）标记 Cancelled，剩余任务保持 Pending
+                if (ct.IsCancellationRequested)
+                {
+                    var nextTask = _tasks.FirstOrDefault(t => t.Id == step.TaskId.Value);
+                    if (nextTask is not null)
+                        nextTask.Status = DeployTaskStatus.Cancelled;
+                    throw new OperationCanceledException(ct);
+                }
+
                 if (!step.ShouldRun(_currentConfig))
                 {
                     _logger.Debug("Orchestrator", "Task skipped: {TaskId}", step.TaskId.Value);
@@ -106,8 +116,12 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
 
                 var result = await step.ExecuteAsync(ctx, ct);
 
-                if (!result.IsSuccess)
+                if (!result.IsSuccess && !result.NonFatal)
                 {
+                    // 失败路径同样尊重取消：Abort 后任何失败结局一律归为 Cancelled
+                    if (ct.IsCancellationRequested)
+                        return DeploymentResult.Cancelled();
+
                     _logger.Error("Orchestrator", "Task failed: {TaskId} - {Error}", step.TaskId.Value,
                         result.ErrorMessage ?? "Unknown error");
                     return DeploymentResult.Failed(step.TaskId, result.ErrorMessage ?? "Unknown error");
@@ -119,6 +133,10 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
                     await ResolveDriveLettersAsync();
             }
 
+            // 全部步骤自然执行完毕；若期间收到过取消请求，结局为 Cancelled
+            if (ct.IsCancellationRequested)
+                return DeploymentResult.Cancelled();
+
             _logger.Info("Orchestrator", "Deployment completed successfully in {Elapsed:F1}s.", sw.Elapsed.TotalSeconds);
             return DeploymentResult.Ok();
         }
@@ -129,6 +147,10 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
         }
         catch (Exception ex)
         {
+            // Abort 场景的任何异常一律归为 Cancelled（取消语义优先于失败）
+            if (ct.IsCancellationRequested)
+                return DeploymentResult.Cancelled();
+
             _logger.Error("Orchestrator", "Deployment failed after {Elapsed:F1}s - ({Error}).", sw.Elapsed.TotalSeconds, ex.ToString());
             return DeploymentResult.Failed(null, ex.Message);
         }
