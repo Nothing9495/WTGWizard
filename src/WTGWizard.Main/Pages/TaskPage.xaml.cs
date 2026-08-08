@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using WTGWizard.Helpers;
 using WTGWizard.Main;
+using WTGWizard.Main.DeploymentCore.Models;
 using WTGWizard.Main.DeploymentCore.Orchestrator;
 using WTGWizard.Shared.Services;
 using WTGWizard.Shared.Services.DiskServices;
@@ -27,6 +29,10 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
     private string _lastFlushedSnapshot = string.Empty;
     private bool _isFrozen;
     private bool _isConnected;
+    private bool _windowClosing;
+    private bool _outcomeShown;
+    private bool _completionPending;
+    private DispatcherTimer? _completionClearTimer;
 
     private bool _hasDeployment;
     /// <summary>是否有进行中的部署（SwitchPresenter 双态界面切换依据）。</summary>
@@ -116,6 +122,10 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
         _lastFlushedSnapshot = string.Empty;
         _pendingSnapshot = string.Empty;
         _isFrozen = false;
+        _windowClosing = false;
+        _outcomeShown = false;
+        _completionPending = false;
+        _completionClearTimer?.Stop();
 
         ConnectUI();
 
@@ -127,10 +137,20 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
     {
         try
         {
-            await _orchestrator!.StartAsync(_cts!.Token);
+            var result = await _orchestrator!.StartAsync(_cts!.Token);
+
+            // 结局 → 任务栏指示（单一数据源：DeploymentResult.Outcome）
+            ShowTaskbarOutcome(result.Outcome);
         }
-        catch (OperationCanceledException) { }
-        catch (Exception) { /* 已由 DeploymentOrchestrator 记录 */ }
+        catch (OperationCanceledException)
+        {
+            ShowTaskbarOutcome(TaskOutcome.Cancelled);
+        }
+        catch (Exception)
+        {
+            /* 已由 DeploymentOrchestrator 记录 */
+            ShowTaskbarOutcome(TaskOutcome.Failed);
+        }
         finally
         {
             FlushPendingOutput(null, EventArgs.Empty);
@@ -142,7 +162,75 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
             VM.StopDeploymentForClose = null;
             _orchestrator?.Dispose();
             _deploymentTask = null;
+
+            // 结局已显示则交给闪烁定时器清除；否则兜底清除
+            if (!_completionPending)
+            {
+                _completionClearTimer?.Stop();
+                TaskbarProgressHelper.Clear(App.MainWindow);
+            }
         }
+    }
+
+    /// <summary>
+    /// 运行期任务栏状态：存在部署（且结局未定）时保持 Active 动画。
+    /// </summary>
+    private void UpdateTaskbarProgress()
+    {
+        // 结局已定或无部署：不干预（结局状态由 ShowTaskbarOutcome 持有）
+        if (_outcomeShown || _orchestrator is null) return;
+        TaskbarProgressHelper.SetIndeterminate(App.MainWindow);
+    }
+
+    /// <summary>
+    /// 任务栏结局指示：正常完成直接清除；取消黄满条 + 闪烁；失败红满条 + 闪烁（3s 后清除）。
+    /// 窗口关闭流程中跳过（进程即将退出，设置无意义）。
+    /// </summary>
+    private void ShowTaskbarOutcome(TaskOutcome outcome)
+    {
+        // 幂等保护：首次结局生效（杜绝异常路径二次设置覆盖已显示状态）
+        if (_windowClosing || _outcomeShown) return;
+        _outcomeShown = true;
+
+        var window = App.MainWindow;
+        switch (outcome)
+        {
+            case TaskOutcome.Success:
+                TaskbarProgressHelper.Clear(window);
+                break;
+            case TaskOutcome.Cancelled:
+                TaskbarProgressHelper.SetPaused(window);
+                TaskbarProgressHelper.Flash(window);
+                _completionPending = true;
+                StartCompletionClearTimer();
+                break;
+            default:
+                TaskbarProgressHelper.SetError(window);
+                TaskbarProgressHelper.Flash(window);
+                _completionPending = true;
+                StartCompletionClearTimer();
+                break;
+        }
+    }
+
+    private void StartCompletionClearTimer()
+    {
+        if (_completionClearTimer is null)
+        {
+            _completionClearTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        }
+        _completionClearTimer.Stop();
+        _completionClearTimer.Tick -= OnCompletionClearTimerTick;
+        _completionClearTimer.Tick += OnCompletionClearTimerTick;
+        _completionClearTimer.Start();
+    }
+
+    private void OnCompletionClearTimerTick(object? sender, object e)
+    {
+        _completionClearTimer!.Stop();
+        _completionClearTimer.Tick -= OnCompletionClearTimerTick;
+        _completionPending = false;
+        TaskbarProgressHelper.Clear(App.MainWindow!);
     }
 
     /// <summary>
@@ -151,6 +239,7 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
     /// </summary>
     public async Task StopForAppCloseAsync()
     {
+        _windowClosing = true;
         _cts?.Cancel();
         _orchestrator?.ForceCancelCurrentTask();
         if (_deploymentTask is null) return;
@@ -212,6 +301,9 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
 
     private void FlushPendingOutput(object? sender, object e)
     {
+        // 部署进行中：任务栏保持 Active 动画（结局已定后不再覆盖）
+        UpdateTaskbarProgress();
+
         string snapshot;
         lock (_syncRoot)
         {
