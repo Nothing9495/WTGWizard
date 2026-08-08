@@ -104,6 +104,7 @@ WTGWizard 是**独立的开源项目**，与 Microsoft 无关联、未获其背�
 WTGWizard 使用/参考了以下项目。感谢它们的出色工作！
 
 - [wimlib](https://wimlib.net) / [ManagedWimLib](https://github.com/MircoBabin/ManagedWimLib) — WIM 相关操作，WTGWizard 的核心组件。
+- [Vanara](https://github.com/dahall/Vanara) — DiskIOService 的核心基础.
 - [Windows CommunityToolkit](https://github.com/CommunityToolkit) — MVVM 与 WinUI 控件。
 - [Serilog](https://serilog.net) — 应用日志服务。
 - [Starward](https://github.com/Scighost/Starward) — 单解决方案多项目架构与本地化实现。Starward 是一款美观易用的米哈游游戏启动器，附带丰富的增强功能。
