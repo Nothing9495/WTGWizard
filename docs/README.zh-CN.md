@@ -35,7 +35,7 @@
 
 ## 下载与使用
 
-1. 从 [Releases](../releases) 页面（`WTGWizard-vX.Y.Z-x64.zip`）下载最新发布 ZIP。
+1. 从 [Releases](../../../releases) 页面（`WTGWizard-vX.Y.Z-x64.zip`）下载最新发布 ZIP。
 2. 解压并运行 `WTGWizard.Main.exe`。程序将请求获取**管理员权限**。
 3. 按向导完成每个设置页面，确认配置后开始部署。部署时长受磁盘性能影响，可能需要一定时间。
 
