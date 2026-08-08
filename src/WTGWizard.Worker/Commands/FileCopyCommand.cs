@@ -54,7 +54,7 @@ internal static class FileCopyCommand
         }
         catch (OperationCanceledException)
         {
-            pipe.WriteCancel();
+            pipe.WriteCancelled("filecopy");
             return 1;
         }
         catch (Exception ex)

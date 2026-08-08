@@ -40,7 +40,7 @@ internal static class BcdbootCommand
         }
         catch (OperationCanceledException)
         {
-            pipe.WriteCancel();
+            pipe.WriteCancelled("bcdboot");
             return 1;
         }
         catch (Exception ex)

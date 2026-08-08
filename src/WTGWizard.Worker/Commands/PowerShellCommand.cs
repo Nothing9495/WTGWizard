@@ -24,14 +24,15 @@ internal static class PowerShellCommand
 
         WorkerDebug.Write($"PowerShell: script={scriptPath}, pipe={pipeName}, timeout={timeoutMs}ms");
 
+        using var pipe = PipeHelper.Connect(pipeName);
+
+        // 文件检查并入统一连接：缺失时仍须连接并回报失败（否则 Main 等待超时）
         if (!System.IO.File.Exists(scriptPath))
         {
-            using var pipe0 = PipeHelper.Connect(pipeName);
-            pipe0.WriteFailed("pwsh", 1, $"Script file not found: {scriptPath}");
+            pipe.WriteFailed("pwsh", 1, $"Script file not found: {scriptPath}");
             return 1;
         }
 
-        using var pipe = PipeHelper.Connect(pipeName);
         pipe.WriteRunning("pwsh", $"Executing PowerShell script: {scriptPath}");
 
         try
@@ -51,7 +52,7 @@ internal static class PowerShellCommand
         }
         catch (OperationCanceledException)
         {
-            pipe.WriteCancel();
+            pipe.WriteCancelled("pwsh");
             return 1;
         }
         catch (Exception ex)

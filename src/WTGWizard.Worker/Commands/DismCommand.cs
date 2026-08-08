@@ -40,7 +40,7 @@ internal static class DismCommand
         }
         catch (OperationCanceledException)
         {
-            pipe.WriteCancel();
+            pipe.WriteCancelled("dism");
             return 1;
         }
         catch (Exception ex)

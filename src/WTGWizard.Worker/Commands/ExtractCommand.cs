@@ -80,7 +80,7 @@ internal static class ExtractCommand
         }
         catch (OperationCanceledException)
         {
-            pipe.WriteCancel();
+            pipe.WriteCancelled("extract");
             return 1;
         }
         catch (Exception ex)
