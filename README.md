@@ -14,7 +14,7 @@
 ![WTGWizard](assets/screenshot-1.png)
 
 
-[中文版本](docs\README.zh-CN.md)
+[中文版本](docs/README.zh-CN.md)
 
 ## Features
 
