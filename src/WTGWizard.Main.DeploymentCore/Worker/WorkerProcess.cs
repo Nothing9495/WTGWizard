@@ -20,6 +20,8 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
     private Process? _activeProcess;
     private PipeServer? _activeServer;
     private TaskCompletionSource<WorkerExecutionResult>? _activeTcs;
+    private bool _cancelRequested;
+    private bool _ended;
 
     public WorkerProcess(ILoggerService logger) => _logger = logger;
 
@@ -35,25 +37,50 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         _logger.Debug("WorkerMgr", "Launching Worker: {Path} {Args}", exePath, workerArgs);
 
         using var pipeServer = new PipeServer(pipeName);
-        var tcs = new TaskCompletionSource<WorkerExecutionResult>();
+        var tcs = new TaskCompletionSource<WorkerExecutionResult>(TaskCreationOptions.RunContinuationsAsynchronously);
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+
+        _cancelRequested = false;
+        _ended = false;
+
+        // 软取消（ct）：标记取消请求；执行阶段 Worker 自然跑完，结局由部署层判定
+        using var cancelReg = ct.Register(() => _cancelRequested = true);
+
+        bool Settle(WorkerExecutionResult result)
+        {
+            if (_ended) return false;
+            _ended = true;
+            tcs.TrySetResult(result);
+            return true;
+        }
 
         pipeServer.OnCompleted += (task, rc) =>
         {
             _logger.Debug("WorkerMgr", "Worker completed: {Task} exit={ExitCode}", task, rc);
-            tcs.TrySetResult(WorkerExecutionResult.Ok(rc));
+            // 防御：completed 语义仅 rc==0；非 0 按失败处理
+            Settle(rc == 0
+                ? WorkerExecutionResult.Ok(rc)
+                : WorkerExecutionResult.Fail(rc, $"Worker reported completion with exit code {rc}"));
         };
         pipeServer.OnFailed += (task, rc, msg) =>
         {
             _logger.Error("WorkerMgr", "Worker failed: {Task} exit={ExitCode} msg={Msg}", task, rc, msg);
-            tcs.TrySetResult(WorkerExecutionResult.Fail(rc, msg ?? $"Exit code: {rc}"));
+            Settle(WorkerExecutionResult.Fail(rc, msg ?? $"Exit code: {rc}"));
+        };
+        pipeServer.OnCancelled += () =>
+        {
+            _logger.Debug("WorkerMgr", "Worker reported cancellation");
+            Settle(WorkerExecutionResult.Cancelled());
         };
         pipeServer.OnDisconnected += () =>
         {
             if (!tcs.Task.IsCompleted)
             {
-                _logger.Warn("WorkerMgr", "Pipe disconnected unexpectedly");
-                tcs.TrySetResult(WorkerExecutionResult.Fail(-1, "Pipe disconnected unexpectedly"));
+                // 取消请求后的断开视为取消（消除事件竞态）；否则为意外断开
+                _logger.Warn("WorkerMgr", "Pipe disconnected (cancelRequested={Cancel})", _cancelRequested);
+                Settle(_cancelRequested
+                    ? WorkerExecutionResult.Cancelled()
+                    : WorkerExecutionResult.Fail(-1, "Pipe disconnected unexpectedly"));
             }
         };
         pipeServer.OnProgress += (_, p) => progress?.Report(p);
@@ -101,8 +128,8 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
             await pipeServer.WaitHandshakeAsync(PipeProtocol.ConnectTimeoutMs, cts.Token);
             _logger.Debug("WorkerMgr", "Handshake complete: {Pipe}", pipeName);
 
-            // Worker 回报取消确认 → 任务取消完成
-            pipeServer.OnCancel += () => tcs.TrySetResult(WorkerExecutionResult.Cancelled());
+            // Worker 回报取消确认（task_cancelled 专用上报）→ 任务取消完成
+            pipeServer.OnCancel += () => Settle(WorkerExecutionResult.Cancelled());
 
             var processExitTask = process.WaitForExitAsync();
 
@@ -111,6 +138,20 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
 
             if (!process.HasExited)
                 await processExitTask;
+
+            // 兜底：消息全丢的极端场景下按进程退出码裁定（消息与进程退出双通道交叉验证）
+            if (!_ended)
+            {
+                _logger.Warn("WorkerMgr", "No pipe message received; fallback to process exit code {ExitCode}", process.ExitCode);
+                if (Settle(process.ExitCode == 0
+                        ? WorkerExecutionResult.Ok(process.ExitCode)
+                        : WorkerExecutionResult.Fail(process.ExitCode, $"Worker exited with code {process.ExitCode}")))
+                {
+                    result = process.ExitCode == 0
+                        ? WorkerExecutionResult.Ok(process.ExitCode)
+                        : WorkerExecutionResult.Fail(process.ExitCode, $"Worker exited with code {process.ExitCode}");
+                }
+            }
 
             _logger.Debug("WorkerMgr", "Process exited with code {ExitCode}", process.ExitCode);
             return result;
@@ -148,6 +189,7 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
     /// </summary>
     public void ForceCancelCurrentTask()
     {
+        _cancelRequested = true;
         _activeServer?.SendCancel();
 
         var proc = _activeProcess;
