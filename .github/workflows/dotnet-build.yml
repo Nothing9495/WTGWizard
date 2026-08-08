@@ -22,6 +22,9 @@ on:
         type: string
         default: "x64"
 
+permissions:
+  contents: write
+
 env:
   IS_PRERELEASE: ${{ inputs.is-prerelease }}
   UPLOAD_TAG: ${{ inputs.upload-tag }}
@@ -30,9 +33,9 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -47,14 +50,14 @@ jobs:
 
       - name: Upload artifact
         if: inputs.upload-artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: WTGWizard-${{ env.UPLOAD_TAG }}
           path: build/WTGWizard-*.zip
 
       - name: Publish to GitHub Releases
         if: inputs.upload-artifact
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           prerelease: ${{ env.IS_PRERELEASE }}
           files: build/WTGWizard-*.zip
