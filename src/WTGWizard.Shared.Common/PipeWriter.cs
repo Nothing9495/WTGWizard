@@ -69,6 +69,7 @@ public sealed class PipeWriter : IDisposable
         => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildProgress(task, percent) + PipeProtocol.NewLine), _ct, WriteTimeoutMs, "progress", throwOnTimeout: true, logDetail: false);
     public void WriteCompleted(string task, int returnCode) => Send(PipeProtocol.BuildCompleted(task, returnCode));
     public void WriteFailed(string task, int returnCode, string? message = null) => Send(PipeProtocol.BuildFailed(task, returnCode, message));
+    public void WriteCancelled(string task) => Send(PipeProtocol.BuildCancelled(task));
     public void WriteCancel() => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildCancel() + PipeProtocol.NewLine),
         CancellationToken.None, CancelAckTimeoutMs, "cancel ack", throwOnTimeout: false);
     public void WriteReady() => Send(PipeProtocol.BuildReady());

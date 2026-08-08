@@ -32,6 +32,9 @@ public sealed class PipeReader : IDisposable
     /// <summary>收到取消指令（主 → 子）。</summary>
     public event Action? OnCancelRequested;
 
+    /// <summary>收到取消回报（子 → 主，Worker 确认已取消）。</summary>
+    public event Action? OnCancelled;
+
     /// <summary>收到握手 ready（主 → 子）。</summary>
     public event Action? OnReady;
 
@@ -118,6 +121,10 @@ public sealed class PipeReader : IDisposable
 
                 case PipeProtocol.TaskCancel:
                     OnCancelRequested?.Invoke();
+                    break;
+
+                case PipeProtocol.TaskCancelled:
+                    OnCancelled?.Invoke();
                     break;
 
                 case PipeProtocol.HandshakeReady:

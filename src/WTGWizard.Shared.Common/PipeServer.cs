@@ -38,6 +38,9 @@ public sealed class PipeServer : IDisposable
     /// <summary>收到取消确认（Worker 回报）。</summary>
     public event Action? OnCancel;
 
+    /// <summary>收到取消回报（Worker 专用上报 task_cancelled）。</summary>
+    public event Action? OnCancelled;
+
     /// <summary>握手完成（Worker 回报 ack）。</summary>
     public event Action? OnHandshakeComplete;
 
@@ -80,6 +83,7 @@ public sealed class PipeServer : IDisposable
         _reader.OnFailed += (task, rc, msg) => OnFailed?.Invoke(task, rc, msg);
         _reader.OnDisconnected += () => OnDisconnected?.Invoke();
         _reader.OnCancelRequested += () => OnCancel?.Invoke();
+        _reader.OnCancelled += () => OnCancelled?.Invoke();
         _reader.OnAck += () => OnHandshakeComplete?.Invoke();
         _reader.StartReading();
 

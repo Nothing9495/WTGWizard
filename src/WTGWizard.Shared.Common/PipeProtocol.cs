@@ -18,6 +18,7 @@ public static class PipeProtocol
     public const string TaskCompleted = "task_completed";
     public const string TaskFailed = "task_failed";
     public const string TaskCancel = "task_cancel";
+    public const string TaskCancelled = "task_cancelled";
 
     // ── 握手消息类型（Main → Worker 三次握手中的控制消息）──
     public const string HandshakeReady = "ready";
@@ -51,6 +52,10 @@ public static class PipeProtocol
 
     public static string BuildCancel()
         => $"{{\"type\":\"{TaskCancel}\"}}";
+
+    /// <summary>Worker 回报任务已取消（与指令 task_cancel 分离的专用上报）。</summary>
+    public static string BuildCancelled(string task)
+        => $"{{\"type\":\"{TaskCancelled}\",\"task\":\"{task}\"}}";
 
     public static string BuildReady()
         => $"{{\"type\":\"{HandshakeReady}\"}}";
