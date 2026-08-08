@@ -13,6 +13,7 @@
 		<UseWinUI>true</UseWinUI>
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<WindowsPackageType>None</WindowsPackageType>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 		<!-- <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants> -->
 	</PropertyGroup>
 

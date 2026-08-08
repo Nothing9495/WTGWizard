@@ -1,0 +1,163 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0-windows10.0.26100": {
+      "ManagedWimLib": {
+        "type": "Direct",
+        "requested": "[2.6.0, )",
+        "resolved": "2.6.0",
+        "contentHash": "/2/NCpM6taSiZSHwlRkflw8cex9cDEUCuIO5W1Bg+3bjnGK2snBde563m0+youh6Cb2kJw8pknlePH5ixEuJJQ==",
+        "dependencies": {
+          "Joveler.DynLoader": "2.3.1"
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "Direct",
+        "requested": "[10.0.10, )",
+        "resolved": "10.0.10",
+        "contentHash": "zkFxGYUvdxAvIKTyXHrmW+Sux53D4SezD9dMyZ6hrwwzPQJNuwCRy1f5W7AvYTqacEGhWF2XderRQG1OvbV8og==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10"
+        }
+      },
+      "Serilog.Extensions.Logging": {
+        "type": "Direct",
+        "requested": "[10.0.0, )",
+        "resolved": "10.0.0",
+        "contentHash": "vx0kABKl2dWbBhhqAfTOk53/i8aV/5VaT3a6il9gn72Wqs2pM7EK2OB6No6xdqK2IaY6Zf9gdjLuK9BVa2rT+Q==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "10.0.0",
+          "Serilog": "4.2.0"
+        }
+      },
+      "Serilog.Sinks.Debug": {
+        "type": "Direct",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "4BzXcdrgRX7wde9PmHuYd9U6YqycCC28hhpKonK7hx0wb19eiuRj16fPcPSVp0o/Y1ipJuNLYQ00R3q2Zs8FDA==",
+        "dependencies": {
+          "Serilog": "4.0.0"
+        }
+      },
+      "Serilog.Sinks.File": {
+        "type": "Direct",
+        "requested": "[7.0.0, )",
+        "resolved": "7.0.0",
+        "contentHash": "fKL7mXv7qaiNBUC71ssvn/dU0k9t0o45+qm2XgKAlSt19xF+ijjxyA3R6HmCgfKEKwfcfkwWjayuQtRueZFkYw==",
+        "dependencies": {
+          "Serilog": "4.2.0"
+        }
+      },
+      "Vanara.PInvoke.CfgMgr32": {
+        "type": "Direct",
+        "requested": "[5.0.5, )",
+        "resolved": "5.0.5",
+        "contentHash": "BSqYz09uTFEYvtM7pPLFBYg99AX24i39RIbQ3qqi7STJWPZv92tWm8AzUSYpVq2sNC0/4vt7H6xIMbhbDWs46A==",
+        "dependencies": {
+          "Vanara.Core": "5.0.5",
+          "Vanara.PInvoke.Security": "5.0.5",
+          "Vanara.PInvoke.SetupAPI": "5.0.5"
+        }
+      },
+      "Vanara.PInvoke.Kernel32": {
+        "type": "Direct",
+        "requested": "[5.0.5, )",
+        "resolved": "5.0.5",
+        "contentHash": "RyUEG8DN5BUttC82xTdiVz/HpCKa/zeqv2j7kNfABSj3m/3hyH9PSQdeg/fwkOY5VbIWyBegnp+2AKfYAJL3PA==",
+        "dependencies": {
+          "Vanara.Core": "5.0.5"
+        }
+      },
+      "Vanara.PInvoke.SetupAPI": {
+        "type": "Direct",
+        "requested": "[5.0.5, )",
+        "resolved": "5.0.5",
+        "contentHash": "tMDWiNsBWdFAfQn+WOGbBW4261McfhNt1DETcQbQbauc5LUOKqITkla2pamynoLT+lIha0kBkZq7mmYJ6A/n/Q==",
+        "dependencies": {
+          "Vanara.Core": "5.0.5"
+        }
+      },
+      "Joveler.DynLoader": {
+        "type": "Transitive",
+        "resolved": "2.3.1",
+        "contentHash": "lG4uwAo2UCygLXxeTVk2mZQcqmZhMFsn+4bKBvr7x66uu0xdqtUO8/g8fMOT5fyjVWvrn9ljjQF4vWCrTny4ZQ=="
+      },
+      "Microsoft.Extensions.DependencyInjection": {
+        "type": "Transitive",
+        "resolved": "10.0.0",
+        "contentHash": "f0RBabswJq+gRu5a+hWIobrLWiUYPKMhCD9WO3sYBAdSy3FFH14LMvLVFZc2kPSCimBLxSuitUhsd6tb0TAY6A==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0"
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.0.10",
+        "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
+      },
+      "Microsoft.Extensions.Logging": {
+        "type": "Transitive",
+        "resolved": "10.0.0",
+        "contentHash": "BStFkd5CcnEtarlcgYDBcFzGYCuuNMzPs02wN3WBsOFoYIEmYoUdAiU+au6opzoqfTYJsMTW00AeqDdnXH2CvA==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection": "10.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.0",
+          "Microsoft.Extensions.Options": "10.0.0"
+        }
+      },
+      "Microsoft.Extensions.Options": {
+        "type": "Transitive",
+        "resolved": "10.0.0",
+        "contentHash": "8oCAgXOow5XDrY9HaXX1QmH3ORsyZO/ANVHBlhLyCeWTH5Sg4UuqZeOTWJi6484M+LqSx0RqQXDJtdYy2BNiLQ==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
+          "Microsoft.Extensions.Primitives": "10.0.0"
+        }
+      },
+      "Microsoft.Extensions.Primitives": {
+        "type": "Transitive",
+        "resolved": "10.0.0",
+        "contentHash": "inRnbpCS0nwO/RuoZIAqxQUuyjaknOOnCEZB55KSMMjRhl0RQDttSmLSGsUJN3RQ3ocf5NDLFd2mOQViHqMK5w=="
+      },
+      "Serilog": {
+        "type": "Transitive",
+        "resolved": "4.2.0",
+        "contentHash": "gmoWVOvKgbME8TYR+gwMf7osROiWAURterc6Rt2dQyX7wtjZYpqFiA/pY6ztjGQKKV62GGCyOcmtP1UKMHgSmA=="
+      },
+      "Vanara.Core": {
+        "type": "Transitive",
+        "resolved": "5.0.5",
+        "contentHash": "e3+5FNx0tJGKXCl/2yieiiU2WoIQN3A3AO6xuKIQVhQlo45CGBrM5riU6FYDPC4iX3WBypty/h0EZL4xWV2ucA=="
+      },
+      "Vanara.PInvoke.Cryptography": {
+        "type": "Transitive",
+        "resolved": "5.0.5",
+        "contentHash": "lXcUtjy3vy+hjqrT2YnHFtAl56UdDPpNnqQaAuQ3+FoNlkeA7k1yFxvqMKOVJ3tM88NJPniOiJHl/tSF2eSW+A==",
+        "dependencies": {
+          "Vanara.Core": "5.0.5"
+        }
+      },
+      "Vanara.PInvoke.Security": {
+        "type": "Transitive",
+        "resolved": "5.0.5",
+        "contentHash": "XgZoG4GnU4Xetur8saYJqxQGJw5HCTu2hAz28sMuCqmy66//cNSvsroEClnxHF+f6jy4LG0K7esniZb6y7dOPg==",
+        "dependencies": {
+          "Vanara.Core": "5.0.5",
+          "Vanara.PInvoke.Cryptography": "5.0.5",
+          "Vanara.PInvoke.Kernel32": "5.0.5"
+        }
+      }
+    },
+    "net10.0-windows10.0.26100/win-x64": {
+      "ManagedWimLib": {
+        "type": "Direct",
+        "requested": "[2.6.0, )",
+        "resolved": "2.6.0",
+        "contentHash": "/2/NCpM6taSiZSHwlRkflw8cex9cDEUCuIO5W1Bg+3bjnGK2snBde563m0+youh6Cb2kJw8pknlePH5ixEuJJQ==",
+        "dependencies": {
+          "Joveler.DynLoader": "2.3.1"
+        }
+      }
+    }
+  }
+}

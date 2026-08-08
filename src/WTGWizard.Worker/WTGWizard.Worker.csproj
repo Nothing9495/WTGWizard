@@ -6,6 +6,7 @@
 		<LangVersion>preview</LangVersion>
 		<RootNamespace>WTGWizard.Worker</RootNamespace>
 		<Nullable>enable</Nullable>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 		<Platforms>x64</Platforms>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 	</PropertyGroup>
