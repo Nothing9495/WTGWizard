@@ -11,3 +11,4 @@ jobs:
       is-prerelease: true
       upload-artifact: true
       upload-tag: Manual-Build-${{ github.run_id }}
+# this remark is intented to make the workflow show in Github Actions.
