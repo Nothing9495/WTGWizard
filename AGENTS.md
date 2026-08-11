@@ -450,3 +450,12 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 17. **ExtractFileAsync semantics**: `targetFilePath` is a FILE path (not a directory). Internally it extracts to the target's parent dir with `ExtractFlags.NoPreserveDirStructure | ExtractFlags.NoAcls`, then `File.Move(overwrite: true)`. Using a bare `ExtractPath(target=filePath, ...)` would create `<filePath>\Windows\Panther\...` with full WIM ACLs.
 
 18. **常量三处重叠（已收敛）**: 历史上 GPT GUID/分区布局/回退链/超时在 `Main/Models/Constants.cs`、`DeploymentCore/Models/DeploymentConstants.cs`、`Shared.Services/DiskServices/Models/DiskConstants.cs` 三处重复定义（部分重叠）。2026-08-06 已收敛为三个单一来源：**`DiskConstants`**（磁盘物理布局唯一来源，Main/DeploymentCore 均可引用）、**`DeploymentConstants`**（仅 Worker 命令超时 Timeout*Ms）、**`WinBuildConstants`**（仅 Windows 构建号阈值）。新增磁盘/部署常量按此归属；旧文件 `Constants.cs`/`WimConstants.cs` 已删除，`DiskConstants` 中为 DiskIOWriter PInvoke 预留的项标注 `reserved` 注释。
+
+19. **WASDK unpackaged self-contained 启动崩溃（仅论据）**: 以下为 `WindowsAppSDKSelfContained=true` + unpackaged（`WindowsPackageType=None`）构建的观测事实，不做结论推导：
+   - SCD 产物启动崩溃：`0xc000027b`（stowed）/ `E_FAIL` @ `Application.Start`（Microsoft.UI.Xaml.dll `FailFastWithStowedExceptions`）；FDD 产物正常。
+   - 产物差异：SCD Main.dll 内嵌 `UndockedRegFreeWinRTCS` 与 `Microsoft.WindowsAppRuntime.dll` 类型引用（较 FDD +127KB）；SCD apphost 内嵌 `WindowsAppRuntime`/activation 引用（400KB vs FDD 271KB）。
+   - 二分替换实验（pri 保持 82KB 不变，pri 非崩溃因素）：SCD exe + FDD dll → 崩于 Microsoft.UI.Xaml.dll（0xc000027b）；FDD exe + SCD dll → 崩于 CoreMessagingXP.dll（0xc0000602）；FDD exe + dll → 正常。
+   - 本机安装有 `Microsoft.WindowsAppRuntime.2` 2.3.1.0（与项目 PackageReference 同版本），FDD 走共享注册运行时。
+   - 版本实验：WASDK `1.8.260710003`、`2.3.2-experimentala` 仍复现崩溃；`1.7.260224002` 缺 `Microsoft.Windows.Storage.Pickers`（`FileOpenPicker`/`FileSavePicker` 不可用）。
+   - 上游参照：[microsoft/WindowsAppSDK#6248](https://github.com/microsoft/WindowsAppSDK/issues/6248)（1.8+ unpackaged self-contained 崩溃，1.7 及更早不重现；Open）。
+   - 当前处置：SCD 构建保留 `SelfContained=true` + `WindowsAppSDKSelfContained=false`（WASDK 框架依赖，需目标机安装 Windows App SDK 2.x）。
