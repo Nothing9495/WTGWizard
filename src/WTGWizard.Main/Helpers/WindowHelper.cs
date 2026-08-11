@@ -46,27 +46,12 @@ internal static class WindowHelper
     }
 
     /// <summary>
-    /// 设置窗口默认尺寸（自动考虑 DPI 缩放）。
+    /// 设置窗口尺寸并自动适配当前显示器工作区。
+    /// 期望尺寸（设计尺寸 × DPI 缩放）逐轴钳制到工作区，居中显示；
+    /// 最小尺寸同时钳制，确保其不会超过实际尺寸（避免高缩放下最小尺寸本身超屏）。
     /// 应在窗口加载后调用（需 XamlRoot 可用）。
     /// </summary>
-    public static void SetWindowSize(Window window, double width, double height)
-    {
-        if (window.Content is not FrameworkElement windowContent)
-            return;
-        if (windowContent.XamlRoot is null)
-            return;
-
-        var scale = windowContent.XamlRoot.RasterizationScale;
-        window.AppWindow.Resize(new SizeInt32(
-            (int)(width * scale),
-            (int)(height * scale)));
-    }
-
-    /// <summary>
-    /// 设置窗口最小尺寸（自动考虑 DPI 缩放）。
-    /// 应在窗口加载后调用（需 XamlRoot 可用）。
-    /// </summary>
-    public static void SetWindowMinSize(Window window, double width, double height)
+    public static void FitWindow(Window window, double designWidth, double designHeight, double minWidth, double minHeight)
     {
         if (window.Content is not FrameworkElement windowContent)
             return;
@@ -75,8 +60,20 @@ internal static class WindowHelper
         if (window.AppWindow.Presenter is not OverlappedPresenter presenter)
             return;
 
+        var display = DisplayArea.GetFromWindowId(window.AppWindow.Id, DisplayAreaFallback.Nearest);
+        var workArea = display.WorkArea;
+
         var scale = windowContent.XamlRoot.RasterizationScale;
-        presenter.PreferredMinimumWidth = (int)(width * scale);
-        presenter.PreferredMinimumHeight = (int)(height * scale);
+
+        int width = (int)Math.Min(designWidth * scale, workArea.Width);
+        int height = (int)Math.Min(designHeight * scale, workArea.Height);
+
+        int x = workArea.X + (workArea.Width - width) / 2;
+        int y = workArea.Y + (workArea.Height - height) / 2;
+
+        window.AppWindow.MoveAndResize(new RectInt32(x, y, width, height));
+
+        presenter.PreferredMinimumWidth = (int)Math.Min(minWidth * scale, width);
+        presenter.PreferredMinimumHeight = (int)Math.Min(minHeight * scale, height);
     }
 }

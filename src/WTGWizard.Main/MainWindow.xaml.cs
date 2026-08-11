@@ -11,16 +11,24 @@ using WTGWizard.Helpers;
 using WTGWizard.Messages;
 using WTGWizard.Pages;
 using WTGWizard.ViewModels;
+using Windows.Graphics;
 
 namespace WTGWizard.Main;
 
 public sealed partial class MainWindow : Window
 {
+    private const double DesignWindowWidth = 1150;
+    private const double DesignWindowHeight = 800;
+    private const double MinWindowWidth = 970;
+    private const double MinWindowHeight = 680;
+
     private OverlappedPresenter? _windowPresenter;
     private OverlappedPresenterState _currentWindowState;
     private readonly WizardViewModel _vm;
     private ITabActivatable? _currentPage;
     private string _currentTag = string.Empty;
+    private RectInt32 _lastWorkArea;
+    private double _lastScale;
 
     public MainWindow()
     {
@@ -46,6 +54,13 @@ public sealed partial class MainWindow : Window
 
         // 部署进行中关闭窗口：拦截 + 警告 + 强制终止（详见 OnAppWindowClosing）
         AppWindow.Closing += OnAppWindowClosing;
+
+        // 拖动到其他显示器时重新适配（工作区变化才触发，MoveAndResize 自身不触发 DidPositionChange，无循环）
+        AppWindow.Changed += (_, args) =>
+        {
+            if (args.DidPositionChange)
+                RefitIfDisplayChanged();
+        };
 
         // 响应式导航：窗口宽度 >= 1300 DIP 时使用 Left 模式，否则 Top
         RootGrid.SizeChanged += (_, e) => UpdateNavViewPaneMode(e.NewSize.Width);
@@ -113,13 +128,34 @@ public sealed partial class MainWindow : Window
     private void RootGrid_Loaded(object sender, RoutedEventArgs e)
     {
         TitleBarHelper.ApplySystemThemeToCaptionButtons(this, RootGrid.ActualTheme);
-        // Window 样式控制
-        WindowHelper.SetWindowSize(this, 1150, 800);
-        WindowHelper.SetWindowMinSize(this, 970, 680);
+        // 窗口样式控制：自动适配当前显示器工作区（尺寸钳制 + 居中 + 最小尺寸钳制）
+        WindowHelper.FitWindow(this, DesignWindowWidth, DesignWindowHeight, MinWindowWidth, MinWindowHeight);
         UpdateNavViewPaneMode(RootGrid.ActualWidth);
+        _lastWorkArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Nearest).WorkArea;
+        _lastScale = RootGrid.XamlRoot.RasterizationScale;
+
+        // 系统 DPI 缩放变化时重新适配（工作区/缩放未变化时内部直接返回，内容尺寸变化不会误触发）
+        RootGrid.XamlRoot.Changed += (_, _) => RefitIfDisplayChanged();
 #if DEBUG
         ShowDebugBuildWarning();
 #endif
+    }
+
+    /// <summary>
+    /// 当前显示器工作区或缩放与上次记录不一致时，重新适配窗口尺寸（跨屏/DPI 变化共用）。
+    /// </summary>
+    private void RefitIfDisplayChanged()
+    {
+        if (RootGrid.XamlRoot is null)
+            return;
+
+        var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Nearest).WorkArea;
+        if (workArea == _lastWorkArea && _lastScale == RootGrid.XamlRoot.RasterizationScale)
+            return;
+
+        WindowHelper.FitWindow(this, DesignWindowWidth, DesignWindowHeight, MinWindowWidth, MinWindowHeight);
+        _lastWorkArea = workArea;
+        _lastScale = RootGrid.XamlRoot.RasterizationScale;
     }
 
     /// <summary>
