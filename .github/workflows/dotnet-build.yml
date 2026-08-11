@@ -46,22 +46,22 @@ jobs:
           global-json-file: global.json
 
       # 版本去 v 由工作流处理（tag 如 v1.2.3-preview1 → 1.2.3-preview1）
-      - name: Publish release build
+      - name: Build artfacts
         shell: pwsh
         run: |
           $mainVer = "${{ inputs.main-version }}" -replace '^v',''
-          $scriptArgs = @(
-            "-Architecture", "${{ inputs.architecture }}",
-            "-MainVer", $mainVer,
-            "-WorkerVer", "${{ inputs.worker-version }}",
-            "-ZipTag", "${{ env.UPLOAD_TAG }}"
-          )
+          $scriptArgs = @{
+            Architecture = "${{ inputs.architecture }}"
+            MainVer      = $mainVer
+            WorkerVer    = "${{ inputs.worker-version }}"
+            ZipTag       = "${{ env.UPLOAD_TAG }}"
+          }
           if ("${{ inputs.diagnostics }}" -eq "true") {
-            $scriptArgs += "-Diagnostics"
+            $scriptArgs["Diagnostics"] = $true
           }
           & ./BuildArtifacts.ps1 @scriptArgs
 
-      - name: Upload artifact
+      - name: Upload artifacts
         if: inputs.upload-artifact
         uses: actions/upload-artifact@v5
         with:
