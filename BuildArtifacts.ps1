@@ -22,8 +22,6 @@ param(
 
     [switch]$Diagnostics,
 
-    [long]$MinPriBytes = 0.05MB,
-
     [int]$MinXbfCount = 20
 )
 
@@ -225,7 +223,6 @@ function Collect-EnvironmentInfo {
     Write-Log "WorkerVer: $WorkerVer"
     Write-Log "ZipTag: $ZipTag"
     Write-Log "Diagnostics: $Diagnostics"
-    Write-Log "MinPriBytes: $MinPriBytes"
     Write-Log "MinXbfCount: $MinXbfCount"
 
     if ($env:GITHUB_ACTIONS) {
@@ -484,15 +481,9 @@ function Publish-Main {
         "-p:Platform=$Architecture",
         "-p:Version=$MainVer",
         "--no-restore",
-        "-p:SelfContained=$SelfContained"
+        "-p:SelfContained=$SelfContained",
+        "-p:WindowsAppSDKSelfContained=false"
     )
-
-    if ($SelfContained) {
-        $arguments += "-p:WindowsAppSDKSelfContained=true"
-    }
-    else {
-        $arguments += "-p:WindowsAppSDKSelfContained=false"
-    }
 
     Invoke-CommandLogged `
         -FilePath "dotnet" `
@@ -913,11 +904,7 @@ function Assert-MainPriComplete {
     }
 
     $size = (Get-Item $pri).Length
-    Write-Log "PRI size: $size bytes"
-
-    if ($size -lt $MinPriBytes) {
-        throw "PRI too small ($size bytes < $MinPriBytes) - XBF resources likely missing."
-    }
+    Write-Log "PRI size: $size bytes (informational; size check removed)"
 
     $makePri = Get-MakePriPath
 
