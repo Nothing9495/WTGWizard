@@ -22,7 +22,7 @@ param(
 
     [switch]$Diagnostics,
 
-    [long]$MinPriBytes = 1MB,
+    [long]$MinPriBytes = 0.05MB,
 
     [int]$MinXbfCount = 20
 )
@@ -794,17 +794,51 @@ function Get-PriXbfNames {
         $dumpFile = Join-Path $DiagnosticsRoot ("PriDump-{0}.xml" -f (Split-Path $PriPath -Leaf))
         $priFull = (Resolve-Path $PriPath).Path
 
-        & $MakePriPath dump /if $priFull /dt basic /of $dumpFile 2>&1 | Out-Null
-
-        if ($LASTEXITCODE -ne 0) {
-            Write-Log "makepri dump failed (exit $LASTEXITCODE), falling back to string scan." "WARN"
+        if (Test-Path $dumpFile) {
+            Remove-Item -LiteralPath $dumpFile -Force
         }
-        elseif (Test-Path $dumpFile) {
-            $content = Get-Content $dumpFile -Raw
-            $xbfNames = @([regex]::Matches($content, '<NamedResource name="([^"]+\.xbf)"') |
-                ForEach-Object { $_.Groups[1].Value } |
-                Sort-Object -Unique)
-            Write-Log "PRI dump retained: $dumpFile"
+
+        $baseName = Split-Path $PriPath -Leaf
+        $stdoutFile = Join-Path $DiagnosticsRoot ("PriDump-{0}.stdout.txt" -f $baseName)
+        $stderrFile = Join-Path $DiagnosticsRoot ("PriDump-{0}.stderr.txt" -f $baseName)
+        $nullInput = Join-Path $env:TEMP "makepri-empty-input.txt"
+
+        if (-not (Test-Path $nullInput)) {
+            New-Item -ItemType File -Path $nullInput -Force | Out-Null
+        }
+
+        try {
+            $proc = Start-Process `
+                -FilePath $MakePriPath `
+                -ArgumentList @("dump", "/if", $priFull, "/dt", "basic", "/of", $dumpFile) `
+                -RedirectStandardOutput $stdoutFile `
+                -RedirectStandardError $stderrFile `
+                -RedirectStandardInput $nullInput `
+                -WindowStyle Hidden `
+                -PassThru
+
+            $exited = $proc.WaitForExit(60000)
+
+            if (-not $exited) {
+                Write-Log "makepri dump timed out after 60s; killing process." "WARN"
+                $proc.Kill()
+                $proc.WaitForExit()
+            }
+            elseif ((Test-Path $dumpFile) -and (Get-Item $dumpFile).Length -gt 0) {
+                $content = Get-Content $dumpFile -Raw
+                $xbfNames = @([regex]::Matches($content, '<NamedResource name="([^"]+\.xbf)"') |
+                    ForEach-Object { $_.Groups[1].Value } |
+                    Sort-Object -Unique)
+                Write-Log "PRI dump retained: $dumpFile"
+            }
+            else {
+                $errMsg = ((Get-Content $stderrFile -ErrorAction SilentlyContinue) -join " ")
+                Write-Log "makepri dump produced no output; falling back to string scan. $errMsg" "WARN"
+            }
+        }
+        finally {
+            Remove-Item -LiteralPath $stdoutFile -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $stderrFile -Force -ErrorAction SilentlyContinue
         }
     }
 
