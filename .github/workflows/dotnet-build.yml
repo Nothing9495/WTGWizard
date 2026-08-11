@@ -9,6 +9,9 @@ on:
       upload-tag:
         type: string
         default: "Build-Artifacts"
+      publish-artifact:
+        type: boolean
+        default: false
       main-version:
         type: string
         default: "1.0.0"
@@ -21,6 +24,9 @@ on:
       architecture:
         type: string
         default: "x64"
+      diagnostics:
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -44,9 +50,16 @@ jobs:
         shell: pwsh
         run: |
           $mainVer = "${{ inputs.main-version }}" -replace '^v',''
-          ./BuildArtifacts.ps1 -Architecture ${{ inputs.architecture }} `
-            -MainVer $mainVer -WorkerVer ${{ inputs.worker-version }} `
-            -ZipTag "${{ env.UPLOAD_TAG }}" -ZipDir build
+          $scriptArgs = @(
+            "-Architecture", "${{ inputs.architecture }}",
+            "-MainVer", $mainVer,
+            "-WorkerVer", "${{ inputs.worker-version }}",
+            "-ZipTag", "${{ env.UPLOAD_TAG }}"
+          )
+          if ("${{ inputs.diagnostics }}" -eq "true") {
+            $scriptArgs += "-Diagnostics"
+          }
+          & ./BuildArtifacts.ps1 @scriptArgs
 
       - name: Upload artifact
         if: inputs.upload-artifact
@@ -55,8 +68,15 @@ jobs:
           name: WTGWizard-${{ env.UPLOAD_TAG }}
           path: build/WTGWizard-*.zip
 
+      - name: Upload build diagnostics
+        if: inputs.diagnostics
+        uses: actions/upload-artifact@v5
+        with:
+          name: WTGWizard-Diagnostics-${{ env.UPLOAD_TAG }}
+          path: build/BuildDiagnostics
+
       - name: Publish to GitHub Releases
-        if: inputs.upload-artifact
+        if: inputs.publish-artifact
         uses: softprops/action-gh-release@v2
         with:
           prerelease: ${{ env.IS_PRERELEASE }}

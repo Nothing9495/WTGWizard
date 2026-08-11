@@ -12,6 +12,7 @@ jobs:
     with:
       upload-artifact: true
       upload-tag: ${{ github.ref_name }}
+      publish-artifact: true
       main-version: ${{ github.ref_name }}
       worker-version: '1.0.0'
       # 三段构建号后含 preview 字样 → 作为 Pre-release 发布

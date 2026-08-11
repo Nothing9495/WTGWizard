@@ -15,4 +15,6 @@ jobs:
     uses: ./.github/workflows/dotnet-build.yml
     secrets: inherit
     with:
-      upload-artifact: false
+      upload-artifact: true
+      publish-artifact: false
+      diagnostics: true
