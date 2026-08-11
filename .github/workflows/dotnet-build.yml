@@ -62,14 +62,15 @@ jobs:
           & ./BuildArtifacts.ps1 @scriptArgs
 
       - name: Upload artifacts
-        if: inputs.upload-artifact
+        if: always() && inputs.upload-artifact
         uses: actions/upload-artifact@v5
         with:
           name: WTGWizard-${{ env.UPLOAD_TAG }}
           path: build/WTGWizard-*.zip
+          if-no-files-found: warn
 
       - name: Upload build diagnostics
-        if: inputs.diagnostics
+        if: always() && inputs.diagnostics
         uses: actions/upload-artifact@v5
         with:
           name: WTGWizard-Diagnostics-${{ env.UPLOAD_TAG }}
