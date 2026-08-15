@@ -26,15 +26,14 @@
 
 - 系统：Windows 10 1809（Build 17763）或更高版本，**x64**。在 **Windows 11** 上使用以获得最佳体验。
 - 运行时: 
-  - 对于 `-SCD` 版本: [Windows App SDK 2.3.1 x64](https://aka.ms/windowsappsdk/2.3/2.3.1/windowsappruntimeinstall-x64.exe) 是必须的（见 [限制](#限制)）。
-  - 对于 `-FDD` 版本: [.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) 和 [Windows App SDK 2.3.1 x64](https://aka.ms/windowsappsdk/2.3/2.3.1/windowsappruntimeinstall-x64.exe) 都是必须的。
+  - 对于 `-SCD` 版本: 包含了所有必要运行时，你不需要额外安装任何运行时或框架。
+  - 对于 `-FDD` 版本: 需要提前安装[.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) 和 [Windows App SDK 2.4.0 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) 
 - **管理员权限**：应用会请求获取管理员权限以便进行磁盘操作、DISM 等。
 - 需要一个外接硬盘或 USB 驱动器。
 
 ## 限制
 
 - WTGWizard **不支持**创建 MBR（主引导记录）分区表风格的 Windows To Go 驱动器（尽管技术上可行）。
-- **`-SCD` 版本仍需安装 Windows App SDK 2.3.1 x64**：由于 Windows App SDK（1.8+/2.x）可能存在的上游回归——unpackaged 完全自包含（`WindowsAppSDKSelfContained=true`）应用无法启动（`Application.Start` 中 `0xc000027b` / `E_FAIL`，见 [microsoft/WindowsAppSDK#6248](https://github.com/microsoft/WindowsAppSDK/issues/6248)）——`-SCD` 构建保留 .NET 自包含，但 Windows App SDK 以框架依赖形式分发。该问题尚需进一步研究。
 
 ## 下载与使用
 

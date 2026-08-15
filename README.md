@@ -30,15 +30,14 @@
 
 - System: Windows 10 version 1809 (Build 17763) or later, **x64**. Best experienced on **Windows 11**.
 - Runtimes: 
-  - For `-SCD` version: [Windows App SDK 2.3.1 x64](https://aka.ms/windowsappsdk/2.3/2.3.1/windowsappruntimeinstall-x64.exe) is reqiured. (see [Limitations](#limitations)).
-  - For `-FDD` version: Both [.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) and [Windows App SDK 2.3.1 x64](https://aka.ms/windowsappsdk/2.3/2.3.1/windowsappruntimeinstall-x64.exe) is reqiured.
+  - For `-SCD` version: All required runtimes and frameworks are bundled; nothing extra needs to be installed.
+  - For `-FDD` version: Both [.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) and [Windows App SDK 2.4.0 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) is reqiured to be installed beforehand.
 - **Elevated privilege**: The app requests elevation for disk operations, DISM operations, etc.
 - An external hard drive or a USB drive is needed.
 
 ## Limitations
 
 - WTGWizard **does not** support creating a Windows To Go drive with MBR (Master Boot Record) partition style though it is technically feasible.
-- **`-SCD` releases require Windows App SDK 2.x**: due to a potential upstream regression in the Windows App SDK (1.8+/2.x) where unpackaged fully self-contained (`WindowsAppSDKSelfContained=true`) apps fail to start (`0xc000027b` / `E_FAIL` in `Application.Start`; see [microsoft/WindowsAppSDK#6248](https://github.com/microsoft/WindowsAppSDK/issues/6248)), the `-SCD` build keeps .NET self-contained but ships the Windows App SDK as framework-dependent. This issue needs further researches. 
 
 ## Download & Usage
 
