@@ -951,12 +951,47 @@ function Compress-Artifact {
         Remove-Item $archive -Force
     }
 
-    Compress-Archive `
-        -Path (Join-Path $Directory "*") `
-        -DestinationPath $archive `
-        -CompressionLevel Optimal
+    Add-Type -AssemblyName System.IO.Compression
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+    $root = (Resolve-Path $Directory).Path
+    $zip = [System.IO.Compression.ZipFile]::Open($archive, [System.IO.Compression.ZipArchiveMode]::Create)
+
+    try {
+        $included = 0
+        $excluded = 0
+
+        $files = Get-ChildItem `
+            -LiteralPath $Directory `
+            -File `
+            -Recurse `
+            -Force
+
+        foreach ($file in $files) {
+            if ($file.Name -like "WTGWizard*.pdb") {
+                Write-Log "Excluding symbol file: $($file.Name)" "WARN"
+                $excluded++
+                continue
+            }
+
+            $relative = $file.FullName.Substring($root.Length).TrimStart('\').Replace('\', '/')
+
+            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+                $zip,
+                $file.FullName,
+                $relative,
+                [System.IO.Compression.CompressionLevel]::Optimal
+            ) | Out-Null
+
+            $included++
+        }
+    }
+    finally {
+        $zip.Dispose()
+    }
 
     Write-Log "Archive: $archive"
+    Write-Log "Files included: $included; symbol files excluded: $excluded"
 
     $hash = Get-FileHash `
         -LiteralPath $archive `
