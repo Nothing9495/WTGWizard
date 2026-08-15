@@ -467,7 +467,10 @@ function Publish-Main {
         [string]$Output,
 
         [Parameter(Mandatory)]
-        [bool]$SelfContained
+        [bool]$SelfContained,
+
+        [Parameter(Mandatory)]
+        [string]$WASDKSelfContained
     )
 
     Write-SubSection "Main publish"
@@ -482,7 +485,7 @@ function Publish-Main {
         "-p:Version=$MainVer",
         "--no-restore",
         "-p:SelfContained=$SelfContained",
-        "-p:WindowsAppSDKSelfContained=false"
+        "-p:WindowsAppSDKSelfContained=$WASDKSelfContained"
     )
 
     Invoke-CommandLogged `
@@ -981,7 +984,8 @@ function Build-FDD {
 
     Publish-Main `
         -Output $output `
-        -SelfContained $false
+        -SelfContained $false `
+        -WASDKSelfContained $false
 
     Validate-PublishOutput `
         -Directory $output `
@@ -1031,7 +1035,8 @@ function Build-SCD {
 
     Publish-Main `
         -Output $output `
-        -SelfContained $true
+        -SelfContained $true `
+        -WASDKSelfContained $true
 
     Validate-PublishOutput `
         -Directory $output `
@@ -1096,12 +1101,12 @@ try {
         Write-Log "Enable explicitly if the solution has a stable test target."
     }
 
-    if ($BuildType -in @("FDD", "Both")) {
-        Build-FDD
-    }
-
     if ($BuildType -in @("SCD", "Both")) {
         Build-SCD
+    }
+
+    if ($BuildType -in @("FDD", "Both")) {
+        Build-FDD
     }
 
     Write-Section "Build Summary"
