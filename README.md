@@ -37,7 +37,8 @@
 
 ## Limitations
 
-- WTGWizard **does not** support creating a Windows To Go drive with MBR (Master Boot Record) partition style though it is technically feasible.
+- WTGWizard **does not** support creating a Windows To Go drive with MBR (Master Boot Record) partition style though it is technically feasible. Only GPT partition style is supported.
+- WTGWizard **dose not** support creating a Windows To Go drive compatible with Legacy boot manager though it is technically feasible. Only UEFI is supported.
 
 ## Download & Usage
 

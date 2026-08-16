@@ -33,7 +33,8 @@
 
 ## 限制
 
-- WTGWizard **不支持**创建 MBR（主引导记录）分区表风格的 Windows To Go 驱动器（尽管技术上可行）。
+- WTGWizard **不支持**创建使用 MBR（主引导记录）磁盘格式的 Windows To Go 驱动器（尽管技术上可行）。WTGWizard 只支持在 GPT 磁盘格式上创建 Windows To Go。
+- WTGWizard **不支持**创建使用 Legacy 引导方式的 Windows To Go 驱动器（尽管技术上可行）。WTGWizard 只支持创建使用 UEFI 引导方式的 Windows To Go。
 
 ## 下载与使用
 
