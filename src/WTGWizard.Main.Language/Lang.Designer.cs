@@ -306,7 +306,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Selected disk has no ESP partition. Only Clean Install available. 的本地化字符串。
+        ///   查找类似 Selected disk has no ESP partition, so Partition Install is unavailable. 的本地化字符串。
         /// </summary>
         public static string InfoBar_NoEsp_Message {
             get {
@@ -1326,6 +1326,15 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Start Deployment 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_Confirm_StartDeployButton {
+            get {
+                return ResourceManager.GetString("Page.WizStep.Confirm.StartDeployButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Hide Local Disks 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_Confirm_SummaryCard_Tag1 {
@@ -1367,15 +1376,6 @@ namespace WTGWizard.Main.Language {
         public static string Page_WizStep_Confirm_SummaryCard_Tag5 {
             get {
                 return ResourceManager.GetString("Page.WizStep.Confirm.SummaryCard.Tag5", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Start Deployment 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_Confirm_StartDeployButton {
-            get {
-                return ResourceManager.GetString("Page.WizStep.Confirm.StartDeployButton", resourceCulture);
             }
         }
         
@@ -1899,6 +1899,33 @@ namespace WTGWizard.Main.Language {
         public static string Page_WizStep_ImageConfig_Title {
             get {
                 return ResourceManager.GetString("Page.WizStep.ImageConfig.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Start 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_VerifyImg_BtnContent {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.VerifyImg.BtnContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Check image data integrity. It might take some time to complete. 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_VerifyImg_Desc {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.VerifyImg.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Check Image Integrity 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_ImageConfig_VerifyImg_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.ImageConfig.VerifyImg.Header", resourceCulture);
             }
         }
         

@@ -105,13 +105,13 @@
                     SelectionChanged="ImageIndexComboBox_SelectionChanged"/>
         </cc:SettingsCard>
 
-        <cc:SettingsCard Header="校验映像完整性"
-                         Description="校验映像的数据完整性，这可能耗费需要较长时间"
+        <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_Header}"
+                         Description="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xEE6F;}">
           <cc:SwitchPresenter TargetType="vm:VerifyStatus"
                               Value="{x:Bind VM.Image.VerifyStatus, Mode=OneWay}">
             <cc:Case Value="Idle">
-              <Button Content="开始校验" Click="VerifyButton_Click"
+              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click"
                       IsEnabled="{x:Bind VM.Image.CanVerify, Mode=OneWay}" />
             </cc:Case>
             <cc:Case Value="Verifying">
@@ -123,16 +123,16 @@
               </StackPanel>
             </cc:Case>
             <cc:Case Value="Succeeded">
-              <Button Content="重新校验" Click="VerifyButton_Click" />
+              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
             </cc:Case>
             <cc:Case Value="NotPass">
-              <Button Content="重新校验" Click="VerifyButton_Click" />
+              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
             </cc:Case>
             <cc:Case Value="Failed">
-              <Button Content="重新校验" Click="VerifyButton_Click" />
+              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
             </cc:Case>
             <cc:Case Value="Unknown">
-              <Button Content="重新校验" Click="VerifyButton_Click" />
+              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
             </cc:Case>
           </cc:SwitchPresenter>
         </cc:SettingsCard>

@@ -292,13 +292,13 @@
     <value>无 ESP 分区</value>
   </data>
   <data name="InfoBar.NoEsp.Message" xml:space="preserve">
-    <value>选中磁盘无 ESP 分区，仅全新安装可用。</value>
+    <value>选中的磁盘没有 ESP 分区，因此无法使用分区安装的部署方式</value>
   </data>
   <data name="InfoBar.PartNoLetter.Title" xml:space="preserve">
     <value>所选分区无盘符！</value>
   </data>
   <data name="InfoBar.PartNoLetter.Message" xml:space="preserve">
-    <value>所选分区未分配盘符，无法部署。请在磁盘管理中分配盘符。</value>
+    <value>所选分区未分配盘符，无法部署。请在磁盘管理中分配盘符</value>
   </data>
   <data name="Page.WizStep.DeployMethod.EspSize.Desc" xml:space="preserve">
     <value>设置引导分区的容量，大小在300MB~500MB之间</value>
@@ -723,12 +723,6 @@
   <data name="Page.WizStep.Confirm.SummaryCard.Tag5" xml:space="preserve">
     <value>使用 CA 2023 签名的引导程序</value>
   </data>
-  <data name="Page.WizStep.Confirm.InfoCard.Enabled" xml:space="preserve">
-    <value>已启用</value>
-  </data>
-  <data name="Page.WizStep.Confirm.InfoCard.Disabled" xml:space="preserve">
-    <value>未启用</value>
-  </data>
   <data name="Page.WizStep.Confirm.InfoCard.ImageConfig.Title" xml:space="preserve">
     <value>映像信息</value>
   </data>
@@ -777,9 +771,6 @@
   <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.ReservedFs" xml:space="preserve">
     <value>保留分区文件系统</value>
   </data>
-  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.TargetPartition" xml:space="preserve">
-    <value>目标分区</value>
-  </data>
   <data name="Page.WizStep.Confirm.InfoCard.DeployOptions.Title" xml:space="preserve">
     <value>部署选项</value>
   </data>
@@ -827,5 +818,23 @@
   </data>
   <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.Title" xml:space="preserve">
     <value>部署方式</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.Enabled" xml:space="preserve">
+    <value>已启用</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.Disabled" xml:space="preserve">
+    <value>未启用</value>
+  </data>
+  <data name="Page.WizStep.Confirm.InfoCard.DeployMethod.TargetPartition" xml:space="preserve">
+    <value>目标分区</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.VerifyImg.Header" xml:space="preserve">
+    <value>校验映像完整性</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.VerifyImg.Desc" xml:space="preserve">
+    <value>校验映像的数据完整性，这可能需要一些时间</value>
+  </data>
+  <data name="Page.WizStep.ImageConfig.VerifyImg.BtnContent" xml:space="preserve">
+    <value>开始校验</value>
   </data>
 </root>
