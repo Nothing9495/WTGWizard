@@ -38,11 +38,12 @@
           <cc:WrapPanel HorizontalSpacing="16" Orientation="Horizontal" VerticalSpacing="4">
             <StackPanel Orientation="Horizontal" Spacing="8">
               <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xF012;" Opacity="0.7" />
-              <TextBlock MaxWidth="280"
-                         VerticalAlignment="Center"
+              <TextBlock VerticalAlignment="Center"
                          Opacity="0.7"
                          Style="{ThemeResource CaptionTextBlockStyle}"
                          Text="{x:Bind VM.Image.FilePath, Mode=OneWay}"
+                         TextWrapping="WrapWholeWords"
+                         MaxLines="2"
                          TextTrimming="CharacterEllipsis" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8">
