@@ -88,6 +88,7 @@
                      PlaceholderText="{x:Bind lang:Lang.Page_WizStep_ImageConfig_FilePathPlaceholder}"
                      IsReadOnly="True"
                      MinWidth="250"
+                     MaxWidth="400"
                      VerticalAlignment="Center" />
           </StackPanel>
         </cc:SettingsCard>

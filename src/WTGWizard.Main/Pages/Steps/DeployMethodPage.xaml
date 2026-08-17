@@ -113,7 +113,7 @@
             </cc:SettingsCard>
             <!--  OS 卷标  -->
             <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsLabel_Header}">
-              <TextBox MinWidth="151" Text="{x:Bind VM.Method.OsDriveLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+              <TextBox MinWidth="151" MaxWidth="400" Text="{x:Bind VM.Method.OsDriveLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </cc:SettingsCard>
             <!--  保留卷开关  -->
             <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Reserved_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Reserved_Header}">
@@ -144,7 +144,7 @@
             </cc:SettingsCard>
             <!--  保留卷卷标  -->
             <cc:SettingsCard x:Name="ReservedLabelCard" Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Header}" IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}">
-              <TextBox MinWidth="151" PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Placeholder}" Text="{x:Bind VM.Method.ReservedVolLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+              <TextBox MinWidth="151" MaxWidth="400" PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Placeholder}" Text="{x:Bind VM.Method.ReservedVolLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </cc:SettingsCard>
           </cc:SettingsExpander.Items>
         </cc:SettingsExpander>
@@ -174,7 +174,7 @@
           </InfoBar.ActionButton>
         </InfoBar>
         <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartOsLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartOsLabel_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE8AC;}" IsEnabled="{x:Bind VM.Method.IsPartitionInstallSelected, Mode=OneWay}">
-          <TextBox MinWidth="151" Text="{x:Bind VM.Method.OsDriveLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBox MinWidth="151" MaxWidth="400" Text="{x:Bind VM.Method.OsDriveLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </cc:SettingsCard>
       </StackPanel>
     </StackPanel>

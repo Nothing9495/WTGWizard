@@ -45,7 +45,8 @@
             </uc:FolderPickerControl>
             <TextBox PlaceholderText="{x:Bind lang:Lang.Page_WizStep_AdvOptions_DriverPath_Placeholder}"
                      Text="{x:Bind VM.Advanced.DriverPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     MinWidth="250"/>
+                     MinWidth="250"
+                     MaxWidth="400"/>
           </StackPanel>
         </cc:SettingsCard>
         <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_AdvOptions_ForceUnsigned_Header}"
@@ -106,6 +107,7 @@
             </uc:FilePickerControl>
             <TextBox PlaceholderText="{x:Bind lang:Lang.Page_WizStep_AdvOptions_AnsFilePath_Placeholder}"
                      Text="{x:Bind VM.Advanced.AnsFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     MaxWidth="400"
                      MinWidth="250"/>
           </StackPanel>
         </cc:SettingsCard>
