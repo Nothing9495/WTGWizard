@@ -11,7 +11,7 @@
   <UserControl.Resources>
     <SolidColorBrush x:Key="FloatingBarBackgroundBrush"
            Color="{ThemeResource SystemChromeMediumLowColor}"
-           Opacity="0.75"/>
+           Opacity="0.9"/>
 
     <Style x:Key="FloatingBarStyle" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
       <Setter Property="Background" Value="{ThemeResource FloatingBarBackgroundBrush}" />
