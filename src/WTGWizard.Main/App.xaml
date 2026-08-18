@@ -12,6 +12,11 @@
       <!-- XAML Constants -->
       <x:Double x:Key="PageContentMaxWidth">1250</x:Double>
       <x:Double x:Key="NavViewPaneBreakpoint">1350</x:Double>
+      <!-- 底部内容边距步骤页内容高度，避免页面控件被底栏遮挡 -->
+      <Thickness x:Key="PageContentBottomMargin">0,0,0,88</Thickness>
+      <!-- 步骤页 ScrollViewer 公用 Padding / ConfirmPage 悬浮按钮抬升共用 -->
+      <Thickness x:Key="StepPagePadding">36,40,36,0</Thickness>
+      <Thickness x:Key="FloatingStartDeployButtonMargin">0,0,28,96</Thickness>
 
       <!-- 通用卡片外观：Card 主题背景/描边/圆角 4，供页面 Border 引用 -->
       <Style x:Key="CardBorderStyle" TargetType="Border">
@@ -35,7 +40,7 @@
         <Setter Property="Opacity" Value="0.7" />
         <Setter Property="VerticalAlignment" Value="Center" />
       </Style>
-
+      
       <!-- 悬浮元素投影（配合 Translation 使用） -->
       <ThemeShadow x:Key="SharedShadow" />
     </ResourceDictionary>

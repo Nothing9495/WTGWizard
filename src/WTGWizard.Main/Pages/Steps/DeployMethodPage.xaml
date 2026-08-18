@@ -11,91 +11,90 @@
       NavigationCacheMode="Required"
       mc:Ignorable="d">
 
-  <ScrollViewer Padding="36,40,36,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
-    <StackPanel Spacing="32">
-      <StackPanel Spacing="4">
-        <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Title}" />
-        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Desc}" />
+  <ScrollViewer Padding="{StaticResource StepPagePadding}" MaxWidth="{ThemeResource PageContentMaxWidth}">
+    <StackPanel Spacing="4" Margin="{StaticResource PageContentBottomMargin}">
+      <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Title}" />
+      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Desc}" />
 
-        <!--  ═══ 磁盘选择 ═══  -->
-        <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Header}" />
-        <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE88E;}">
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button x:Name="DiskRefreshButton" Click="OnDiskRefreshClick">
-              <FontIcon FontSize="14" Glyph="&#xE72C;" />
-            </Button>
-            <ComboBox x:Name="DiskListComboBox" Width="350" PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Placeholder}" SelectionChanged="OnDiskSelectionChanged">
-              <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="diskServices:DiskBasicInfo">
-                  <TextBlock Text="{x:Bind DisplayName}" />
-                </DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-          </StackPanel>
-        </cc:SettingsCard>
-        <InfoBar Title="{x:Bind lang:Lang.InfoBar_DataSecurity_Title}"
+      <!--  ═══ 磁盘选择 ═══  -->
+      <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Header}" />
+      <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE88E;}">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button x:Name="DiskRefreshButton" Click="OnDiskRefreshClick">
+            <FontIcon FontSize="14" Glyph="&#xE72C;" />
+          </Button>
+          <ComboBox x:Name="DiskListComboBox" Width="350" PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelDisk_Placeholder}" SelectionChanged="OnDiskSelectionChanged">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="diskServices:DiskBasicInfo">
+                <TextBlock Text="{x:Bind DisplayName}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+      </cc:SettingsCard>
+      <InfoBar Title="{x:Bind lang:Lang.InfoBar_DataSecurity_Title}"
                  IsClosable="True"
                  IsOpen="True"
                  Message="{x:Bind lang:Lang.InfoBar_DataSecurity_Message}"
                  Severity="Warning" />
-        <InfoBar Title="{x:Bind lang:Lang.InfoBar_NoEsp_Title}"
+      <InfoBar Title="{x:Bind lang:Lang.InfoBar_NoEsp_Title}"
                  IsClosable="False"
                  IsOpen="{x:Bind VM.Method.ShowEspWarning, Mode=OneWay}"
                  Message="{x:Bind lang:Lang.InfoBar_NoEsp_Message}"
                  Severity="Informational" />
 
-        <!--  ═══ 部署方式 ═══  -->
-        <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Method_Header}" />
-        <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Method_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Method_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE7B8;}" IsEnabled="{x:Bind VM.Method.IsDiskSelected, Mode=OneWay}">
-          <RadioButtons x:Name="MethodRadioButtons"
+      <!--  ═══ 部署方式 ═══  -->
+      <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Method_Header}" />
+      <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Method_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Method_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE7B8;}" IsEnabled="{x:Bind VM.Method.IsDiskSelected, Mode=OneWay}">
+        <RadioButtons x:Name="MethodRadioButtons"
                         Margin="0,0,0,5"
                         VerticalAlignment="Center"
                         MaxColumns="2"
                         SelectionChanged="DeployMethod_MethodSelectionChanged">
-            <RadioButton Content="{x:Bind lang:Lang.Page_WizStep_DeployMethod_CleanInstall}" />
-            <RadioButton Content="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartInstall}" IsEnabled="{x:Bind VM.Method.CanUsePartitionInstall, Mode=OneWay}" />
-          </RadioButtons>
-        </cc:SettingsCard>
+          <RadioButton Content="{x:Bind lang:Lang.Page_WizStep_DeployMethod_CleanInstall}" />
+          <RadioButton Content="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartInstall}" IsEnabled="{x:Bind VM.Method.CanUsePartitionInstall, Mode=OneWay}" />
+        </RadioButtons>
+      </cc:SettingsCard>
 
-        <!--  ═══ 分区配置 ═══  -->
-        <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartConfig_Header}" />
-        <cc:SettingsExpander x:Name="PartitionConfigExpander"
+      <!--  ═══ 分区配置 ═══  -->
+      <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartConfig_Header}" />
+      <cc:SettingsExpander x:Name="PartitionConfigExpander"
                              Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartConfig_Desc}"
                              Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartConfig_Header}"
                              HeaderIcon="{ui:FontIcon Glyph=&#xEBC4;}"
                              IsEnabled="{x:Bind VM.Method.IsPartitionConfigEnabled, Mode=OneWay}"
                              IsExpanded="{x:Bind VM.Method.IsPartitionConfigEnabled, Mode=OneWay}">
-          <cc:SettingsExpander.ItemsHeader>
-            <InfoBar Title="{x:Bind lang:Lang.InfoBar_ReservedSizeZero_Title}"
+        <cc:SettingsExpander.ItemsHeader>
+          <InfoBar Title="{x:Bind lang:Lang.InfoBar_ReservedSizeZero_Title}"
                      BorderThickness="0"
                      CornerRadius="0"
                      IsClosable="False"
                      IsOpen="{x:Bind VM.Method.ShowReservedSizeWarning, Mode=OneWay}"
                      Message="{x:Bind lang:Lang.InfoBar_ReservedSizeZero_Message}"
                      Severity="Error" />
-          </cc:SettingsExpander.ItemsHeader>
-          <cc:SettingsExpander.Items>
-            <!--  ESP 分区大小  -->
-            <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_EspSize_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_EspSize_Header}">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <NumberBox x:Name="EspSizeBox"
+        </cc:SettingsExpander.ItemsHeader>
+        <cc:SettingsExpander.Items>
+          <!--  ESP 分区大小  -->
+          <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_EspSize_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_EspSize_Header}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <NumberBox x:Name="EspSizeBox"
                            MinWidth="120"
                            Maximum="500"
                            Minimum="300"
                            SmallChange="10"
                            SpinButtonPlacementMode="Compact"
                            ValueChanged="OnEspSizeChanged" />
-                <TextBlock Width="23"
+              <TextBlock Width="23"
                            VerticalAlignment="Center"
                            FontSize="16"
                            HorizontalTextAlignment="Center"
                            Text="MB" />
-              </StackPanel>
-            </cc:SettingsCard>
-            <!--  OS 分区大小  -->
-            <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsSize_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsSize_Header}">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <NumberBox x:Name="OsSizeBox"
+            </StackPanel>
+          </cc:SettingsCard>
+          <!--  OS 分区大小  -->
+          <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsSize_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsSize_Header}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <NumberBox x:Name="OsSizeBox"
                            MinWidth="120"
                            Value="{x:Bind VM.Method.OsDriveSize, Mode=OneWay}"
                            IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}"
@@ -104,80 +103,78 @@
                            SmallChange="10"
                            SpinButtonPlacementMode="Compact"
                            ValueChanged="OnOsSizeChanged" />
-                <TextBlock Width="23"
+              <TextBlock Width="23"
                            VerticalAlignment="Center"
                            FontSize="16"
                            HorizontalTextAlignment="Center"
                            Text="GB" />
-              </StackPanel>
-            </cc:SettingsCard>
-            <!--  OS 卷标  -->
-            <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsLabel_Header}">
-              <TextBox MinWidth="151" MaxWidth="400" Text="{x:Bind VM.Method.OsDriveLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            </cc:SettingsCard>
-            <!--  保留卷开关  -->
-            <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Reserved_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Reserved_Header}">
-              <ToggleSwitch x:Name="ReservedSwitch" IsOn="{x:Bind VM.Method.EnableReservedVol, Mode=TwoWay}" Toggled="OnReservedSwitchToggled" />
-            </cc:SettingsCard>
-            <!--  保留卷大小  -->
-            <cc:SettingsCard x:Name="ReservedSizeCard" Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedSize_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedSize_Header}" IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock HorizontalAlignment="Right"
+            </StackPanel>
+          </cc:SettingsCard>
+          <!--  OS 卷标  -->
+          <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_OsLabel_Header}">
+            <TextBox MinWidth="151" MaxWidth="400" Text="{x:Bind VM.Method.OsDriveLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+          </cc:SettingsCard>
+          <!--  保留卷开关  -->
+          <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Reserved_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Reserved_Header}">
+            <ToggleSwitch x:Name="ReservedSwitch" IsOn="{x:Bind VM.Method.EnableReservedVol, Mode=TwoWay}" Toggled="OnReservedSwitchToggled" />
+          </cc:SettingsCard>
+          <!--  保留卷大小  -->
+          <cc:SettingsCard x:Name="ReservedSizeCard" Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedSize_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedSize_Header}" IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock HorizontalAlignment="Right"
                            VerticalAlignment="Center"
                            FontSize="16"
                            FontWeight="Bold"
                            Text="{x:Bind VM.Method.ReservedSizeDisplay, Mode=OneWay}" />
-                <TextBlock Width="23"
+              <TextBlock Width="23"
                            VerticalAlignment="Center"
                            FontSize="16"
                            HorizontalTextAlignment="Center"
                            Text="GB" />
-              </StackPanel>
-            </cc:SettingsCard>
-            <!--  保留卷文件系统  -->
-            <cc:SettingsCard x:Name="ReservedFsCard" Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedFs_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedFs_Header}" IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}">
-              <ComboBox x:Name="ReservedFsComboBox" MinWidth="150" VerticalAlignment="Center" SelectionChanged="OnReservedFsSelectionChanged">
-                <ComboBoxItem Content="NTFS" Tag="ntfs" />
-                <ComboBoxItem Content="FAT32" Tag="fat32" />
-                <ComboBoxItem Content="exFAT" Tag="exfat" />
-              </ComboBox>
-            </cc:SettingsCard>
-            <!--  保留卷卷标  -->
-            <cc:SettingsCard x:Name="ReservedLabelCard" Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Header}" IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}">
-              <TextBox MinWidth="151" MaxWidth="400" PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Placeholder}" Text="{x:Bind VM.Method.ReservedVolLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            </cc:SettingsCard>
-          </cc:SettingsExpander.Items>
-        </cc:SettingsExpander>
+            </StackPanel>
+          </cc:SettingsCard>
+          <!--  保留卷文件系统  -->
+          <cc:SettingsCard x:Name="ReservedFsCard" Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedFs_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedFs_Header}" IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}">
+            <ComboBox x:Name="ReservedFsComboBox" MinWidth="150" VerticalAlignment="Center" SelectionChanged="OnReservedFsSelectionChanged">
+              <ComboBoxItem Content="NTFS" Tag="ntfs" />
+              <ComboBoxItem Content="FAT32" Tag="fat32" />
+              <ComboBoxItem Content="exFAT" Tag="exfat" />
+            </ComboBox>
+          </cc:SettingsCard>
+          <!--  保留卷卷标  -->
+          <cc:SettingsCard x:Name="ReservedLabelCard" Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Header}" IsEnabled="{x:Bind VM.Method.EnableReservedVol, Mode=OneWay}">
+            <TextBox MinWidth="151" MaxWidth="400" PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_ReservedLabel_Placeholder}" Text="{x:Bind VM.Method.ReservedVolLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+          </cc:SettingsCard>
+        </cc:SettingsExpander.Items>
+      </cc:SettingsExpander>
 
-        <!--  ═══ 安装到指定位置 ═══  -->
-        <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelPart_Header}" />
-        <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelPart_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelPart_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE74E;}" IsEnabled="{x:Bind VM.Method.IsPartitionInstallSelected, Mode=OneWay}">
-          <ComboBox x:Name="InstallPartitionComboBox"
+      <!--  ═══ 安装到指定位置 ═══  -->
+      <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelPart_Header}" />
+      <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelPart_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelPart_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE74E;}" IsEnabled="{x:Bind VM.Method.IsPartitionInstallSelected, Mode=OneWay}">
+        <ComboBox x:Name="InstallPartitionComboBox"
                     MinWidth="150"
                     ItemsSource="{x:Bind VM.Method.Partitions, Mode=OneWay}"
                     PlaceholderText="{x:Bind lang:Lang.Page_WizStep_DeployMethod_SelPart_Placeholder}"
                     SelectedItem="{x:Bind VM.Method.SelectedPartition, Mode=TwoWay}">
-            <ComboBox.ItemTemplate>
-              <DataTemplate x:DataType="diskServices:PartitionBasicInfo">
-                <TextBlock Text="{x:Bind DisplayName}" />
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-        </cc:SettingsCard>
-        <InfoBar Title="{x:Bind lang:Lang.InfoBar_PartNoLetter_Title}"
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="diskServices:PartitionBasicInfo">
+              <TextBlock Text="{x:Bind DisplayName}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </cc:SettingsCard>
+      <InfoBar Title="{x:Bind lang:Lang.InfoBar_PartNoLetter_Title}"
                  IsClosable="False"
                  IsOpen="{x:Bind VM.Method.ShowPartitionNoLetter, Mode=OneWay}"
                  Message="{x:Bind lang:Lang.InfoBar_PartNoLetter_Message}"
                  Severity="Error">
-          <InfoBar.ActionButton>
-            <Button Content="{x:Bind lang:Lang.InfoBar_PartNoLetter_ActionBtn}" Click="InfoBar_NoDriveLetter_ActionBtn_Click" HorizontalAlignment="Right"/>
-          </InfoBar.ActionButton>
-        </InfoBar>
-        <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartOsLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartOsLabel_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE8AC;}" IsEnabled="{x:Bind VM.Method.IsPartitionInstallSelected, Mode=OneWay}">
-          <TextBox MinWidth="151" MaxWidth="400" Text="{x:Bind VM.Method.OsDriveLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        </cc:SettingsCard>
-      </StackPanel>
+        <InfoBar.ActionButton>
+          <Button Content="{x:Bind lang:Lang.InfoBar_PartNoLetter_ActionBtn}" Click="InfoBar_NoDriveLetter_ActionBtn_Click" HorizontalAlignment="Right"/>
+        </InfoBar.ActionButton>
+      </InfoBar>
+      <cc:SettingsCard Description="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartOsLabel_Desc}" Header="{x:Bind lang:Lang.Page_WizStep_DeployMethod_PartOsLabel_Header}" HeaderIcon="{ui:FontIcon Glyph=&#xE8AC;}" IsEnabled="{x:Bind VM.Method.IsPartitionInstallSelected, Mode=OneWay}">
+        <TextBox MinWidth="151" MaxWidth="400" Text="{x:Bind VM.Method.OsDriveLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+      </cc:SettingsCard>
     </StackPanel>
   </ScrollViewer>
-
 </Page>

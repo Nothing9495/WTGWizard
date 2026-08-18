@@ -12,341 +12,341 @@
 
   <Page.Resources>
     <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    <Thickness x:Key="FloatingStartDeployButtonMargin">0,0,28,96</Thickness>
   </Page.Resources>
 
   <Grid>
-  <ScrollViewer Grid.Row="0" MaxWidth="{ThemeResource PageContentMaxWidth}" Padding="36,40,36,0">
+    <ScrollViewer Grid.Row="0" MaxWidth="{ThemeResource PageContentMaxWidth}" Padding="{StaticResource StepPagePadding}">
+      <StackPanel Spacing="4" Margin="{StaticResource PageContentBottomMargin}">
+        <!--  标题  -->
+        <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_Title}" />
+        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_Desc}" />
 
-    <StackPanel Spacing="4">
-      <!--  标题  -->
-      <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_Title}" />
-      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_Desc}" />
-
-      <Border MinHeight="100"
+        <Border MinHeight="100"
               Margin="0,24,0,0"
               Padding="16"
               HorizontalAlignment="Stretch"
               Style="{StaticResource CardBorderStyle}">
-        <StackPanel Spacing="8">
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE946;" Opacity="0.7" />
-            <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Title}" />
-          </StackPanel>
-
-          <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind Display.ImageName, Mode=OneWay}" />
-
-          <cc:WrapPanel HorizontalSpacing="16" Orientation="Horizontal" VerticalSpacing="4">
+          <StackPanel Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="8">
-              <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xF012;" Opacity="0.7" />
-              <TextBlock VerticalAlignment="Center"
+              <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE946;" Opacity="0.7" />
+              <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Title}" />
+            </StackPanel>
+
+            <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind Display.ImageName, Mode=OneWay}" />
+
+            <cc:WrapPanel HorizontalSpacing="16" Orientation="Horizontal" VerticalSpacing="4">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xF012;" Opacity="0.7" />
+                <TextBlock VerticalAlignment="Center"
                          Opacity="0.7"
                          Style="{ThemeResource CaptionTextBlockStyle}"
                          Text="{x:Bind VM.Image.FilePath, Mode=OneWay}"
                          TextWrapping="WrapWholeWords"
                          MaxLines="2"
                          TextTrimming="CharacterEllipsis" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE8EC;" Opacity="0.7" />
-              <TextBlock VerticalAlignment="Center" Opacity="0.7" Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind Display.ImageSkuVersion, Mode=OneWay}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE7B8;" Opacity="0.7" />
-              <TextBlock VerticalAlignment="Center" Opacity="0.7" Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind Display.MethodType, Mode=OneWay}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE88E;" Opacity="0.7" />
-              <TextBlock VerticalAlignment="Center" Opacity="0.7" Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind Display.TargetDisk, Mode=OneWay}" />
-            </StackPanel>
-          </cc:WrapPanel>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE8EC;" Opacity="0.7" />
+                <TextBlock VerticalAlignment="Center" Opacity="0.7" Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind Display.ImageSkuVersion, Mode=OneWay}" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE7B8;" Opacity="0.7" />
+                <TextBlock VerticalAlignment="Center" Opacity="0.7" Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind Display.MethodType, Mode=OneWay}" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE88E;" Opacity="0.7" />
+                <TextBlock VerticalAlignment="Center" Opacity="0.7" Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind Display.TargetDisk, Mode=OneWay}" />
+              </StackPanel>
+            </cc:WrapPanel>
 
-          <Border Height="1" Margin="0,8,0,8" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+            <Border Height="1" Margin="0,8,0,8" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-          <cc:WrapPanel HorizontalSpacing="16" Orientation="Horizontal" VerticalSpacing="16">
-            <Border Height="25"
+            <cc:WrapPanel HorizontalSpacing="16" Orientation="Horizontal" VerticalSpacing="16">
+              <Border Height="25"
                     Padding="8,0,8,0"
                     Background="{ThemeResource AccentFillColorTertiaryBrush}"
                     CornerRadius="12"
                     Visibility="{x:Bind VM.Options.HideLocalDisks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-              <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag1}" />
-            </Border>
-            <Border Height="25"
+                <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag1}" />
+              </Border>
+              <Border Height="25"
                     Padding="8,0,8,0"
                     Background="{ThemeResource AccentFillColorTertiaryBrush}"
                     CornerRadius="12"
                     Visibility="{x:Bind VM.Options.PreventDeviceEncryption, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-              <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag2}" />
-            </Border>
-            <Border Height="25"
+                <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag2}" />
+              </Border>
+              <Border Height="25"
                     Padding="8,0,8,0"
                     Background="{ThemeResource AccentFillColorTertiaryBrush}"
                     CornerRadius="12"
                     Visibility="{x:Bind VM.Advanced.DriverEnabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-              <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag3}" />
-            </Border>
-            <Border Height="25"
+                <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag3}" />
+              </Border>
+              <Border Height="25"
                     Padding="8,0,8,0"
                     Background="{ThemeResource AccentFillColorTertiaryBrush}"
                     CornerRadius="12"
                     Visibility="{x:Bind VM.Advanced.CustomAnsFileEnabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-              <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag4}" />
-            </Border>
-            <Border Height="25"
+                <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag4}" />
+              </Border>
+              <Border Height="25"
                     Padding="8,0,8,0"
                     Background="{ThemeResource AccentFillColorTertiaryBrush}"
                     CornerRadius="12"
                     Visibility="{x:Bind VM.Advanced.EnableBootEx, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-              <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag5}" />
-            </Border>
-          </cc:WrapPanel>
-        </StackPanel>
-      </Border>
+                <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_SummaryCard_Tag5}" />
+              </Border>
+            </cc:WrapPanel>
+          </StackPanel>
+        </Border>
 
-      <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_DetailInfoGroup}" />
-      <cc:WrapPanel HorizontalAlignment="Center" HorizontalSpacing="16" Orientation="Horizontal" VerticalSpacing="16">
-        <cc:WrapPanel.ChildrenTransitions>
-          <anim:TransitionCollection>
-            <RepositionThemeTransition IsStaggeringEnabled="False" />
-          </anim:TransitionCollection>
-        </cc:WrapPanel.ChildrenTransitions>
+        <TextBlock Margin="0,12,0,6" FontSize="14" FontWeight="SemiBold" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_DetailInfoGroup}" />
+        <cc:WrapPanel HorizontalAlignment="Center" HorizontalSpacing="16" Orientation="Horizontal" VerticalSpacing="16">
+          <cc:WrapPanel.ChildrenTransitions>
+            <anim:TransitionCollection>
+              <RepositionThemeTransition IsStaggeringEnabled="False" />
+            </anim:TransitionCollection>
+          </cc:WrapPanel.ChildrenTransitions>
 
-        <!--  Image Info Card  -->
-        <Border Style="{ThemeResource DetailCardStyle}">
-          <StackPanel Spacing="8">
-            <!--  Card title  -->
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xF012;" Opacity="0.7" />
-              <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_Title}" />
-            </StackPanel>
-            <!--  Image Info  -->
-            <Grid ColumnSpacing="8" RowSpacing="8">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-              </Grid.ColumnDefinitions>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
+          <!--  Image Info Card  -->
+          <Border Style="{ThemeResource DetailCardStyle}">
+            <StackPanel Spacing="8">
+              <!--  Card title  -->
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xF012;" Opacity="0.7" />
+                <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_Title}" />
+              </StackPanel>
+              <!--  Image Info  -->
+              <Grid ColumnSpacing="8" RowSpacing="8">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-              <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageFile}" />
-              <TextBlock Grid.Column="1"
+                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageFile}" />
+                <TextBlock Grid.Column="1"
                          MaxLines="2"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind VM.Image.FilePath, Mode=OneWay}"
                          TextTrimming="CharacterEllipsis"
                          TextWrapping="WrapWholeWords" />
 
-              <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageIndex}" />
-              <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.ImageIndex, Mode=OneWay}" />
+                <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageIndex}" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.ImageIndex, Mode=OneWay}" />
 
-              <TextBlock Grid.Row="2" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageName}" />
-              <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.ImageName, Mode=OneWay}" />
+                <TextBlock Grid.Row="2" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageName}" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.ImageName, Mode=OneWay}" />
 
-              <TextBlock Grid.Row="3" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageSKU}" />
-              <TextBlock Grid.Row="3" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.ImageSku, Mode=OneWay}" />
+                <TextBlock Grid.Row="3" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageSKU}" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.ImageSku, Mode=OneWay}" />
 
-              <TextBlock Grid.Row="4" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageFeatureUpd}" />
-              <TextBlock Grid.Row="4" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.FeatureVersion}" />
+                <TextBlock Grid.Row="4" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageFeatureUpd}" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.FeatureVersion}" />
 
-              <TextBlock Grid.Row="5" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageArchitecture}" />
-              <TextBlock Grid.Row="5" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.Architecture}" />
+                <TextBlock Grid.Row="5" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageArchitecture}" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.Architecture}" />
 
-              <TextBlock Grid.Row="6" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageBuildVer}" />
-              <TextBlock Grid.Row="6" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.BuildNumber}" />
-            </Grid>
-          </StackPanel>
-        </Border>
-
-        <!--  Deploy Method Card  -->
-        <Border Style="{ThemeResource DetailCardStyle}">
-          <StackPanel Spacing="8">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE88E;" Opacity="0.7" />
-              <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Title}" />
+                <TextBlock Grid.Row="6" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_ImageConfig_ImageBuildVer}" />
+                <TextBlock Grid.Row="6" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.BuildNumber}" />
+              </Grid>
             </StackPanel>
-            <Grid ColumnSpacing="8" RowSpacing="8">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-              </Grid.ColumnDefinitions>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
+          </Border>
 
-              <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_TargetDisk}" />
-              <TextBlock Grid.Column="1"
+          <!--  Deploy Method Card  -->
+          <Border Style="{ThemeResource DetailCardStyle}">
+            <StackPanel Spacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE88E;" Opacity="0.7" />
+                <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_DeployMethod_Title}" />
+              </StackPanel>
+              <Grid ColumnSpacing="8" RowSpacing="8">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_TargetDisk}" />
+                <TextBlock Grid.Column="1"
                          MaxLines="2"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.TargetDisk, Mode=OneWay}"
                          TextTrimming="CharacterEllipsis"
                          TextWrapping="WrapWholeWords" />
 
-              <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_InstallationType}" />
-              <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.MethodType, Mode=OneWay}" />
+                <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_InstallationType}" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.MethodType, Mode=OneWay}" />
 
-              <Border Grid.Row="2" Grid.ColumnSpan="2" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                <Border Grid.Row="2" Grid.ColumnSpan="2" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-              <!--  此处Value绑定到IsCleanInstall的布尔值  -->
-              <cc:SwitchPresenter Grid.Row="3" Grid.ColumnSpan="2" TargetType="x:Boolean" Value="{x:Bind VM.Method.IsCleanInstall, Mode=OneWay}">
-                <cc:Case Value="True">
-                  <Grid ColumnSpacing="8" RowSpacing="8">
-                    <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="Auto" />
-                      <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                      <RowDefinition Height="Auto" />
-                      <RowDefinition Height="Auto" />
-                      <RowDefinition Height="Auto" />
-                      <RowDefinition Height="Auto" />
-                      <RowDefinition Height="Auto" />
-                      <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <!--  此处Value绑定到IsCleanInstall的布尔值  -->
+                <cc:SwitchPresenter Grid.Row="3" Grid.ColumnSpan="2" TargetType="x:Boolean" Value="{x:Bind VM.Method.IsCleanInstall, Mode=OneWay}">
+                  <cc:Case Value="True">
+                    <Grid ColumnSpacing="8" RowSpacing="8">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                      </Grid.ColumnDefinitions>
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                      </Grid.RowDefinitions>
 
-                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_EspSize}" />
-                    <TextBlock Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.EspSize, Mode=OneWay}" />
+                      <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_EspSize}" />
+                      <TextBlock Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.EspSize, Mode=OneWay}" />
 
-                    <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_OsSize}" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.OsSize, Mode=OneWay}" />
+                      <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_OsSize}" />
+                      <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.OsSize, Mode=OneWay}" />
 
-                    <TextBlock Grid.Row="2" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_OsLabel}" />
-                    <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.OsLabel, Mode=OneWay}" />
+                      <TextBlock Grid.Row="2" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_OsLabel}" />
+                      <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.OsLabel, Mode=OneWay}" />
 
-                    <TextBlock Grid.Row="3" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_ReservedSize}" Visibility="{x:Bind Display.ReservedVolVisible, Mode=OneWay}" />
-                    <TextBlock Grid.Row="3"
+                      <TextBlock Grid.Row="3" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_ReservedSize}" Visibility="{x:Bind Display.ReservedVolVisible, Mode=OneWay}" />
+                      <TextBlock Grid.Row="3"
                                Grid.Column="1"
                                Style="{ThemeResource BodyTextBlockStyle}"
                                Text="{x:Bind Display.ReservedVolSize, Mode=OneWay}"
                                Visibility="{x:Bind Display.ReservedVolVisible, Mode=OneWay}" />
 
-                    <TextBlock Grid.Row="4" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_ReservedLabel}" Visibility="{x:Bind Display.ReservedVolVisible, Mode=OneWay}" />
-                    <TextBlock Grid.Row="4"
+                      <TextBlock Grid.Row="4" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_ReservedLabel}" Visibility="{x:Bind Display.ReservedVolVisible, Mode=OneWay}" />
+                      <TextBlock Grid.Row="4"
                                Grid.Column="1"
                                Style="{ThemeResource BodyTextBlockStyle}"
                                Text="{x:Bind Display.ReservedVolLabel, Mode=OneWay}"
                                Visibility="{x:Bind Display.ReservedVolVisible, Mode=OneWay}" />
 
-                    <TextBlock Grid.Row="5" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_ReservedFs}" Visibility="{x:Bind Display.ReservedVolVisible, Mode=OneWay}" />
-                    <TextBlock Grid.Row="5"
+                      <TextBlock Grid.Row="5" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_ReservedFs}" Visibility="{x:Bind Display.ReservedVolVisible, Mode=OneWay}" />
+                      <TextBlock Grid.Row="5"
                                Grid.Column="1"
                                Style="{ThemeResource BodyTextBlockStyle}"
                                Text="{x:Bind Display.ReservedVolFs, Mode=OneWay}"
                                Visibility="{x:Bind Display.ReservedVolVisible, Mode=OneWay}" />
-                  </Grid>
-                </cc:Case>
-                <cc:Case Value="False">
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_TargetPartition}" />
-                    <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.TargetPartition, Mode=OneWay}" />
-                  </StackPanel>
-                </cc:Case>
-              </cc:SwitchPresenter>
-            </Grid>
-          </StackPanel>
-        </Border>
-
-        <!--  Deploy Options Card  -->
-        <Border Style="{ThemeResource DetailCardStyle}">
-          <StackPanel Spacing="8">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE712;" Opacity="0.7" />
-              <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_Title}" />
+                    </Grid>
+                  </cc:Case>
+                  <cc:Case Value="False">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployMethod_TargetPartition}" />
+                      <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.TargetPartition, Mode=OneWay}" />
+                    </StackPanel>
+                  </cc:Case>
+                </cc:SwitchPresenter>
+              </Grid>
             </StackPanel>
+          </Border>
 
-            <Grid ColumnSpacing="8" RowSpacing="8">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-              </Grid.ColumnDefinitions>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
+          <!--  Deploy Options Card  -->
+          <Border Style="{ThemeResource DetailCardStyle}">
+            <StackPanel Spacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xE712;" Opacity="0.7" />
+                <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_Title}" />
+              </StackPanel>
 
-              <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_HideLocalDisks}" />
-              <TextBlock Grid.Column="1" HorizontalAlignment="Right" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.HideLocalDisksStateText, Mode=OneWay}" />
+              <Grid ColumnSpacing="8" RowSpacing="8">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-              <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_PreventBDE}" />
-              <TextBlock Grid.Row="1"
+                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_HideLocalDisks}" />
+                <TextBlock Grid.Column="1" HorizontalAlignment="Right" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.HideLocalDisksStateText, Mode=OneWay}" />
+
+                <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_PreventBDE}" />
+                <TextBlock Grid.Row="1"
                          Grid.Column="1"
                          HorizontalAlignment="Right"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.PreventEncryptionStateText, Mode=OneWay}" />
 
-              <Border Grid.Row="2" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                <Border Grid.Row="2" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-              <TextBlock Grid.Row="3" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_NoDefaultDriveLetter}" />
-              <TextBlock Grid.Row="3"
+                <TextBlock Grid.Row="3" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_NoDefaultDriveLetter}" />
+                <TextBlock Grid.Row="3"
                          Grid.Column="1"
                          HorizontalAlignment="Right"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.NoDefaultDriveLetterStateText, Mode=OneWay}" />
 
-              <TextBlock Grid.Row="4" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_AutoRemoveOSLetter}" />
-              <TextBlock Grid.Row="4"
+                <TextBlock Grid.Row="4" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_AutoRemoveOSLetter}" />
+                <TextBlock Grid.Row="4"
                          Grid.Column="1"
                          HorizontalAlignment="Right"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.AutoRemoveOsLetterStateText, Mode=OneWay}" />
 
-              <Border Grid.Row="5" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                <Border Grid.Row="5" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-              <TextBlock Grid.Row="6" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_UseDismToDeploy}" />
-              <TextBlock Grid.Row="6"
+                <TextBlock Grid.Row="6" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_DeployOptions_UseDismToDeploy}" />
+                <TextBlock Grid.Row="6"
                          Grid.Column="1"
                          HorizontalAlignment="Right"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.UseDismToDeployStateText, Mode=OneWay}" />
-            </Grid>
-          </StackPanel>
-        </Border>
-
-        <!--  Advanced Options Card  -->
-        <Border Style="{ThemeResource DetailCardStyle}">
-          <StackPanel Spacing="8">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xEC7A;" Opacity="0.7" />
-              <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_Title}" />
+              </Grid>
             </StackPanel>
+          </Border>
 
-            <Grid ColumnSpacing="8" RowSpacing="8">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-              </Grid.ColumnDefinitions>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
+          <!--  Advanced Options Card  -->
+          <Border Style="{ThemeResource DetailCardStyle}">
+            <StackPanel Spacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon VerticalAlignment="Center" FontSize="14" Glyph="&#xEC7A;" Opacity="0.7" />
+                <TextBlock Style="{ThemeResource CardHeaderTextStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_Title}" />
+              </StackPanel>
 
-              <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_DriversIntegration}" />
-              <TextBlock Grid.Column="1" HorizontalAlignment="Right" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.DriversIntegrationStateText, Mode=OneWay}" />
+              <Grid ColumnSpacing="8" RowSpacing="8">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-              <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_DriversPath}" />
-              <TextBlock Grid.Row="1"
+                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_DriversIntegration}" />
+                <TextBlock Grid.Column="1" HorizontalAlignment="Right" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.DriversIntegrationStateText, Mode=OneWay}" />
+
+                <TextBlock Grid.Row="1" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_DriversPath}" />
+                <TextBlock Grid.Row="1"
                          Grid.Column="1"
                          MaxLines="2"
                          Style="{ThemeResource BodyTextBlockStyle}"
@@ -354,59 +354,59 @@
                          TextTrimming="CharacterEllipsis"
                          TextWrapping="Wrap" />
 
-              <TextBlock Grid.Row="2" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_AllowUnsignedDrv}" />
-              <TextBlock Grid.Row="2"
+                <TextBlock Grid.Row="2" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_AllowUnsignedDrv}" />
+                <TextBlock Grid.Row="2"
                          Grid.Column="1"
                          HorizontalAlignment="Right"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.AllowUnsignedStateText, Mode=OneWay}" />
 
-              <Border Grid.Row="3" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                <Border Grid.Row="3" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-              <TextBlock Grid.Row="4" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_ImportAnsFile}" />
-              <TextBlock Grid.Row="4"
+                <TextBlock Grid.Row="4" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_ImportAnsFile}" />
+                <TextBlock Grid.Row="4"
                          Grid.Column="1"
                          HorizontalAlignment="Right"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.ImportAnsFileStateText, Mode=OneWay}" />
 
-              <TextBlock Grid.Row="5" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_AnsFilePath}" />
-              <TextBlock Grid.Row="5" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.AnsFilePathDisplay, Mode=OneWay}" />
+                <TextBlock Grid.Row="5" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_AnsFilePath}" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind Display.AnsFilePathDisplay, Mode=OneWay}" />
 
-              <TextBlock Grid.Row="6" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_CleanAnsFile}" />
-              <TextBlock Grid.Row="6"
+                <TextBlock Grid.Row="6" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_CleanAnsFile}" />
+                <TextBlock Grid.Row="6"
                          Grid.Column="1"
                          HorizontalAlignment="Right"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.CleanAnsFileStateText, Mode=OneWay}" />
 
-              <Border Grid.Row="7" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                <Border Grid.Row="7" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-              <TextBlock Grid.Row="8" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_bcdbootVerbose}" />
-              <TextBlock Grid.Row="8"
+                <TextBlock Grid.Row="8" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_bcdbootVerbose}" />
+                <TextBlock Grid.Row="8"
                          Grid.Column="1"
                          HorizontalAlignment="Right"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.BootVerboseStateText, Mode=OneWay}" />
 
-              <TextBlock Grid.Row="9" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_EnableBootEx}" />
-              <TextBlock Grid.Row="9"
+                <TextBlock Grid.Row="9" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind lang:Lang.Page_WizStep_Confirm_InfoCard_AdvancedOptions_EnableBootEx}" />
+                <TextBlock Grid.Row="9"
                          Grid.Column="1"
                          HorizontalAlignment="Right"
                          Style="{ThemeResource BodyTextBlockStyle}"
                          Text="{x:Bind Display.EnableBootExStateText, Mode=OneWay}" />
-            </Grid>
-          </StackPanel>
-        </Border>
-      </cc:WrapPanel>
-    </StackPanel>
-  </ScrollViewer>
+              </Grid>
+            </StackPanel>
+          </Border>
+        </cc:WrapPanel>
+      </StackPanel>
+    </ScrollViewer>
 
     <!-- 悬浮开始部署按钮：叠加层，不随滚动 -->
     <Button x:Name="FloatingStartDeployButton"
             VerticalAlignment="Bottom"
             HorizontalAlignment="Right"
-            Margin="0,0,28,28"
+            Margin="{StaticResource FloatingStartDeployButtonMargin}"
             Padding="20,10"
             CornerRadius="20"
             Style="{ThemeResource AccentButtonStyle}"

@@ -8,23 +8,30 @@
              xmlns:lang="using:WTGWizard.Main.Language"
              mc:Ignorable="d">
 
-  <Grid MaxWidth="{StaticResource PageContentMaxWidth}">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
+  <UserControl.Resources>
+    <SolidColorBrush x:Key="FloatingBarBackgroundBrush"
+           Color="{ThemeResource SystemChromeMediumLowColor}"
+           Opacity="0.75"/>
 
+    <Style x:Key="FloatingBarStyle" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
+      <Setter Property="Background" Value="{ThemeResource FloatingBarBackgroundBrush}" />
+      <Setter Property="Shadow" Value="{StaticResource SharedShadow}" />
+    </Style>
+  </UserControl.Resources>
+
+  <Grid MaxWidth="{StaticResource PageContentMaxWidth}">
     <!-- 步骤内容区 -->
-    <Frame Grid.Row="0"
-           x:Name="StepFrame"
+    <Frame x:Name="StepFrame"
            HorizontalAlignment="Stretch"
-           HorizontalContentAlignment="Stretch" />
+           HorizontalContentAlignment="Stretch"/>
 
     <!-- 底栏 -->
-    <Border Grid.Row="1"
-            Padding="24,12"
-            Style="{StaticResource CardBorderStyle}"
-            Margin="16,16,16,16">
+    <Border Padding="24,12"
+            Style="{StaticResource FloatingBarStyle}"
+            CornerRadius="8"
+            Margin="16,16,16,16"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Stretch">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*" />

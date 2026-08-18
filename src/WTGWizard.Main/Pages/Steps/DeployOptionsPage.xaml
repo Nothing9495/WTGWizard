@@ -10,60 +10,58 @@
       mc:Ignorable="d"
       NavigationCacheMode="Required">
 
-  <ScrollViewer Padding="36,40,36,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
-    <StackPanel Spacing="32">
-      <StackPanel Spacing="4">
-        <!-- 标题 -->
-        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_Title}"
+  <ScrollViewer Padding="{StaticResource StepPagePadding}" MaxWidth="{ThemeResource PageContentMaxWidth}">
+    <StackPanel Spacing="4" Margin="{StaticResource PageContentBottomMargin}">
+      <!-- 标题 -->
+      <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_Title}"
                    Style="{ThemeResource TitleTextBlockStyle}" />
-        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_Desc}"
+      <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_Desc}"
                    Style="{ThemeResource BodyTextBlockStyle}"
                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-        <!-- WinToGo 配置组 -->
-        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_WTGGroup}"
+      <!-- WinToGo 配置组 -->
+      <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_WTGGroup}"
                    FontSize="14"
                    Margin="0,12,0,6"
                    FontWeight="SemiBold"/>
-        <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_HideLocalDisks_Header}"
+      <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_HideLocalDisks_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_DeployOptions_HideLocalDisks_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xEDA2;}">
-          <ToggleSwitch IsOn="{x:Bind VM.Options.HideLocalDisks, Mode=TwoWay}" />
-        </cc:SettingsCard>
-        <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_PreventDeviceEncryption_Header}"
+        <ToggleSwitch IsOn="{x:Bind VM.Options.HideLocalDisks, Mode=TwoWay}" />
+      </cc:SettingsCard>
+      <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_PreventDeviceEncryption_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_DeployOptions_PreventDeviceEncryption_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xE785;}">
-          <ToggleSwitch IsOn="{x:Bind VM.Options.PreventDeviceEncryption, Mode=TwoWay}" />
-        </cc:SettingsCard>
+        <ToggleSwitch IsOn="{x:Bind VM.Options.PreventDeviceEncryption, Mode=TwoWay}" />
+      </cc:SettingsCard>
 
-        <!-- 磁盘配置组 -->
-        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_DiskGroup}"
+      <!-- 磁盘配置组 -->
+      <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_DiskGroup}"
                    FontSize="14"
                    Margin="0,12,0,6"
                    FontWeight="SemiBold"/>
-        <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_NoDefaultDriveLetter_Header}"
+      <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_NoDefaultDriveLetter_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_DeployOptions_NoDefaultDriveLetter_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xECE4;}">
-          <ToggleSwitch IsOn="{x:Bind VM.Options.NoDefaultDriveLetter, Mode=TwoWay}"
+        <ToggleSwitch IsOn="{x:Bind VM.Options.NoDefaultDriveLetter, Mode=TwoWay}"
                         IsEnabled="{x:Bind VM.Method.CanToggleNoDefaultDriveLetter, Mode=OneWay}" />
-        </cc:SettingsCard>
-        <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_RemoveOsDriveLetter_Header}"
+      </cc:SettingsCard>
+      <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_RemoveOsDriveLetter_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_DeployOptions_RemoveOsDriveLetter_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xED1A;}">
-          <ToggleSwitch IsOn="{x:Bind VM.Options.AutoRemoveOsDriveLetter, Mode=TwoWay}" />
-        </cc:SettingsCard>
+        <ToggleSwitch IsOn="{x:Bind VM.Options.AutoRemoveOsDriveLetter, Mode=TwoWay}" />
+      </cc:SettingsCard>
 
-        <!-- 部署配置组 -->
-        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_DeployGroup}"
+      <!-- 部署配置组 -->
+      <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_DeployOptions_DeployGroup}"
                    FontSize="14"
                    Margin="0,12,0,6"
                    FontWeight="SemiBold"/>
-        <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_UseDism_Header}"
+      <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_DeployOptions_UseDism_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_DeployOptions_UseDism_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xE756;}">
-          <ToggleSwitch IsOn="{x:Bind VM.Options.UseDismToDeploy, Mode=TwoWay}" />
-        </cc:SettingsCard>
-      </StackPanel>
+        <ToggleSwitch IsOn="{x:Bind VM.Options.UseDismToDeploy, Mode=TwoWay}" />
+      </cc:SettingsCard>
     </StackPanel>
   </ScrollViewer>
 </Page>

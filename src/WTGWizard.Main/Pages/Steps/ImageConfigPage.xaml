@@ -12,132 +12,129 @@
       mc:Ignorable="d"
       NavigationCacheMode="Required">
 
-  <ScrollViewer Padding="36,40,36,0" MaxWidth="{ThemeResource PageContentMaxWidth}">
-    <StackPanel Spacing="32">
-      <StackPanel Spacing="4">
-        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_Title}"
+  <ScrollViewer Padding="{StaticResource StepPagePadding}" MaxWidth="{ThemeResource PageContentMaxWidth}">
+    <StackPanel Spacing="4" Margin="{StaticResource PageContentBottomMargin}">
+      <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_Title}"
          Style="{ThemeResource TitleTextBlockStyle}" />
-        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_Desc}"
+      <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_Desc}"
          Style="{ThemeResource BodyTextBlockStyle}"
          Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_InfoCardHeader}"
+      <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_InfoCardHeader}"
                   FontSize="14"
                   Margin="0,12,0,6"
                   FontWeight="SemiBold"/>
-        <uc:ImageInfoCard x:Name="ImageInfoCard" />
+      <uc:ImageInfoCard x:Name="ImageInfoCard" />
 
-        <!-- 打开映像失败 InfoBar（与校验状态机无关，独立显示） -->
-        <InfoBar Severity="Error" IsClosable="True" IsOpen="{x:Bind VM.Image.ShowOpenError, Mode=OneWay}"
+      <!-- 打开映像失败 InfoBar（与校验状态机无关，独立显示） -->
+      <InfoBar Severity="Error" IsClosable="True" IsOpen="{x:Bind VM.Image.ShowOpenError, Mode=OneWay}"
                  Title="{x:Bind lang:Lang.InfoBar_ImageOpenFailed_Title}"
                  Message="{x:Bind VM.Image.OpenErrorDisplayMessage, Mode=OneWay}" />
 
-        <!-- 校验状态 InfoBar：进行中（不可关）/ 通过（可关）/ 未通过·失败·未知（不可关） -->
-        <cc:SwitchPresenter TargetType="vm:VerifyStatus"
+      <!-- 校验状态 InfoBar：进行中（不可关）/ 通过（可关）/ 未通过·失败·未知（不可关） -->
+      <cc:SwitchPresenter TargetType="vm:VerifyStatus"
                             Value="{x:Bind VM.Image.VerifyStatus, Mode=OneWay}">
-          <cc:Case Value="Verifying">
-            <InfoBar Severity="Informational" IsClosable="False" IsOpen="True"
+        <cc:Case Value="Verifying">
+          <InfoBar Severity="Informational" IsClosable="False" IsOpen="True"
                      Title="{x:Bind lang:Lang.InfoBar_ImageVerificationInProgress_Title}"
                      Message="{x:Bind lang:Lang.InfoBar_ImageVerificationInProgress_Message}">
-              <InfoBar.ActionButton>
-                <Button Content="{x:Bind lang:Lang.InfoBar_ImageVerificationInProgress_ActionBtn}" Click="CancelVerifyButton_Click" HorizontalAlignment="Right"/>
-              </InfoBar.ActionButton>
-            </InfoBar>
-          </cc:Case>
-          <cc:Case Value="Succeeded">
-            <InfoBar Severity="Success" IsClosable="True" IsOpen="{x:Bind VM.Image.ShowVerifySuccess, Mode=OneWay}"
+            <InfoBar.ActionButton>
+              <Button Content="{x:Bind lang:Lang.InfoBar_ImageVerificationInProgress_ActionBtn}" Click="CancelVerifyButton_Click" HorizontalAlignment="Right"/>
+            </InfoBar.ActionButton>
+          </InfoBar>
+        </cc:Case>
+        <cc:Case Value="Succeeded">
+          <InfoBar Severity="Success" IsClosable="True" IsOpen="{x:Bind VM.Image.ShowVerifySuccess, Mode=OneWay}"
                      Title="{x:Bind lang:Lang.InfoBar_ImageVerificationPass_Title}"
                      Message="{x:Bind lang:Lang.InfoBar_ImageVerificationPass_Message}"
                      CloseButtonClick="VerifySuccessInfoBar_Closed" />
-          </cc:Case>
-          <cc:Case Value="NotPass">
-            <InfoBar Severity="Error" IsClosable="False" IsOpen="True"
+        </cc:Case>
+        <cc:Case Value="NotPass">
+          <InfoBar Severity="Error" IsClosable="False" IsOpen="True"
                      Title="{x:Bind lang:Lang.InfoBar_ImageVerificationNotPass_Title}"
                      Message="{x:Bind VM.Image.VerifyNotPassMessage, Mode=OneWay}" />
-          </cc:Case>
-          <cc:Case Value="Failed">
-            <InfoBar Severity="Error" IsClosable="False" IsOpen="True"
+        </cc:Case>
+        <cc:Case Value="Failed">
+          <InfoBar Severity="Error" IsClosable="False" IsOpen="True"
                      Title="{x:Bind lang:Lang.InfoBar_ImageVerificationFailed_Title}"
                      Message="{x:Bind VM.Image.VerifyFailedMessage, Mode=OneWay}" />
-          </cc:Case>
-          <cc:Case Value="Unknown">
-            <InfoBar Severity="Error" IsClosable="False" IsOpen="True"
+        </cc:Case>
+        <cc:Case Value="Unknown">
+          <InfoBar Severity="Error" IsClosable="False" IsOpen="True"
                      Title="{x:Bind lang:Lang.InfoBar_ImageVerificationUnknown_Title}"
                      Message="{x:Bind VM.Image.VerifyUnknownMessage, Mode=OneWay}" />
-          </cc:Case>
-        </cc:SwitchPresenter>
+        </cc:Case>
+      </cc:SwitchPresenter>
 
-        <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelImgGroup}"
+      <TextBlock Text="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelImgGroup}"
                           FontSize="14"
                           Margin="0,12,0,6"
                           FontWeight="SemiBold"/>
-        <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelImg_Header}"
+      <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelImg_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelImg_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xF012;}">
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <uc:FilePickerControl x:Name="ImageFilePicker"
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <uc:FilePickerControl x:Name="ImageFilePicker"
                                   FileTypeFilter=".wim;.esd"
                                   FileSelected="ImageFilePicker_FileSelected" 
                                   IsEnabled="{x:Bind VM.Image.CanSelectImage, Mode=OneWay}"
                                   VerticalAlignment="Center">
-              <uc:FilePickerControl.ButtonContent>
-                <FontIcon FontSize="14" Glyph="&#xE8A5;" />
-              </uc:FilePickerControl.ButtonContent>
-            </uc:FilePickerControl>
-            <TextBox Text="{x:Bind VM.Image.FilePath, Mode=OneWay}"
+            <uc:FilePickerControl.ButtonContent>
+              <FontIcon FontSize="14" Glyph="&#xE8A5;" />
+            </uc:FilePickerControl.ButtonContent>
+          </uc:FilePickerControl>
+          <TextBox Text="{x:Bind VM.Image.FilePath, Mode=OneWay}"
                      PlaceholderText="{x:Bind lang:Lang.Page_WizStep_ImageConfig_FilePathPlaceholder}"
                      IsReadOnly="True"
                      MinWidth="250"
                      MaxWidth="400"
                      VerticalAlignment="Center" />
-          </StackPanel>
-        </cc:SettingsCard>
+        </StackPanel>
+      </cc:SettingsCard>
 
-        <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelIdx_Header}"
+      <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelIdx_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_ImageConfig_SelIdx_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xF2C7;}">
-          <ComboBox x:Name="ImageIndexComboBox"
+        <ComboBox x:Name="ImageIndexComboBox"
                     ItemsSource="{x:Bind VM.Image.Indices, Mode=OneWay}"
                     SelectedIndex="{x:Bind VM.Image.SelectedIndex, Mode=TwoWay}"
                     PlaceholderText="{x:Bind lang:Lang.Page_WizStep_ImageConfig_IdxCombo_Placeholder}"
                     MinWidth="150"
                     VerticalAlignment="Center"
                     SelectionChanged="ImageIndexComboBox_SelectionChanged"/>
-        </cc:SettingsCard>
+      </cc:SettingsCard>
 
-        <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_Header}"
+      <cc:SettingsCard Header="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_Header}"
                          Description="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_Desc}"
                          HeaderIcon="{ui:FontIcon Glyph=&#xEE6F;}">
-          <cc:SwitchPresenter TargetType="vm:VerifyStatus"
+        <cc:SwitchPresenter TargetType="vm:VerifyStatus"
                               Value="{x:Bind VM.Image.VerifyStatus, Mode=OneWay}">
-            <cc:Case Value="Idle">
-              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click"
+          <cc:Case Value="Idle">
+            <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click"
                       IsEnabled="{x:Bind VM.Image.CanVerify, Mode=OneWay}" />
-            </cc:Case>
-            <cc:Case Value="Verifying">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="{x:Bind VM.Image.VerifyProgressDisplay, Mode=OneWay}"
+          </cc:Case>
+          <cc:Case Value="Verifying">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="{x:Bind VM.Image.VerifyProgressDisplay, Mode=OneWay}"
                            VerticalAlignment="Center"/>
-                <ProgressBar Value="{x:Bind VM.Image.VerifyProgress, Mode=OneWay}"
+              <ProgressBar Value="{x:Bind VM.Image.VerifyProgress, Mode=OneWay}"
                              Maximum="100" Width="150" VerticalAlignment="Center" />
-              </StackPanel>
-            </cc:Case>
-            <cc:Case Value="Succeeded">
-              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
-            </cc:Case>
-            <cc:Case Value="NotPass">
-              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
-            </cc:Case>
-            <cc:Case Value="Failed">
-              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
-            </cc:Case>
-            <cc:Case Value="Unknown">
-              <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
-            </cc:Case>
-          </cc:SwitchPresenter>
-        </cc:SettingsCard>
-      </StackPanel>
+            </StackPanel>
+          </cc:Case>
+          <cc:Case Value="Succeeded">
+            <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
+          </cc:Case>
+          <cc:Case Value="NotPass">
+            <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
+          </cc:Case>
+          <cc:Case Value="Failed">
+            <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
+          </cc:Case>
+          <cc:Case Value="Unknown">
+            <Button Content="{x:Bind lang:Lang.Page_WizStep_ImageConfig_VerifyImg_BtnContent}" Click="VerifyButton_Click" />
+          </cc:Case>
+        </cc:SwitchPresenter>
+      </cc:SettingsCard>
     </StackPanel>
   </ScrollViewer>
-
 </Page>
