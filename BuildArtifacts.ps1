@@ -266,7 +266,8 @@ function Collect-EnvironmentInfo {
 # ============================================================================
 
 function Get-ProjectInfoProperties {
-    $props = @(
+    # 仅 -Diagnostics 模式调用（Collect-ProjectInfo 整体受控），直接全量返回
+    return @(
         "MSBuildVersion",
         "MSBuildToolsPath",
         "TargetFramework",
@@ -283,24 +284,17 @@ function Get-ProjectInfoProperties {
         "LangVersion",
         "Configuration",
         "OutputPath",
-        "PublishDir"
+        "PublishDir",
+        "XamlCompiler",
+        "EnableXbf",
+        "GenerateXbf",
+        "ShouldComputeInputPris",
+        "AppxPriConfigXmlPath",
+        "EnableCoreMrtTooling",
+        "IntermediateOutputPath",
+        "PkgMicrosoft_Windows_SDK_BuildTools",
+        "WindowsSdkBuildToolsVersion"
     )
-
-    if ($Diagnostics) {
-        $props += @(
-            "XamlCompiler",
-            "EnableXbf",
-            "GenerateXbf",
-            "ShouldComputeInputPris",
-            "AppxPriConfigXmlPath",
-            "EnableCoreMrtTooling",
-            "IntermediateOutputPath",
-            "PkgMicrosoft_Windows_SDK_BuildTools",
-            "WindowsSdkBuildToolsVersion"
-        )
-    }
-
-    return $props
 }
 
 function Collect-ProjectInfo {
@@ -1034,19 +1028,19 @@ function Build-FDD {
         Assert-MainPriComplete `
             -Directory $output `
             -Name "FDD-$Architecture"
+
+        Get-FileManifest `
+            -Directory $output `
+            -Name "FDD-$Architecture"
+
+        Write-ImportantFiles `
+            -Directory $output `
+            -Name "FDD-$Architecture"
+
+        Write-WTGWizardReport `
+            -Directory $output `
+            -Name "FDD-$Architecture"
     }
-
-    Get-FileManifest `
-        -Directory $output `
-        -Name "FDD-$Architecture"
-
-    Write-ImportantFiles `
-        -Directory $output `
-        -Name "FDD-$Architecture"
-
-    Write-WTGWizardReport `
-        -Directory $output `
-        -Name "FDD-$Architecture"
 
     Compress-Artifact `
         -Directory $output `
@@ -1085,19 +1079,19 @@ function Build-SCD {
         Assert-MainPriComplete `
             -Directory $output `
             -Name "SCD-$Architecture"
+
+        Get-FileManifest `
+            -Directory $output `
+            -Name "SCD-$Architecture"
+
+        Write-ImportantFiles `
+            -Directory $output `
+            -Name "SCD-$Architecture"
+
+        Write-WTGWizardReport `
+            -Directory $output `
+            -Name "SCD-$Architecture"
     }
-
-    Get-FileManifest `
-        -Directory $output `
-        -Name "SCD-$Architecture"
-
-    Write-ImportantFiles `
-        -Directory $output `
-        -Name "SCD-$Architecture"
-
-    Write-WTGWizardReport `
-        -Directory $output `
-        -Name "SCD-$Architecture"
 
     Compress-Artifact `
         -Directory $output `
@@ -1117,8 +1111,10 @@ try {
     Write-Log "Timestamp: $(Get-Date -Format o)"
     Write-Log "Root: $Root"
 
-    Collect-EnvironmentInfo
-    Collect-ProjectInfo
+    if ($Diagnostics) {
+        Collect-EnvironmentInfo
+        Collect-ProjectInfo
+    }
 
     if (-not $SkipClean) {
         Remove-ProjectBuildArtifacts
