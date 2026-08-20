@@ -410,6 +410,7 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 | Debug Build Dialog | ✅ Complete | `MainWindow.xaml.cs`（`#if DEBUG` 启动弹窗，键 `App.Dialog.DebugBuild.*`） |
 | DiskIOWriter | ⚠️ Stub | `Shared.Services/DiskServices/DiskIOService/DiskIOWriter.cs` (PInvoke Implementation to replace Powershell disk layout creation script.) |
 | 常量收敛（三份重叠） | ✅ Resolved | `WinBuildConstants`（UI 构建阈值）/ `DeploymentConstants`（Worker 超时）/ `DiskConstants`（磁盘布局唯一来源）——见 Pitfall 18 |
+| 构建脚本（并行构建） | ✅ Complete | `BuildArtifacts.ps1`（子进程并行 FDD/SCD + obj/bin 隔离 + 打包分离 + 7za 打包 + Summary 精简；机制与坑见 Pitfall 20/21） |
 
 ---
 
@@ -458,4 +459,19 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
    - 本机安装有 `Microsoft.WindowsAppRuntime.2` 2.3.1.0（与项目 PackageReference 同版本），FDD 走共享注册运行时。
    - 版本实验：WASDK `1.8.260710003`、`2.3.2-experimentala` 仍复现崩溃；`1.7.260224002` 缺 `Microsoft.Windows.Storage.Pickers`（`FileOpenPicker`/`FileSavePicker` 不可用）。
    - 上游参照：[microsoft/WindowsAppSDK#6248](https://github.com/microsoft/WindowsAppSDK/issues/6248)（1.8+ unpackaged self-contained 崩溃，1.7 及更早不重现；Open）。
-   - 当前处置：SCD 构建保留 `SelfContained=true` + `WindowsAppSDKSelfContained=false`（WASDK 框架依赖，需目标机安装 Windows App SDK 2.x）。
+   - 当前处置：SCD 构建保留 `SelfContained=true` + `WindowsAppSDKSelfContained=true`；FDD 用 `WindowsAppSDKSelfContained=false`；obj/bin 按模式隔离后构建顺序无关（FDD/SCD 可并行，见 Pitfall 21）。
+
+20. **构建脚本 PowerShell 5.1 陷阱（BuildArtifacts.ps1）**:
+   - **param 变量与 `$script:` 同名冲突**：`param([string]$LogFile)` 与 `$script:LogFile = ...` 同属脚本作用域——脚本顶层赋值会**覆盖 param 值**。param 已改名 `-ChildLog` 规避；新增 param 时避免与 script-scope 变量同名。
+   - **`Start-Process -PassThru` 的 `$p.ExitCode` 在 PS 5.1 常为空**（`$null -ne 0` 恒真会误判失败）。并行子进程改用**成功标记文件**（`Build-{mode}.log.succeeded`，子进程成功时创建）判定结果；ExitCode 仅作非空时辅助校验。
+   - **native stderr + `$ErrorActionPreference=Stop`**：`& exe 2>&1 | Out-Null` 中 stderr 行会抛 `RemoteException` 终止脚本。调用 7za 等外部命令时**不要合并 stderr**（`-bso0 -bsp0` 静默即可）。
+   - **裸 token 通配符解析**：`-x!*.pdb` 作为裸参数会被 PS 5.1 做通配符解析导致参数错位（7za 归档名被当作输入文件）。排除模式须**经变量传递**（`$excludePdb = '-x!*.pdb'`）。
+   - **`Expand-Archive` 仅接受 `.zip` 扩展名**（不校验内容）：nupkg 解包前需复制改名 `.zip`。
+   - **`DefaultItemExcludes` vs `ItemGroup Remove`（Directory.Build.props）**：SDK 默认 Compile glob 在 targets 阶段（props 之后）添加，props 里的 `Remove` 不作用于后加项（CS0579 特性重复）。须用 `DefaultItemExcludes`（props 中设置，控制默认 glob 排除）；且默认只排除当前 `BaseIntermediateOutputPath`，多模式 obj（`obj\fdd\`/`obj\scd\`）需显式追加 `obj\**`。
+   - **makepri dump 阻塞**：`makepri dump` 在 stdout 经管道时等待 stdin（覆盖确认/EOF）。须 `Start-Process` + `-RedirectStandardInput`（空文件）+ `WaitForExit(60s)` 超时 Kill + 以输出文件存在作成功判据。
+
+21. **并行构建的隔离要求（BuildArtifacts.ps1）**: FDD/SCD 并行 publish（子进程模式，`-PublishOnly`）的前提是**obj 与 bin 双隔离**：
+   - obj：`-p:BaseIntermediateOutputPath=obj\{mode}\`（嵌套 obj 下，Clean 递归覆盖）；`project.assets.json` 必须落在与 restore 相同的 BaseIntermediateOutputPath 下（`--no-restore` 依赖）——restore 须按模式分别执行。
+   - bin：`-p:BaseOutputPath=bin\{mode}\`——仅隔离 obj 时两进程的 XAML 编译器并发写同一 bin 会文件锁（MSB3027 重试耗尽，DeploymentCore.dll 被 `Microsoft.UI.Xaml.Markup.Compiler` 锁定）。
+   - 子进程日志：`-ChildLog` 独立文件（`Build-{mode}.log`）；PriDump 文件名带模式前缀防并行写；打包（7za）统一由主实例在构建完成后执行（`Package-Artifacts`），天然规避缓存竞态。
+   - 子进程解释器：PS7 用 `pwsh`、PS 5.1 用 `powershell.exe`（按 `$PSVersionTable.PSEdition`）。
