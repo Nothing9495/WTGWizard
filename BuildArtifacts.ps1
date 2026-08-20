@@ -399,27 +399,33 @@ function Remove-ProjectBuildArtifacts {
 function Restore-Projects {
     Write-Section "NuGet Restore"
 
-    Write-SubSection "Restore Main"
+    # 按模式分别 restore：project.assets.json 必须落在与 publish 相同的
+    # BaseIntermediateOutputPath 下（--no-restore 依赖），否则 publish 找不到 assets
+    foreach ($mode in @("fdd", "scd")) {
+        Write-SubSection "Restore Main ($mode)"
 
-    Invoke-CommandLogged `
-        -FilePath "dotnet" `
-        -Arguments @(
-            "restore",
-            $MainProject,
-            "--locked-mode"
-        ) `
-        -LogName "restore-main.txt"
+        Invoke-CommandLogged `
+            -FilePath "dotnet" `
+            -Arguments @(
+                "restore",
+                $MainProject,
+                "--locked-mode",
+                "-p:BaseIntermediateOutputPath=obj\$mode\"
+            ) `
+            -LogName "restore-main-$mode.txt"
 
-    Write-SubSection "Restore Worker"
+        Write-SubSection "Restore Worker ($mode)"
 
-    Invoke-CommandLogged `
-        -FilePath "dotnet" `
-        -Arguments @(
-            "restore",
-            $WorkerProject,
-            "--locked-mode"
-        ) `
-        -LogName "restore-worker.txt"
+        Invoke-CommandLogged `
+            -FilePath "dotnet" `
+            -Arguments @(
+                "restore",
+                $WorkerProject,
+                "--locked-mode",
+                "-p:BaseIntermediateOutputPath=obj\$mode\"
+            ) `
+            -LogName "restore-worker-$mode.txt"
+    }
 }
 
 # ============================================================================
@@ -432,7 +438,10 @@ function Publish-Worker {
         [string]$Output,
 
         [Parameter(Mandatory)]
-        [bool]$SelfContained
+        [bool]$SelfContained,
+
+        [Parameter(Mandatory)]
+        [string]$ObjMode
     )
 
     Write-SubSection "Worker publish"
@@ -446,13 +455,14 @@ function Publish-Worker {
         "-p:Platform=$Architecture",
         "-p:Version=$WorkerVer",
         "--no-restore",
-        "-p:SelfContained=$SelfContained"
+        "-p:SelfContained=$SelfContained",
+        "-p:BaseIntermediateOutputPath=obj\$ObjMode\"
     )
 
     Invoke-CommandLogged `
         -FilePath "dotnet" `
         -Arguments $arguments `
-        -LogName "publish-worker-$($SelfContained).txt"
+        -LogName "publish-worker-$($ObjMode).txt"
 }
 
 function Publish-Main {
@@ -464,7 +474,10 @@ function Publish-Main {
         [bool]$SelfContained,
 
         [Parameter(Mandatory)]
-        [string]$WASDKSelfContained
+        [string]$WASDKSelfContained,
+
+        [Parameter(Mandatory)]
+        [string]$ObjMode
     )
 
     Write-SubSection "Main publish"
@@ -479,13 +492,14 @@ function Publish-Main {
         "-p:Version=$MainVer",
         "--no-restore",
         "-p:SelfContained=$SelfContained",
-        "-p:WindowsAppSDKSelfContained=$WASDKSelfContained"
+        "-p:WindowsAppSDKSelfContained=$WASDKSelfContained",
+        "-p:BaseIntermediateOutputPath=obj\$ObjMode\"
     )
 
     Invoke-CommandLogged `
         -FilePath "dotnet" `
         -Arguments $arguments `
-        -LogName "publish-main-$($SelfContained).txt"
+        -LogName "publish-main-$($ObjMode).txt"
 }
 
 # ============================================================================
@@ -1102,12 +1116,14 @@ function Build-FDD {
 
     Publish-Worker `
         -Output $output `
-        -SelfContained $false
+        -SelfContained $false `
+        -ObjMode "fdd"
 
     Publish-Main `
         -Output $output `
         -SelfContained $false `
-        -WASDKSelfContained $false
+        -WASDKSelfContained $false `
+        -ObjMode "fdd"
 
     Validate-PublishOutput `
         -Directory $output `
@@ -1153,12 +1169,14 @@ function Build-SCD {
 
     Publish-Worker `
         -Output $output `
-        -SelfContained $true
+        -SelfContained $true `
+        -ObjMode "scd"
 
     Publish-Main `
         -Output $output `
         -SelfContained $true `
-        -WASDKSelfContained $true
+        -WASDKSelfContained $true `
+        -ObjMode "scd"
 
     Validate-PublishOutput `
         -Directory $output `

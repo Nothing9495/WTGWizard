@@ -2,5 +2,10 @@
   <PropertyGroup>
     <!-- 统一源码路径映射：本地与 CI 产物内嵌路径一致，确定性哈希可复现 -->
     <PathMap>$(MSBuildThisFileDirectory)=src/</PathMap>
+    <!-- 排除全部模式的中间生成文件：SDK 默认仅排除当前 BaseIntermediateOutputPath
+         （如 obj\fdd\），obj\scd\ 等其他模式的生成 .cs 会被默认 Compile glob 捕获，
+         导致 AssemblyInfo 等特性重复（CS0579）。DefaultItemExcludes 须在 props 中设置
+         （作用于 SDK targets 阶段的默认项生成），ItemGroup Remove 在 props 中无效。 -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj\**</DefaultItemExcludes>
   </PropertyGroup>
 </Project>
