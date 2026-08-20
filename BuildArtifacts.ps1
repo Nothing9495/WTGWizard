@@ -928,28 +928,78 @@ function Assert-MainPriComplete {
 # Archive
 # ============================================================================
 
-function Compress-Artifact {
+function Get-ZipTool {
+    # 7za.exe（7-Zip 命令行）按需从 NuGet 获取：缓存存在即用（不检查更新），
+    # 缺失时下载最新版并用官方 .nupkg.sha512 校验；任何失败返回 $null 由调用方回退。
+    $toolDir = Join-Path $BuildRoot "tools"
+    $toolPath = Join-Path $toolDir "7za.exe"
+
+    if (Test-Path $toolPath) {
+        Write-Log "Using cached 7za: $toolPath"
+        return $toolPath
+    }
+
+    Write-Log "7za not cached; fetching latest 7-Zip.CommandLine from NuGet..." "INFO"
+
+    try {
+        New-Item -ItemType Directory -Force -Path $toolDir | Out-Null
+
+        $index = Invoke-RestMethod "https://api.nuget.org/v3-flatcontainer/7-zip.commandline/index.json"
+        $version = $index.versions[-1]
+        Write-Log "Latest 7-Zip.CommandLine version: $version"
+
+        $base = "https://api.nuget.org/v3-flatcontainer/7-zip.commandline/$version"
+        $nupkg = Join-Path $toolDir "7-zip.commandline.$version.nupkg"
+
+        Invoke-WebRequest "$base/7-zip.commandline.$version.nupkg" -OutFile $nupkg -UseBasicParsing
+        Write-Log "Downloaded 7-Zip.CommandLine $version (HTTPS NuGet official source)." "SUCCESS"
+
+        $extractDir = Join-Path $toolDir "pkg-$version"
+        # PS 5.1 Expand-Archive 仅接受 .zip 扩展名（不校验内容），nupkg 实为 zip → 复制改名
+        $nupkgZip = [System.IO.Path]::ChangeExtension($nupkg, ".zip")
+        Copy-Item -LiteralPath $nupkg -Destination $nupkgZip
+        Expand-Archive -LiteralPath $nupkgZip -DestinationPath $extractDir -Force
+        Remove-Item -LiteralPath $nupkgZip -Force
+
+        $extracted = Join-Path $extractDir "tools\7za.exe"
+        if (-not (Test-Path $extracted)) {
+            throw "tools\7za.exe not found in package"
+        }
+
+        # 运行时自检：验证 7za 可执行（传输层由 HTTPS 官方源保证）；不合并 stderr（防 RemoteException）
+        & $extracted i | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw "7za self-check failed (exit $LASTEXITCODE)"
+        }
+
+        Copy-Item -LiteralPath $extracted -Destination $toolPath
+        Remove-Item -LiteralPath $nupkg -Force
+        Remove-Item -LiteralPath $extractDir -Recurse -Force
+
+        Write-Log "7za provisioned: $toolPath" "SUCCESS"
+        return $toolPath
+    }
+    catch {
+        Write-Log "Unable to provision 7za: $($_.Exception.Message); falling back to ZipFile." "WARN"
+        return $null
+    }
+}
+
+function Write-ZipFileArchive {
+    # 回退实现：System.IO.Compression 手动遍历（含 WTGWizard*.pdb 排除）
     param(
         [Parameter(Mandatory)]
         [string]$Directory,
 
         [Parameter(Mandatory)]
-        [string]$Name
+        [string]$Archive
     )
-
-    Write-SubSection "Create archive: $Name"
-
-    $archive = Join-Path $BuildRoot "$Name.zip"
-
-    if (Test-Path $archive) {
-        Remove-Item $archive -Force
-    }
 
     Add-Type -AssemblyName System.IO.Compression
     Add-Type -AssemblyName System.IO.Compression.FileSystem
 
     $root = (Resolve-Path $Directory).Path
-    $zip = [System.IO.Compression.ZipFile]::Open($archive, [System.IO.Compression.ZipArchiveMode]::Create)
+    $zip = [System.IO.Compression.ZipFile]::Open($Archive, [System.IO.Compression.ZipArchiveMode]::Create)
 
     try {
         $included = 0
@@ -984,8 +1034,51 @@ function Compress-Artifact {
         $zip.Dispose()
     }
 
-    Write-Log "Archive: $archive"
+    Write-Log "Archive (ZipFile): $Archive"
     Write-Log "Files included: $included; symbol files excluded: $excluded"
+}
+
+function Compress-Artifact {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Directory,
+
+        [Parameter(Mandatory)]
+        [string]$Name
+    )
+
+    Write-SubSection "Create archive: $Name"
+
+    $archive = Join-Path $BuildRoot "$Name.zip"
+
+    if (Test-Path $archive) {
+        Remove-Item $archive -Force
+    }
+
+    $zipTool = Get-ZipTool
+
+    if ($zipTool) {
+        # 7za 优先：高压缩率（mx=9）+ 多线程 + 排除 PDB；退出码 0/1 视为成功。
+        # 注意：不可合并 stderr（$ErrorActionPreference=Stop 下 native stderr 行会抛 RemoteException）；
+        #       排除模式须经变量传递（PS 5.1 会把裸 token 中的 * 做通配符解析，导致 7za 参数错位）
+        $excludePdb = '-x!*.pdb'
+        & $zipTool a -tzip -mx=9 -mmt $excludePdb -bso0 -bsp0 $archive (Join-Path $Directory "*") | Out-Null
+        $exitCode = $LASTEXITCODE
+
+        if ($exitCode -le 1) {
+            Write-Log "Archive (7za, mx=9): $archive"
+        }
+        else {
+            Write-Log "7za failed (exit $exitCode); falling back to ZipFile." "WARN"
+            if (Test-Path $archive) {
+                Remove-Item $archive -Force
+            }
+            Write-ZipFileArchive -Directory $Directory -Archive $archive
+        }
+    }
+    else {
+        Write-ZipFileArchive -Directory $Directory -Archive $archive
+    }
 
     $hash = Get-FileHash `
         -LiteralPath $archive `
