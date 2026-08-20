@@ -22,6 +22,10 @@ param(
 
     [switch]$Diagnostics,
 
+    [switch]$PublishOnly,
+
+    [string]$ChildLog,
+
     [int]$MinXbfCount = 20
 )
 
@@ -53,6 +57,12 @@ $Rid = "win-$Architecture"
 # ============================================================================
 
 $script:LogFile = Join-Path $DiagnosticsRoot "Build.log"
+
+if ($ChildLog) {
+    # 并行子进程模式：独立日志文件，避免多进程并发写 Build.log
+    # （注意：param 变量不能与 $script:LogFile 同名——同作用域赋值会互相覆盖）
+    $script:LogFile = $ChildLog
+}
 
 function Initialize-Directories {
     New-Item -ItemType Directory -Force -Path $BuildRoot | Out-Null
@@ -432,7 +442,7 @@ function Restore-Projects {
 # Build / Publish
 # ============================================================================
 
-function Publish-Worker {
+function Build-Worker {
     param(
         [Parameter(Mandatory)]
         [string]$Output,
@@ -456,7 +466,8 @@ function Publish-Worker {
         "-p:Version=$WorkerVer",
         "--no-restore",
         "-p:SelfContained=$SelfContained",
-        "-p:BaseIntermediateOutputPath=obj\$ObjMode\"
+        "-p:BaseIntermediateOutputPath=obj\$ObjMode\",
+        "-p:BaseOutputPath=bin\$ObjMode\"
     )
 
     Invoke-CommandLogged `
@@ -465,7 +476,7 @@ function Publish-Worker {
         -LogName "publish-worker-$($ObjMode).txt"
 }
 
-function Publish-Main {
+function Build-Main {
     param(
         [Parameter(Mandatory)]
         [string]$Output,
@@ -493,7 +504,8 @@ function Publish-Main {
         "--no-restore",
         "-p:SelfContained=$SelfContained",
         "-p:WindowsAppSDKSelfContained=$WASDKSelfContained",
-        "-p:BaseIntermediateOutputPath=obj\$ObjMode\"
+        "-p:BaseIntermediateOutputPath=obj\$ObjMode\",
+        "-p:BaseOutputPath=bin\$ObjMode\"
     )
 
     Invoke-CommandLogged `
@@ -787,22 +799,28 @@ function Get-PriXbfNames {
         [string]$PriPath,
 
         [Parameter()]
-        [string]$MakePriPath
+        [string]$MakePriPath,
+
+        [Parameter()]
+        [string]$DumpPrefix
     )
 
     $xbfNames = @()
 
     if ($MakePriPath) {
-        $dumpFile = Join-Path $DiagnosticsRoot ("PriDump-{0}.xml" -f (Split-Path $PriPath -Leaf))
+        $baseName = Split-Path $PriPath -Leaf
+        $dumpName = if ($DumpPrefix) { "PriDump-$DumpPrefix-$baseName.xml" } else { "PriDump-$baseName.xml" }
+        $dumpFile = Join-Path $DiagnosticsRoot $dumpName
         $priFull = (Resolve-Path $PriPath).Path
 
         if (Test-Path $dumpFile) {
             Remove-Item -LiteralPath $dumpFile -Force
         }
 
-        $baseName = Split-Path $PriPath -Leaf
-        $stdoutFile = Join-Path $DiagnosticsRoot ("PriDump-{0}.stdout.txt" -f $baseName)
-        $stderrFile = Join-Path $DiagnosticsRoot ("PriDump-{0}.stderr.txt" -f $baseName)
+        $stdoutName = if ($DumpPrefix) { "PriDump-$DumpPrefix-$baseName.stdout.txt" } else { "PriDump-$baseName.stdout.txt" }
+        $stderrName = if ($DumpPrefix) { "PriDump-$DumpPrefix-$baseName.stderr.txt" } else { "PriDump-$baseName.stderr.txt" }
+        $stdoutFile = Join-Path $DiagnosticsRoot $stdoutName
+        $stderrFile = Join-Path $DiagnosticsRoot $stderrName
         $nullInput = Join-Path $env:TEMP "makepri-empty-input.txt"
 
         if (-not (Test-Path $nullInput)) {
@@ -926,7 +944,7 @@ function Assert-MainPriComplete {
         Write-Log "makepri not found in NuGet cache; using string-scan fallback." "WARN"
     }
 
-    $xbfNames = Get-PriXbfNames -PriPath $pri -MakePriPath $makePri
+    $xbfNames = Get-PriXbfNames -PriPath $pri -MakePriPath $makePri -DumpPrefix $Name
 
     Write-Log "XBF entries in PRI: $($xbfNames.Count) (threshold: $MinXbfCount)"
 
@@ -1104,109 +1122,105 @@ function Compress-Artifact {
 }
 
 # ============================================================================
-# Build FDD
+# Build variants
 # ============================================================================
 
-function Build-FDD {
-    Write-Section "Framework-Dependent Build"
+function Build-Variant {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Output,
 
-    $output = Join-Path $FddOutput $Architecture
+        [Parameter(Mandatory)]
+        [string]$ObjMode,
 
-    New-Item -ItemType Directory -Force -Path $output | Out-Null
+        [Parameter(Mandatory)]
+        [bool]$SelfContained,
 
-    Publish-Worker `
-        -Output $output `
-        -SelfContained $false `
-        -ObjMode "fdd"
+        [Parameter(Mandatory)]
+        [string]$WASDKSelfContained,
 
-    Publish-Main `
-        -Output $output `
-        -SelfContained $false `
-        -WASDKSelfContained $false `
-        -ObjMode "fdd"
+        [Parameter(Mandatory)]
+        [string]$ModeLabel
+    )
+
+    Write-Section "$ModeLabel Build"
+
+    New-Item -ItemType Directory -Force -Path $Output | Out-Null
+
+    Build-Worker `
+        -Output $Output `
+        -SelfContained $SelfContained `
+        -ObjMode $ObjMode
+
+    Build-Main `
+        -Output $Output `
+        -SelfContained $SelfContained `
+        -WASDKSelfContained $WASDKSelfContained `
+        -ObjMode $ObjMode
 
     Validate-PublishOutput `
-        -Directory $output `
-        -SelfContained $false
+        -Directory $Output `
+        -SelfContained $SelfContained
 
     if ($Diagnostics) {
         Write-XbfReport `
-            -Directory $output `
-            -Name "FDD-$Architecture"
+            -Directory $Output `
+            -Name "$ModeLabel-$Architecture"
 
         Assert-MainPriComplete `
-            -Directory $output `
-            -Name "FDD-$Architecture"
+            -Directory $Output `
+            -Name "$ModeLabel-$Architecture"
 
         Get-FileManifest `
-            -Directory $output `
-            -Name "FDD-$Architecture"
+            -Directory $Output `
+            -Name "$ModeLabel-$Architecture"
 
         Write-ImportantFiles `
-            -Directory $output `
-            -Name "FDD-$Architecture"
+            -Directory $Output `
+            -Name "$ModeLabel-$Architecture"
 
         Write-WTGWizardReport `
-            -Directory $output `
-            -Name "FDD-$Architecture"
+            -Directory $Output `
+            -Name "$ModeLabel-$Architecture"
     }
+}
 
-    Compress-Artifact `
-        -Directory $output `
-        -Name "WTGWizard-$ZipTag-$Architecture-FDD"
+function Build-FDD {
+    Build-Variant `
+        -Output (Join-Path $FddOutput $Architecture) `
+        -ObjMode "fdd" `
+        -SelfContained $false `
+        -WASDKSelfContained $false `
+        -ModeLabel "FDD"
+}
+
+function Build-SCD {
+    Build-Variant `
+        -Output (Join-Path $ScdOutput $Architecture) `
+        -ObjMode "scd" `
+        -SelfContained $true `
+        -WASDKSelfContained $true `
+        -ModeLabel "SCD"
 }
 
 # ============================================================================
-# Build SCD
+# Package (build phase completed; archiving is centralized here)
 # ============================================================================
 
-function Build-SCD {
-    Write-Section "Self-Contained Build"
+function Package-Artifacts {
+    Write-Section "Package Artifacts"
 
-    $output = Join-Path $ScdOutput $Architecture
-
-    New-Item -ItemType Directory -Force -Path $output | Out-Null
-
-    Publish-Worker `
-        -Output $output `
-        -SelfContained $true `
-        -ObjMode "scd"
-
-    Publish-Main `
-        -Output $output `
-        -SelfContained $true `
-        -WASDKSelfContained $true `
-        -ObjMode "scd"
-
-    Validate-PublishOutput `
-        -Directory $output `
-        -SelfContained $true
-
-    if ($Diagnostics) {
-        Write-XbfReport `
-            -Directory $output `
-            -Name "SCD-$Architecture"
-
-        Assert-MainPriComplete `
-            -Directory $output `
-            -Name "SCD-$Architecture"
-
-        Get-FileManifest `
-            -Directory $output `
-            -Name "SCD-$Architecture"
-
-        Write-ImportantFiles `
-            -Directory $output `
-            -Name "SCD-$Architecture"
-
-        Write-WTGWizardReport `
-            -Directory $output `
-            -Name "SCD-$Architecture"
+    if ($BuildType -in @("FDD", "Both")) {
+        Compress-Artifact `
+            -Directory (Join-Path $FddOutput $Architecture) `
+            -Name "WTGWizard-$ZipTag-$Architecture-FDD"
     }
 
-    Compress-Artifact `
-        -Directory $output `
-        -Name "WTGWizard-$ZipTag-$Architecture-SCD"
+    if ($BuildType -in @("SCD", "Both")) {
+        Compress-Artifact `
+            -Directory (Join-Path $ScdOutput $Architecture) `
+            -Name "WTGWizard-$ZipTag-$Architecture-SCD"
+    }
 }
 
 # ============================================================================
@@ -1222,33 +1236,112 @@ try {
     Write-Log "Timestamp: $(Get-Date -Format o)"
     Write-Log "Root: $Root"
 
-    if ($Diagnostics) {
-        Collect-EnvironmentInfo
-        Collect-ProjectInfo
+    $buildModes = @()
+    if ($BuildType -in @("SCD", "Both")) { $buildModes += "SCD" }
+    if ($BuildType -in @("FDD", "Both")) { $buildModes += "FDD" }
+
+    if (-not $PublishOnly) {
+        if ($Diagnostics) {
+            Collect-EnvironmentInfo
+            Collect-ProjectInfo
+        }
+
+        if (-not $SkipClean) {
+            Remove-ProjectBuildArtifacts
+        }
+        else {
+            Write-Log "WARNING: Build cleanup skipped." "WARN"
+        }
+
+        Restore-Projects
+
+        if (-not $SkipTests) {
+            Write-Section "Tests"
+
+            Write-Log "Test execution is currently disabled by default."
+            Write-Log "Enable explicitly if the solution has a stable test target."
+        }
     }
 
-    if (-not $SkipClean) {
-        Remove-ProjectBuildArtifacts
+    if ($PublishOnly) {
+        # 子进程模式（并行构建的子任务）：仅构建本模式，不打包
+        foreach ($m in $buildModes) {
+            if ($m -eq "SCD") { Build-SCD } else { Build-FDD }
+        }
+    }
+    elseif ($buildModes.Count -gt 1) {
+        # 并行构建：FDD/SCD 各自独立子进程（obj 隔离后互不干扰），日志隔离防并发写
+        Write-Section "Parallel Build"
+
+        $shellPath = if ($PSVersionTable.PSEdition -eq "Core") { "pwsh" } else { "powershell.exe" }
+
+        $procs = @()
+
+        foreach ($m in $buildModes) {
+            $childLog = Join-Path $DiagnosticsRoot "Build-$($m.ToLower()).log"
+            # 清理旧成功标记（PS 5.1 Start-Process 的 ExitCode 常为空，用标记文件判定子进程结果）
+            Remove-Item -LiteralPath "$childLog.succeeded" -Force -ErrorAction SilentlyContinue
+
+            $childArgs = @(
+                "-NoProfile",
+                "-File", $PSCommandPath,
+                "-BuildType", $m,
+                "-PublishOnly",
+                "-SkipClean", "-SkipTests",
+                "-Architecture", $Architecture,
+                "-MainVer", $MainVer,
+                "-WorkerVer", $WorkerVer,
+                "-ZipTag", $ZipTag,
+                "-MinXbfCount", "$MinXbfCount",
+                "-ChildLog", $childLog
+            )
+            if ($Diagnostics) { $childArgs += "-Diagnostics" }
+
+            $consoleLog = Join-Path $DiagnosticsRoot "Build-$($m.ToLower())-console.log"
+            Write-Log "Starting child build ($m): $shellPath $($childArgs -join ' ')"
+
+            $procs += Start-Process `
+                -FilePath $shellPath `
+                -ArgumentList $childArgs `
+                -RedirectStandardOutput $consoleLog `
+                -RedirectStandardError "$consoleLog.err" `
+                -PassThru `
+                -WindowStyle Hidden
+        }
+
+        $failed = $false
+
+        for ($i = 0; $i -lt $procs.Count; $i++) {
+            $p = $procs[$i]
+            $m = $buildModes[$i]
+            $childLog = Join-Path $DiagnosticsRoot "Build-$($m.ToLower()).log"
+            $p.WaitForExit()
+
+            $succeeded = Test-Path -LiteralPath "$childLog.succeeded"
+
+            if (-not $succeeded -or ($p.ExitCode -ne $null -and $p.ExitCode -ne 0)) {
+                $failed = $true
+                Write-Log "Child build ($m) failed (exit $($p.ExitCode))." "ERROR"
+            }
+            else {
+                Write-Log "Child build ($m) completed (exit $($p.ExitCode))." "SUCCESS"
+            }
+        }
+
+        if ($failed) {
+            throw "One or more parallel child builds failed."
+        }
     }
     else {
-        Write-Log "WARNING: Build cleanup skipped." "WARN"
+        # 单模式构建（主实例）
+        foreach ($m in $buildModes) {
+            if ($m -eq "SCD") { Build-SCD } else { Build-FDD }
+        }
     }
 
-    Restore-Projects
-
-    if (-not $SkipTests) {
-        Write-Section "Tests"
-
-        Write-Log "Test execution is currently disabled by default."
-        Write-Log "Enable explicitly if the solution has a stable test target."
-    }
-
-    if ($BuildType -in @("SCD", "Both")) {
-        Build-SCD
-    }
-
-    if ($BuildType -in @("FDD", "Both")) {
-        Build-FDD
+    # 打包阶段：构建全部完成后统一执行（主实例独占，规避 7za 缓存竞态）
+    if (-not $PublishOnly) {
+        Package-Artifacts
     }
 
     Write-Section "Build Summary"
@@ -1257,17 +1350,37 @@ try {
     Write-Log "Output root: $OutputRoot"
     Write-Log "Diagnostics: $DiagnosticsRoot"
 
-    Get-ChildItem `
-        -LiteralPath $BuildRoot `
-        -File `
-        -Recurse `
-        -Force |
-        Sort-Object FullName |
-        ForEach-Object {
-            Write-Log "$($_.FullName) [$($_.Length) bytes]"
-        }
+    if ($Diagnostics) {
+        # 诊断模式：完整文件列表
+        Get-ChildItem `
+            -LiteralPath $BuildRoot `
+            -File `
+            -Recurse `
+            -Force |
+            Sort-Object FullName |
+            ForEach-Object {
+                Write-Log "$($_.FullName) [$($_.Length) bytes]"
+            }
+    }
+    else {
+        # 默认：仅核心产物（zip）
+        Get-ChildItem `
+            -LiteralPath $BuildRoot `
+            -File `
+            -Force |
+            Where-Object { $_.Name -like "WTGWizard-*.zip" } |
+            Sort-Object Name |
+            ForEach-Object {
+                Write-Log "$($_.Name) [$($_.Length) bytes]"
+            }
+    }
 
     Write-Log "WTGWizard build finished successfully." "SUCCESS"
+
+    if ($ChildLog) {
+        # 成功标记：主实例据此判定子进程结果（PS 5.1 下 Start-Process 的 ExitCode 常为空）
+        New-Item -ItemType File -Path "$ChildLog.succeeded" -Force | Out-Null
+    }
 }
 catch {
     Write-Section "BUILD FAILED"
