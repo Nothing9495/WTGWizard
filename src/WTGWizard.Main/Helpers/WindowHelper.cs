@@ -46,12 +46,14 @@ internal static class WindowHelper
     }
 
     /// <summary>
-    /// 设置窗口尺寸并自动适配当前显示器工作区。
-    /// 期望尺寸（设计尺寸 × DPI 缩放）逐轴钳制到工作区，居中显示；
-    /// 最小尺寸同时钳制，确保其不会超过实际尺寸（避免高缩放下最小尺寸本身超屏）。
+    /// 设置窗口尺寸。setInitialSize=true（首次启动）：设置初始宽高（基准 × 可用缩放，
+    /// 默认保持基准全尺寸，屏幕放不下才缩小）、最小宽高并居中；
+    /// setInitialSize=false（运行时 DPI 变换）：仅重新计算并设置最小宽高，
+    /// 不主动修改当前宽高（由系统 DPI 缩放处理）与窗口位置。
     /// 应在窗口加载后调用（需 XamlRoot 可用）。
     /// </summary>
-    public static void FitWindow(Window window, double designWidth, double designHeight, double minWidth, double minHeight)
+    public static void SetWindowSize(Window window, double baseWidth, double baseHeight,
+        double minScale = 0.85, double screenRatio = 0.9, bool setInitialSize = true)
     {
         if (window.Content is not FrameworkElement windowContent)
             return;
@@ -65,15 +67,30 @@ internal static class WindowHelper
 
         var scale = windowContent.XamlRoot.RasterizationScale;
 
-        int width = (int)Math.Min(designWidth * scale, workArea.Width);
-        int height = (int)Math.Min(designHeight * scale, workArea.Height);
+        // 基准尺寸（DIP）→ 物理像素；防除零
+        double basePxW = baseWidth * scale;
+        double basePxH = baseHeight * scale;
+        if (basePxW <= 0 || basePxH <= 0)
+            return;
 
+        // 最小宽高：基准 × min(minScale, 可用缩放)，极小屏进一步降低
+        double availableScale = Math.Min(
+            workArea.Width * screenRatio / basePxW,
+            workArea.Height * screenRatio / basePxH);
+        double effectiveMinScale = Math.Min(minScale, availableScale);
+        presenter.PreferredMinimumWidth = Math.Max(1, (int)(basePxW * effectiveMinScale));
+        presenter.PreferredMinimumHeight = Math.Max(1, (int)(basePxH * effectiveMinScale));
+
+        if (!setInitialSize)
+            return; // DPI 变换：仅刷新最小宽高，不触碰当前尺寸与位置
+
+        // 首次启动：初始宽高（默认保持基准全尺寸，屏幕放不下才缩小）+ 居中
+        double fitScale = Math.Min(1.0, availableScale);
+        int width = Math.Max(1, (int)(basePxW * fitScale));
+        int height = Math.Max(1, (int)(basePxH * fitScale));
         int x = workArea.X + (workArea.Width - width) / 2;
         int y = workArea.Y + (workArea.Height - height) / 2;
 
         window.AppWindow.MoveAndResize(new RectInt32(x, y, width, height));
-
-        presenter.PreferredMinimumWidth = (int)Math.Min(minWidth * scale, width);
-        presenter.PreferredMinimumHeight = (int)Math.Min(minHeight * scale, height);
     }
 }

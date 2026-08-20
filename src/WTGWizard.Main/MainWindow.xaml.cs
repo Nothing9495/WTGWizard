@@ -19,8 +19,6 @@ public sealed partial class MainWindow : Window
 {
     private const double DesignWindowWidth = 1150;
     private const double DesignWindowHeight = 800;
-    private const double MinWindowWidth = 970;
-    private const double MinWindowHeight = 680;
 
     private OverlappedPresenter? _windowPresenter;
     private OverlappedPresenterState _currentWindowState;
@@ -59,7 +57,7 @@ public sealed partial class MainWindow : Window
         AppWindow.Changed += (_, args) =>
         {
             if (args.DidPositionChange)
-                RefitIfDisplayChanged();
+                RefitOnDisplayChanged();
         };
 
         // 响应式导航：窗口宽度 >= 1300 DIP 时使用 Left 模式，否则 Top
@@ -128,14 +126,14 @@ public sealed partial class MainWindow : Window
     private void RootGrid_Loaded(object sender, RoutedEventArgs e)
     {
         TitleBarHelper.ApplySystemThemeToCaptionButtons(this, RootGrid.ActualTheme);
-        // 窗口样式控制：自动适配当前显示器工作区（尺寸钳制 + 居中 + 最小尺寸钳制）
-        WindowHelper.FitWindow(this, DesignWindowWidth, DesignWindowHeight, MinWindowWidth, MinWindowHeight);
+        // 窗口样式控制：首次启动设置初始宽高/最小宽高并居中（基准×缩放，屏小才缩）
+        WindowHelper.SetWindowSize(this, DesignWindowWidth, DesignWindowHeight);
         UpdateNavViewPaneMode(RootGrid.ActualWidth);
         _lastWorkArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Nearest).WorkArea;
         _lastScale = RootGrid.XamlRoot.RasterizationScale;
 
         // 系统 DPI 缩放变化时重新适配（工作区/缩放未变化时内部直接返回，内容尺寸变化不会误触发）
-        RootGrid.XamlRoot.Changed += (_, _) => RefitIfDisplayChanged();
+        RootGrid.XamlRoot.Changed += (_, _) => RefitOnDisplayChanged();
 #if DEBUG
         ShowDebugBuildWarning();
 #endif
@@ -144,7 +142,7 @@ public sealed partial class MainWindow : Window
     /// <summary>
     /// 当前显示器工作区或缩放与上次记录不一致时，重新适配窗口尺寸（跨屏/DPI 变化共用）。
     /// </summary>
-    private void RefitIfDisplayChanged()
+    private void RefitOnDisplayChanged()
     {
         if (RootGrid.XamlRoot is null)
             return;
@@ -153,7 +151,8 @@ public sealed partial class MainWindow : Window
         if (workArea == _lastWorkArea && _lastScale == RootGrid.XamlRoot.RasterizationScale)
             return;
 
-        WindowHelper.FitWindow(this, DesignWindowWidth, DesignWindowHeight, MinWindowWidth, MinWindowHeight);
+        // DPI 变换：仅刷新最小宽高，当前尺寸由系统缩放处理，不重设窗口位置
+        WindowHelper.SetWindowSize(this, DesignWindowWidth, DesignWindowHeight, setInitialSize: false);
         _lastWorkArea = workArea;
         _lastScale = RootGrid.XamlRoot.RasterizationScale;
     }
