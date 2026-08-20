@@ -39,9 +39,9 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
@@ -63,7 +63,7 @@ jobs:
 
       - name: Upload artifacts
         if: always() && inputs.upload-artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: WTGWizard-${{ env.UPLOAD_TAG }}
           path: build/WTGWizard-*.zip
@@ -78,7 +78,7 @@ jobs:
 
       - name: Publish to GitHub Releases
         if: inputs.publish-artifact
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           prerelease: ${{ env.IS_PRERELEASE }}
           files: build/WTGWizard-*.zip
