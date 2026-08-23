@@ -25,12 +25,12 @@
 	<ItemGroup>
 		<!-- 图标同时嵌入为 .NET 资源，供运行时标题栏图标使用（无磁盘文件依赖） -->
 		<EmbeddedResource Include="Assets\AppLogo.ico" LogicalName="WTGWizard.Assets.AppLogo.ico" />
-	</ItemGroup>
-
-	<ItemGroup>
+		<Content Include="Assets\WinLogo\*.png" CopyToOutputDirectory="PreserveNewest" />
+		<Content Include="Assets\AppLogo.ico" CopyToOutputDirectory="PreserveNewest" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
+	<!-- Referenced NuGet Packages -->
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
@@ -40,6 +40,7 @@
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
 	</ItemGroup>
 
+	<!-- Project References -->
 	<ItemGroup>
 		<ProjectReference Include="..\WTGWizard.Shared.Services\WTGWizard.Shared.Services.csproj" />
 		<ProjectReference Include="..\WTGWizard.Shared.Common\WTGWizard.Shared.Common.csproj" />
@@ -47,11 +48,7 @@
 		<ProjectReference Include="..\WTGWizard.Main.DeploymentCore\WTGWizard.Main.DeploymentCore.csproj" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Assets\WinLogo\*.png" CopyToOutputDirectory="PreserveNewest" />
-	<Content Include="Assets\AppLogo.ico" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
+	<!-- Copy WTGWizard.Worker Output -->
 	<Target Name="CopyWorkerOutput" AfterTargets="Build">
 		<PropertyGroup>
 			<WorkerOutputPath>$(MSBuildProjectDirectory)\..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)</WorkerOutputPath>
