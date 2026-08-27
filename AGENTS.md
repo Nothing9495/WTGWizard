@@ -53,8 +53,9 @@ Worker is NOT a project reference — MSBuild targets copy Worker output to Main
 # Build
 dotnet build WTGWizard.slnx
 
-# Publish
-dotnet publish src/WTGWizard.Main -c Release -r "win-x64" -o "build" -p:Platform=x64 -p:Version=1.0.0;
+# Publish (发布参数唯一来源：Properties/PublishProfiles/*.pubxml，见 Pitfall 22)
+dotnet publish src/WTGWizard.Main -p:PublishProfile=SCD-x64
+dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\publish\FDD
 ```
 
 - **SDK**: .NET 10.0.302 (rollForward: latestMajor)
@@ -410,7 +411,7 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 | Debug Build Dialog | ✅ Complete | `MainWindow.xaml.cs`（`#if DEBUG` 启动弹窗，键 `App.Dialog.DebugBuild.*`） |
 | DiskIOWriter | ⚠️ Stub | `Shared.Services/DiskServices/DiskIOService/DiskIOWriter.cs` (PInvoke Implementation to replace Powershell disk layout creation script.) |
 | 常量收敛（三份重叠） | ✅ Resolved | `WinBuildConstants`（UI 构建阈值）/ `DeploymentConstants`（Worker 超时）/ `DiskConstants`（磁盘布局唯一来源）——见 Pitfall 18 |
-| 构建脚本（并行构建） | ✅ Complete | `BuildArtifacts.ps1`（子进程并行 FDD/SCD + obj/bin 隔离 + 打包分离 + 7za 打包 + Summary 精简；机制与坑见 Pitfall 20/21） |
+| 构建脚本（PublishProfile 化，单模式） | ✅ Complete | `BuildArtifacts.ps1`（`-BuildType FDD/SCD` 单模式 + 发布参数由 `Properties/PublishProfiles/*.pubxml` 提供 + 并行/隔离机制已移除；机制与坑见 Pitfall 20；Profile 化见 Pitfall 22） |
 
 ---
 
@@ -459,19 +460,19 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
    - 本机安装有 `Microsoft.WindowsAppRuntime.2` 2.3.1.0（与项目 PackageReference 同版本），FDD 走共享注册运行时。
    - 版本实验：WASDK `1.8.260710003`、`2.3.2-experimentala` 仍复现崩溃；`1.7.260224002` 缺 `Microsoft.Windows.Storage.Pickers`（`FileOpenPicker`/`FileSavePicker` 不可用）。
    - 上游参照：[microsoft/WindowsAppSDK#6248](https://github.com/microsoft/WindowsAppSDK/issues/6248)（1.8+ unpackaged self-contained 崩溃，1.7 及更早不重现；Open）。
-   - 当前处置：SCD 构建保留 `SelfContained=true` + `WindowsAppSDKSelfContained=true`；FDD 用 `WindowsAppSDKSelfContained=false`；obj/bin 按模式隔离后构建顺序无关（FDD/SCD 可并行，见 Pitfall 21）。
+   - 当前处置：SCD 构建保留 `SelfContained=true` + `WindowsAppSDKSelfContained=true`（均在 `SCD-x64.pubxml`）；FDD 用 `WindowsAppSDKSelfContained=false`（`FDD-x64.pubxml`）；构建顺序无关——每次 `BuildArtifacts.ps1` 运行都会 Clean（Pitfall 19 的崩溃仅在共享 obj/bin 中间产物时复现）。
 
 20. **构建脚本 PowerShell 5.1 陷阱（BuildArtifacts.ps1）**:
-   - **param 变量与 `$script:` 同名冲突**：`param([string]$LogFile)` 与 `$script:LogFile = ...` 同属脚本作用域——脚本顶层赋值会**覆盖 param 值**。param 已改名 `-ChildLog` 规避；新增 param 时避免与 script-scope 变量同名。
-   - **`Start-Process -PassThru` 的 `$p.ExitCode` 在 PS 5.1 常为空**（`$null -ne 0` 恒真会误判失败）。并行子进程改用**成功标记文件**（`Build-{mode}.log.succeeded`，子进程成功时创建）判定结果；ExitCode 仅作非空时辅助校验。
    - **native stderr + `$ErrorActionPreference=Stop`**：`& exe 2>&1 | Out-Null` 中 stderr 行会抛 `RemoteException` 终止脚本。调用 7za 等外部命令时**不要合并 stderr**（`-bso0 -bsp0` 静默即可）。
    - **裸 token 通配符解析**：`-x!*.pdb` 作为裸参数会被 PS 5.1 做通配符解析导致参数错位（7za 归档名被当作输入文件）。排除模式须**经变量传递**（`$excludePdb = '-x!*.pdb'`）。
    - **`Expand-Archive` 仅接受 `.zip` 扩展名**（不校验内容）：nupkg 解包前需复制改名 `.zip`。
-   - **`DefaultItemExcludes` vs `ItemGroup Remove`（Directory.Build.props）**：SDK 默认 Compile glob 在 targets 阶段（props 之后）添加，props 里的 `Remove` 不作用于后加项（CS0579 特性重复）。须用 `DefaultItemExcludes`（props 中设置，控制默认 glob 排除）；且默认只排除当前 `BaseIntermediateOutputPath`，多模式 obj（`obj\fdd\`/`obj\scd\`）需显式追加 `obj\**`。
-   - **makepri dump 阻塞**：`makepri dump` 在 stdout 经管道时等待 stdin（覆盖确认/EOF）。须 `Start-Process` + `-RedirectStandardInput`（空文件）+ `WaitForExit(60s)` 超时 Kill + 以输出文件存在作成功判据。
+   - **`DefaultItemExcludes` vs `ItemGroup Remove`（Directory.Build.props）**：SDK 默认 Compile glob 在 targets 阶段（props 之后）添加，props 里的 `Remove` 不作用于后加项（CS0579 特性重复）。须用 `DefaultItemExcludes`（props 中设置，控制默认 glob 排除）。
+   - **makepri dump 阻塞**：`makepri dump` 在 stdout 经管道时等待 stdin（覆盖确认/EOF）。须 `Start-Process` + `-RedirectStandardInput`（空文件）+ `WaitForExit(60s)` 超时 Kill + 以输出文件存在作成功判据。（历史条目：`param` 与 `$script:` 同名冲突、`Start-Process` ExitCode 空、子进程成功标记文件等坑已随并行子进程模式移除——2026-08 并行机制不再使用。）
 
-21. **并行构建的隔离要求（BuildArtifacts.ps1）**: FDD/SCD 并行 publish（子进程模式，`-PublishOnly`）的前提是**obj 与 bin 双隔离**：
-   - obj：`-p:BaseIntermediateOutputPath=obj\{mode}\`（嵌套 obj 下，Clean 递归覆盖）；`project.assets.json` 必须落在与 restore 相同的 BaseIntermediateOutputPath 下（`--no-restore` 依赖）——restore 须按模式分别执行。
-   - bin：`-p:BaseOutputPath=bin\{mode}\`——仅隔离 obj 时两进程的 XAML 编译器并发写同一 bin 会文件锁（MSB3027 重试耗尽，DeploymentCore.dll 被 `Microsoft.UI.Xaml.Markup.Compiler` 锁定）。
-   - 子进程日志：`-ChildLog` 独立文件（`Build-{mode}.log`）；PriDump 文件名带模式前缀防并行写；打包（7za）统一由主实例在构建完成后执行（`Package-Artifacts`），天然规避缓存竞态。
-   - 子进程解释器：PS7 用 `pwsh`、PS 5.1 用 `powershell.exe`（按 `$PSVersionTable.PSEdition`）。
+21. **构建脚本 PublishProfile 化（BuildArtifacts.ps1 + Properties/PublishProfiles）**: 发布参数（`SelfContained`/`WindowsAppSDKSelfContained`/`PublishTrimmed`/`Platform`/`RuntimeIdentifier`/`Configuration`）**唯一来源是 `Properties/PublishProfiles/{FDD|SCD}-x64.pubxml`**，脚本/CI 只传 `-p:PublishProfile=…` + `-p:PublishDir=…` + `-p:Version=…`：
+   - **Profile 与构建布线正交**：`BaseIntermediateOutputPath`/`BaseOutputPath` 不再需要按模式注入；脚本每次运行自带 Clean，单模式本机构建（FDD、SCD 分两次跑）天然无中间产物污染。
+   - **本地不支持多实例并发**：同一时间只允许一个 `BuildArtifacts.ps1` 实例（默认 obj/bin 无隔离）；并行由 GitHub Actions matrix（`dotnet-ci.yml`/`dotnet-manual.yml`/`dotnet-tag.yml` 的 `[FDD, SCD]` 双 job，各自独立 VM）承担。
+   - **Restore 单次**：`--locked-mode` 单 obj，不按模式区分。
+   - **Worker 独立验证目录**：Worker 先 publish 到 `build/Worker-{mode}/`（不进 zip，仅验证其 Profile 可用），Main publish 后经 csproj `CopyWorkerBuildOutputToPublish` 把 Worker 的 **Build 输出**（非 Publish 输出）注入 Main 输出——Main SCD 的 .NET/WASDK 运行时由 Main 提供，Worker 共享同目录运行时。
+
+22. **Worker copy target 路径必须含 RID 段（WTGWizard.Main.csproj）**: `CopyWorkerBuildOutput*` 的 `WorkerOutputPath` 为 `..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)`（`RuntimeIdentifier` 非空时追加）。**缺 RID 段时 target 静默复制零文件**——早期版本仅因"Worker 先 publish 到同一目录 + `-o` 不清理残留"而表面上"工作"，Profile 化后该隐式链路已移除。另外：`dotnet publish -o`/`-p:PublishDir` **不会清理目标目录**；依赖"发布目录可能残留旧文件"的行为视为 bug。

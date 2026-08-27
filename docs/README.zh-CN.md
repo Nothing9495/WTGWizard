@@ -56,10 +56,18 @@
 dotnet build WTGWizard.slnx
 ```
 
-发布发布版构建（可选打包为压缩文件）：
+发布发布版构建：
 
 ```powershell
-./BuildArtifacts.ps1 -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
+./BuildArtifacts.ps1 -BuildType FDD -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
+./BuildArtifacts.ps1 -BuildType SCD -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
+```
+
+或直接使用 PublishProfile（发布参数唯一来源为 `Properties/PublishProfiles/*.pubxml`）：
+
+```powershell
+dotnet publish src/WTGWizard.Main -p:PublishProfile=SCD-x64
+dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\publish\FDD
 ```
 
 ## 架构

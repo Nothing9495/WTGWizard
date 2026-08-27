@@ -60,10 +60,19 @@ Requirements:
 dotnet build WTGWizard.slnx
 ```
 
-Publish a release build (optionally zipped):
+Publish a release build:
 
 ```powershell
-./BuildArtifacts.ps1 -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
+# Single mode per run (FDD or SCD); the CI/Release pipeline builds both via GitHub Actions matrix
+./BuildArtifacts.ps1 -BuildType FDD -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
+./BuildArtifacts.ps1 -BuildType SCD -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
+```
+
+Or use the PublishProfile directly (the single source of publish parameters is `Properties/PublishProfiles/*.pubxml`):
+
+```powershell
+dotnet publish src/WTGWizard.Main -p:PublishProfile=SCD-x64
+dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\publish\FDD
 ```
 
 ## Architecture
