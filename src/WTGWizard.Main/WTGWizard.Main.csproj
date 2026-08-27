@@ -47,23 +47,21 @@
 		<ProjectReference Include="..\WTGWizard.Main.DeploymentCore\WTGWizard.Main.DeploymentCore.csproj" />
 	</ItemGroup>
 
-	<!-- Copy WTGWizard.Worker Output -->
-	<Target Name="CopyWorkerOutput" AfterTargets="Build">
-		<PropertyGroup>
-			<WorkerOutputPath>$(MSBuildProjectDirectory)\..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)</WorkerOutputPath>
-		</PropertyGroup>
+	<!-- Copy WTGWizard.Worker Build Output -->
+	<!-- WorkerOutputPath 含 Platform 段（CLI 全局 Platform）与不含 Platform 段（pubxml 内 Platform 晚于
+	     OutputPath 公式求值，见 Pitfall 22）两种形态；用 **/Configuration 兼容两者 -->
+	<Target Name="CopyWorkerBuildOutput" AfterTargets="Build">
 		<ItemGroup>
-			<WorkerOutputFiles Include="$(WorkerOutputPath)\WTGWizard.Worker*" />
+			<WorkerOutputFiles Include="$(MSBuildProjectDirectory)\..\WTGWizard.Worker\bin\**\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\WTGWizard.Worker*" />
+			<WorkerOutputFiles Include="$(MSBuildProjectDirectory)\..\WTGWizard.Worker\bin\**\$(Configuration)\$(TargetFramework)\WTGWizard.Worker*" />
 		</ItemGroup>
 		<Copy SourceFiles="@(WorkerOutputFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
 	</Target>
 
-	<Target Name="CopyWorkerOutputToPublish" AfterTargets="Publish">
-		<PropertyGroup>
-			<WorkerOutputPath>$(MSBuildProjectDirectory)\..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)</WorkerOutputPath>
-		</PropertyGroup>
+	<Target Name="CopyWorkerBuildOutputToPublish" AfterTargets="Publish">
 		<ItemGroup>
-			<WorkerOutputFiles Include="$(WorkerOutputPath)\WTGWizard.Worker*" />
+			<WorkerOutputFiles Include="$(MSBuildProjectDirectory)\..\WTGWizard.Worker\bin\**\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\WTGWizard.Worker*" />
+			<WorkerOutputFiles Include="$(MSBuildProjectDirectory)\..\WTGWizard.Worker\bin\**\$(Configuration)\$(TargetFramework)\WTGWizard.Worker*" />
 		</ItemGroup>
 		<Copy SourceFiles="@(WorkerOutputFiles)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
 	</Target>
