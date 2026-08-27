@@ -5,12 +5,13 @@ on:
 
 jobs:
   run-dotnet-build:
+    strategy:
+      matrix:
+        build-mode: [FDD, SCD]
     uses: ./.github/workflows/dotnet-build.yml
     secrets: inherit
     with:
-      is-prerelease: true
+      build-mode: ${{ matrix.build-mode }}
       upload-artifact: true
-      publish-artifact: false
-      upload-tag: Manual-Build-${{ github.run_id }}
+      upload-tag: Manual-Build-${{ github.run_id }}-${{ matrix.build-mode }}
       diagnostics: true
-# this remark is intented to make the workflow show in Github Actions.

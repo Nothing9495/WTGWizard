@@ -5,15 +5,39 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   run-dotnet-build:
+    strategy:
+      matrix:
+        build-mode: [FDD, SCD]
     uses: ./.github/workflows/dotnet-build.yml
     secrets: inherit
     with:
+      build-mode: ${{ matrix.build-mode }}
       upload-artifact: true
       upload-tag: ${{ github.ref_name }}
-      publish-artifact: true
       main-version: ${{ github.ref_name }}
       worker-version: '1.0.0'
-      # 三段构建号后含 preview 字样 → 作为 Pre-release 发布
-      is-prerelease: ${{ contains(github.ref_name, 'preview') }}
+      diagnostics: false
+
+  release:
+    needs: run-dotnet-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v7
+        with:
+          pattern: WTGWizard-${{ github.ref_name }}-*
+          path: release
+          merge-multiple: true
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v3
+        with:
+          # 三段构建号后含 preview 字样 → 作为 Pre-release 发布
+          prerelease: ${{ contains(github.ref_name, 'preview') }}
+          files: release/WTGWizard-*.zip
+          tag_name: ${{ github.ref_name }}

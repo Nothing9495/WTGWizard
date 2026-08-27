@@ -3,24 +3,22 @@ name: Build WTGWizard
 on:
   workflow_call:
     inputs:
+      build-mode:
+        type: string
+        required: true
+        description: "Build variant: FDD or SCD"
       upload-artifact:
         type: boolean
         default: true
       upload-tag:
         type: string
         default: "Build-Artifacts"
-      publish-artifact:
-        type: boolean
-        default: false
       main-version:
         type: string
         default: "1.0.0"
       worker-version:
         type: string
         default: "1.0.0"
-      is-prerelease:
-        type: boolean
-        default: true
       architecture:
         type: string
         default: "x64"
@@ -32,7 +30,6 @@ permissions:
   contents: write
 
 env:
-  IS_PRERELEASE: ${{ inputs.is-prerelease }}
   UPLOAD_TAG: ${{ inputs.upload-tag }}
 
 jobs:
@@ -45,12 +42,20 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
       # 版本去 v 由工作流处理（tag 如 v1.2.3-preview1 → 1.2.3-preview1）
-      - name: Build artfacts
+      - name: Build artifacts (${{ inputs.build-mode }})
         shell: pwsh
         run: |
           $mainVer = "${{ inputs.main-version }}" -replace '^v',''
           $scriptArgs = @{
+            BuildType    = "${{ inputs.build-mode }}"
             Architecture = "${{ inputs.architecture }}"
             MainVer      = $mainVer
             WorkerVer    = "${{ inputs.worker-version }}"
@@ -65,21 +70,13 @@ jobs:
         if: always() && inputs.upload-artifact
         uses: actions/upload-artifact@v7
         with:
-          name: WTGWizard-${{ env.UPLOAD_TAG }}
+          name: WTGWizard-${{ env.UPLOAD_TAG }}-${{ inputs.build-mode }}
           path: build/WTGWizard-*.zip
           if-no-files-found: warn
 
       - name: Upload build diagnostics
         if: always() && inputs.diagnostics
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
-          name: WTGWizard-Diagnostics-${{ env.UPLOAD_TAG }}
+          name: WTGWizard-Diagnostics-${{ env.UPLOAD_TAG }}-${{ inputs.build-mode }}
           path: build/BuildDiagnostics
-
-      - name: Publish to GitHub Releases
-        if: inputs.publish-artifact
-        uses: softprops/action-gh-release@v3
-        with:
-          prerelease: ${{ env.IS_PRERELEASE }}
-          files: build/WTGWizard-*.zip
-          tag_name: ${{ env.UPLOAD_TAG }}

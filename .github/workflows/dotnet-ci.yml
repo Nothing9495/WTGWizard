@@ -12,9 +12,12 @@ on:
 
 jobs:
   run-dotnet-build:
+    strategy:
+      matrix:
+        build-mode: [FDD, SCD]
     uses: ./.github/workflows/dotnet-build.yml
     secrets: inherit
     with:
+      build-mode: ${{ matrix.build-mode }}
       upload-artifact: true
-      publish-artifact: false
       diagnostics: true

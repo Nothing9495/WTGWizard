@@ -2,13 +2,11 @@
 
 [CmdletBinding()]
 param(
-    [ValidateSet("x64", "arm64")]
+    [ValidateSet("x64")]
     [string]$Architecture = "x64",
 
-    [ValidateSet("FDD", "SCD", "Both")]
-    [string]$BuildType = "Both",
-
-    [string]$Configuration = "Release",
+    [ValidateSet("FDD", "SCD")]
+    [string]$BuildType = "FDD",
 
     [string]$MainVer = "1.0.0",
 
@@ -21,10 +19,6 @@ param(
     [switch]$SkipTests,
 
     [switch]$Diagnostics,
-
-    [switch]$PublishOnly,
-
-    [string]$ChildLog,
 
     [int]$MinXbfCount = 20
 )
@@ -50,19 +44,15 @@ $DiagnosticsRoot = Join-Path $BuildRoot "BuildDiagnostics"
 $FddOutput = Join-Path $OutputRoot "FDD"
 $ScdOutput = Join-Path $OutputRoot "SCD"
 
-$Rid = "win-$Architecture"
+# Worker 独立验证输出目录（不进 zip；最终 Main 输出内的 Worker 由 csproj 的
+# CopyWorkerBuildOutput* target 从其 Build 输出注入——注意：因此完成后 Worker 目录仅作校验用）
+$WorkerOutput = Join-Path $BuildRoot ("Worker-" + $BuildType.ToLower())
 
 # ============================================================================
 # Logging
 # ============================================================================
 
 $script:LogFile = Join-Path $DiagnosticsRoot "Build.log"
-
-if ($ChildLog) {
-    # 并行子进程模式：独立日志文件，避免多进程并发写 Build.log
-    # （注意：param 变量不能与 $script:LogFile 同名——同作用域赋值会互相覆盖）
-    $script:LogFile = $ChildLog
-}
 
 function Initialize-Directories {
     New-Item -ItemType Directory -Force -Path $BuildRoot | Out-Null
@@ -225,9 +215,7 @@ function Collect-EnvironmentInfo {
     Write-SubSection "Build parameters"
 
     Write-Log "Root: $Root"
-    Write-Log "Configuration: $Configuration"
     Write-Log "Architecture: $Architecture"
-    Write-Log "RID: $Rid"
     Write-Log "BuildType: $BuildType"
     Write-Log "MainVer: $MainVer"
     Write-Log "WorkerVer: $WorkerVer"
@@ -282,19 +270,24 @@ function Get-ProjectInfoProperties {
         "MSBuildToolsPath",
         "TargetFramework",
         "TargetFrameworkIdentifier",
+        "TargetFrameworkVersion",
+        "TargetPlatformMinVersion",
+        "SupportedOSPlatformVersion",
         "Platform",
         "PlatformTarget",
         "RuntimeIdentifier",
-        "SelfContained",
         "PublishReadyToRun",
         "PublishSingleFile",
         "PublishTrimmed",
+        "PublishDir",
+        "PublishProfile",
+        "WindowsAppSDKSelfContained",
+        "SelfContained",
         "Deterministic",
         "ContinuousIntegrationBuild",
         "LangVersion",
         "Configuration",
         "OutputPath",
-        "PublishDir",
         "XamlCompiler",
         "EnableXbf",
         "GenerateXbf",
@@ -326,9 +319,12 @@ function Collect-ProjectInfo {
 
     $props = Get-ProjectInfoProperties
 
-    Write-SubSection "Main project MSBuild properties"
+    # -getProperty 评估时携带当前发布 Profile，诊断输出反映实际生效值
+    $publishProfileName = "$BuildType-x64"
 
-    $mainArgs = @("msbuild", $MainProject)
+    Write-SubSection "Main project MSBuild properties (profile: $publishProfileName)"
+
+    $mainArgs = @("msbuild", $MainProject, "-p:PublishProfile=$publishProfileName")
     $mainArgs += $props | ForEach-Object { "-getProperty:$_" }
 
     Invoke-CommandLogged `
@@ -336,9 +332,9 @@ function Collect-ProjectInfo {
         -Arguments $mainArgs `
         -LogName "main-msbuild-properties.txt"
 
-    Write-SubSection "Worker project MSBuild properties"
+    Write-SubSection "Worker project MSBuild properties (profile: $publishProfileName)"
 
-    $workerArgs = @("msbuild", $WorkerProject)
+    $workerArgs = @("msbuild", $WorkerProject, "-p:PublishProfile=$publishProfileName")
     $workerArgs += $props | ForEach-Object { "-getProperty:$_" }
 
     Invoke-CommandLogged `
@@ -392,6 +388,18 @@ function Remove-ProjectBuildArtifacts {
             -Force
     }
 
+    # 陈旧 zip（历史实验/不同模式残留）会污染 CI upload 通配符 build/WTGWizard-*.zip，
+    # Clean 阶段一并清除。
+    Get-ChildItem `
+        -LiteralPath $BuildRoot `
+        -File `
+        -Force |
+        Where-Object { $_.Name -like "WTGWizard-*.zip" } |
+        ForEach-Object {
+            Write-Log "Removing stale archive: $($_.FullName)"
+            Remove-Item -LiteralPath $_.FullName -Force
+        }
+
     if (Test-Path $DiagnosticsRoot) {
         Write-Log "Preserving diagnostics directory."
     }
@@ -409,32 +417,23 @@ function Remove-ProjectBuildArtifacts {
 function Restore-Projects {
     Write-Section "NuGet Restore"
 
-    # 按模式分别 restore：project.assets.json 必须落在与 publish 相同的
-    # BaseIntermediateOutputPath 下（--no-restore 依赖），否则 publish 找不到 assets
-    foreach ($mode in @("fdd", "scd")) {
-        Write-SubSection "Restore Main ($mode)"
+    # 单模式构建：同一 obj/ 下一次性恢复（发布属性由 PublishProfile 传入，不参与 restore）
+    $projects = @(
+        [PSCustomObject]@{ Project = $MainProject; Name = "main" },
+        [PSCustomObject]@{ Project = $WorkerProject; Name = "worker" }
+    )
+
+    foreach ($item in $projects) {
+        Write-SubSection "Restore $($item.Name)"
 
         Invoke-CommandLogged `
             -FilePath "dotnet" `
             -Arguments @(
                 "restore",
-                $MainProject,
-                "--locked-mode",
-                "-p:BaseIntermediateOutputPath=obj\$mode\"
+                $item.Project,
+                "--locked-mode"
             ) `
-            -LogName "restore-main-$mode.txt"
-
-        Write-SubSection "Restore Worker ($mode)"
-
-        Invoke-CommandLogged `
-            -FilePath "dotnet" `
-            -Arguments @(
-                "restore",
-                $WorkerProject,
-                "--locked-mode",
-                "-p:BaseIntermediateOutputPath=obj\$mode\"
-            ) `
-            -LogName "restore-worker-$mode.txt"
+            -LogName "restore-$($item.Name).txt"
     }
 }
 
@@ -448,32 +447,27 @@ function Build-Worker {
         [string]$Output,
 
         [Parameter(Mandatory)]
-        [bool]$SelfContained,
+        [string]$PublishProfile,
 
         [Parameter(Mandatory)]
-        [string]$ObjMode
+        [string]$Version
     )
 
-    Write-SubSection "Worker publish"
+    Write-SubSection "Worker publish [$PublishProfile]"
 
     $arguments = @(
         "publish",
         $WorkerProject,
-        "-c", $Configuration,
-        "-r", $Rid,
-        "-o", $Output,
-        "-p:Platform=$Architecture",
-        "-p:Version=$WorkerVer",
-        "--no-restore",
-        "-p:SelfContained=$SelfContained",
-        "-p:BaseIntermediateOutputPath=obj\$ObjMode\",
-        "-p:BaseOutputPath=bin\$ObjMode\"
+        "-p:PublishProfile=$PublishProfile",
+        "-p:PublishDir=$Output",
+        "-p:Version=$Version",
+        "--no-restore"
     )
 
     Invoke-CommandLogged `
         -FilePath "dotnet" `
         -Arguments $arguments `
-        -LogName "publish-worker-$($ObjMode).txt"
+        -LogName "publish-worker-$PublishProfile.txt"
 }
 
 function Build-Main {
@@ -482,36 +476,27 @@ function Build-Main {
         [string]$Output,
 
         [Parameter(Mandatory)]
-        [bool]$SelfContained,
+        [string]$PublishProfile,
 
         [Parameter(Mandatory)]
-        [string]$WASDKSelfContained,
-
-        [Parameter(Mandatory)]
-        [string]$ObjMode
+        [string]$Version
     )
 
-    Write-SubSection "Main publish"
+    Write-SubSection "Main publish [$PublishProfile]"
 
     $arguments = @(
         "publish",
         $MainProject,
-        "-c", $Configuration,
-        "-r", $Rid,
-        "-o", $Output,
-        "-p:Platform=$Architecture",
-        "-p:Version=$MainVer",
-        "--no-restore",
-        "-p:SelfContained=$SelfContained",
-        "-p:WindowsAppSDKSelfContained=$WASDKSelfContained",
-        "-p:BaseIntermediateOutputPath=obj\$ObjMode\",
-        "-p:BaseOutputPath=bin\$ObjMode\"
+        "-p:PublishProfile=$PublishProfile",
+        "-p:PublishDir=$Output",
+        "-p:Version=$Version",
+        "--no-restore"
     )
 
     Invoke-CommandLogged `
         -FilePath "dotnet" `
         -Arguments $arguments `
-        -LogName "publish-main-$($ObjMode).txt"
+        -LogName "publish-main-$PublishProfile.txt"
 }
 
 # ============================================================================
@@ -706,10 +691,13 @@ function Validate-PublishOutput {
         [string]$Directory,
 
         [Parameter(Mandatory)]
-        [bool]$SelfContained
+        [string]$PublishProfile
     )
 
-    Write-SubSection "Validate publish output"
+    Write-SubSection "Validate publish output ($PublishProfile)"
+
+    # SCD-* = SelfContained（.NET 运行时随包），由 Profile 命名推得，避免双源不一致
+    $isSelfContained = $PublishProfile -like "SCD-*"
 
     if (-not (Test-Path $Directory)) {
         throw "Publish directory does not exist: $Directory"
@@ -734,7 +722,7 @@ function Validate-PublishOutput {
         Write-Log "WTGWizard.Worker.exe co-located with Main." "SUCCESS"
     }
 
-    if ($SelfContained) {
+    if ($isSelfContained) {
         $coreClr = Join-Path $Directory "coreclr.dll"
 
         if (-not (Test-Path $coreClr)) {
@@ -1131,13 +1119,7 @@ function Build-Variant {
         [string]$Output,
 
         [Parameter(Mandatory)]
-        [string]$ObjMode,
-
-        [Parameter(Mandatory)]
-        [bool]$SelfContained,
-
-        [Parameter(Mandatory)]
-        [string]$WASDKSelfContained,
+        [string]$PublishProfile,
 
         [Parameter(Mandatory)]
         [string]$ModeLabel
@@ -1147,20 +1129,21 @@ function Build-Variant {
 
     New-Item -ItemType Directory -Force -Path $Output | Out-Null
 
+    # Worker 先单独 publish 到独立验证目录：确认其 PublishProfile 可用，
+    # 同时把 Worker 的 Build 输出（bin\x64\...）留下，供 Main publish 后的 copy target 注入
     Build-Worker `
-        -Output $Output `
-        -SelfContained $SelfContained `
-        -ObjMode $ObjMode
+        -Output $WorkerOutput `
+        -PublishProfile $PublishProfile `
+        -Version $WorkerVer
 
     Build-Main `
         -Output $Output `
-        -SelfContained $SelfContained `
-        -WASDKSelfContained $WASDKSelfContained `
-        -ObjMode $ObjMode
+        -PublishProfile $PublishProfile `
+        -Version $MainVer
 
     Validate-PublishOutput `
         -Directory $Output `
-        -SelfContained $SelfContained
+        -PublishProfile $PublishProfile
 
     if ($Diagnostics) {
         Write-XbfReport `
@@ -1188,18 +1171,14 @@ function Build-Variant {
 function Build-FDD {
     Build-Variant `
         -Output (Join-Path $FddOutput $Architecture) `
-        -ObjMode "fdd" `
-        -SelfContained $false `
-        -WASDKSelfContained $false `
+        -PublishProfile "FDD-x64" `
         -ModeLabel "FDD"
 }
 
 function Build-SCD {
     Build-Variant `
         -Output (Join-Path $ScdOutput $Architecture) `
-        -ObjMode "scd" `
-        -SelfContained $true `
-        -WASDKSelfContained $true `
+        -PublishProfile "SCD-x64" `
         -ModeLabel "SCD"
 }
 
@@ -1210,13 +1189,12 @@ function Build-SCD {
 function Package-Artifacts {
     Write-Section "Package Artifacts"
 
-    if ($BuildType -in @("FDD", "Both")) {
+    if ($BuildType -eq "FDD") {
         Compress-Artifact `
             -Directory (Join-Path $FddOutput $Architecture) `
             -Name "WTGWizard-$ZipTag-$Architecture-FDD"
     }
-
-    if ($BuildType -in @("SCD", "Both")) {
+    else {
         Compress-Artifact `
             -Directory (Join-Path $ScdOutput $Architecture) `
             -Name "WTGWizard-$ZipTag-$Architecture-SCD"
@@ -1230,119 +1208,38 @@ function Package-Artifacts {
 try {
     Initialize-Directories
 
-    Write-Section "WTGWizard Build"
+    Write-Section "WTGWizard Build ($BuildType)"
 
     Write-Log "Build started."
     Write-Log "Timestamp: $(Get-Date -Format o)"
     Write-Log "Root: $Root"
 
-    $buildModes = @()
-    if ($BuildType -in @("SCD", "Both")) { $buildModes += "SCD" }
-    if ($BuildType -in @("FDD", "Both")) { $buildModes += "FDD" }
-
-    if (-not $PublishOnly) {
-        if ($Diagnostics) {
-            Collect-EnvironmentInfo
-            Collect-ProjectInfo
-        }
-
-        if (-not $SkipClean) {
-            Remove-ProjectBuildArtifacts
-        }
-        else {
-            Write-Log "WARNING: Build cleanup skipped." "WARN"
-        }
-
-        Restore-Projects
-
-        if (-not $SkipTests) {
-            Write-Section "Tests"
-
-            Write-Log "Test execution is currently disabled by default."
-            Write-Log "Enable explicitly if the solution has a stable test target."
-        }
+    if ($Diagnostics) {
+        Collect-EnvironmentInfo
+        Collect-ProjectInfo
     }
 
-    if ($PublishOnly) {
-        # 子进程模式（并行构建的子任务）：仅构建本模式，不打包
-        foreach ($m in $buildModes) {
-            if ($m -eq "SCD") { Build-SCD } else { Build-FDD }
-        }
-    }
-    elseif ($buildModes.Count -gt 1) {
-        # 并行构建：FDD/SCD 各自独立子进程（obj 隔离后互不干扰），日志隔离防并发写
-        Write-Section "Parallel Build"
-
-        $shellPath = if ($PSVersionTable.PSEdition -eq "Core") { "pwsh" } else { "powershell.exe" }
-
-        $procs = @()
-
-        foreach ($m in $buildModes) {
-            $childLog = Join-Path $DiagnosticsRoot "Build-$($m.ToLower()).log"
-            # 清理旧成功标记（PS 5.1 Start-Process 的 ExitCode 常为空，用标记文件判定子进程结果）
-            Remove-Item -LiteralPath "$childLog.succeeded" -Force -ErrorAction SilentlyContinue
-
-            $childArgs = @(
-                "-NoProfile",
-                "-File", $PSCommandPath,
-                "-BuildType", $m,
-                "-PublishOnly",
-                "-SkipClean", "-SkipTests",
-                "-Architecture", $Architecture,
-                "-MainVer", $MainVer,
-                "-WorkerVer", $WorkerVer,
-                "-ZipTag", $ZipTag,
-                "-MinXbfCount", "$MinXbfCount",
-                "-ChildLog", $childLog
-            )
-            if ($Diagnostics) { $childArgs += "-Diagnostics" }
-
-            $consoleLog = Join-Path $DiagnosticsRoot "Build-$($m.ToLower())-console.log"
-            Write-Log "Starting child build ($m): $shellPath $($childArgs -join ' ')"
-
-            $procs += Start-Process `
-                -FilePath $shellPath `
-                -ArgumentList $childArgs `
-                -RedirectStandardOutput $consoleLog `
-                -RedirectStandardError "$consoleLog.err" `
-                -PassThru `
-                -WindowStyle Hidden
-        }
-
-        $failed = $false
-
-        for ($i = 0; $i -lt $procs.Count; $i++) {
-            $p = $procs[$i]
-            $m = $buildModes[$i]
-            $childLog = Join-Path $DiagnosticsRoot "Build-$($m.ToLower()).log"
-            $p.WaitForExit()
-
-            $succeeded = Test-Path -LiteralPath "$childLog.succeeded"
-
-            if (-not $succeeded -or ($p.ExitCode -ne $null -and $p.ExitCode -ne 0)) {
-                $failed = $true
-                Write-Log "Child build ($m) failed (exit $($p.ExitCode))." "ERROR"
-            }
-            else {
-                Write-Log "Child build ($m) completed (exit $($p.ExitCode))." "SUCCESS"
-            }
-        }
-
-        if ($failed) {
-            throw "One or more parallel child builds failed."
-        }
+    if (-not $SkipClean) {
+        Remove-ProjectBuildArtifacts
     }
     else {
-        # 单模式构建（主实例）
-        foreach ($m in $buildModes) {
-            if ($m -eq "SCD") { Build-SCD } else { Build-FDD }
-        }
+        Write-Log "WARNING: Build cleanup skipped." "WARN"
     }
 
-    # 打包阶段：构建全部完成后统一执行（主实例独占，规避 7za 缓存竞态）
-    if (-not $PublishOnly) {
-        Package-Artifacts
+    Restore-Projects
+
+    if (-not $SkipTests) {
+        Write-Section "Tests"
+
+        Write-Log "Test execution is currently disabled by default."
+        Write-Log "Enable explicitly if the solution has a stable test target."
     }
+
+    # 单模式构建：发布形态由 PublishProfile（Properties/PublishProfiles/*.pubxml）决定
+    if ($BuildType -eq "FDD") { Build-FDD } else { Build-SCD }
+
+    # 打包阶段：构建完成后统一执行
+    Package-Artifacts
 
     Write-Section "Build Summary"
 
@@ -1376,11 +1273,6 @@ try {
     }
 
     Write-Log "WTGWizard build finished successfully." "SUCCESS"
-
-    if ($ChildLog) {
-        # 成功标记：主实例据此判定子进程结果（PS 5.1 下 Start-Process 的 ExitCode 常为空）
-        New-Item -ItemType File -Path "$ChildLog.succeeded" -Force | Out-Null
-    }
 }
 catch {
     Write-Section "BUILD FAILED"
