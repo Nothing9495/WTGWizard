@@ -15,16 +15,12 @@
 	  <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
 	  <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
 	  <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-	  <PackageReference Include="Vanara.PInvoke.CfgMgr32" Version="5.0.5" />
-	  <PackageReference Include="Vanara.PInvoke.Kernel32" Version="5.0.5" />
-	  <PackageReference Include="Vanara.PInvoke.SetupAPI" Version="5.0.5" />
+	  <PackageReference Include="Vanara.PInvoke.CfgMgr32" Version="5.0.7" />
+	  <PackageReference Include="Vanara.PInvoke.Kernel32" Version="5.0.7" />
+	  <PackageReference Include="Vanara.PInvoke.SetupAPI" Version="5.0.7" />
 	</ItemGroup>
 	<!-- wimlib 原生库：从 NuGet 包复制，经 ProjectReference 传播到 Main/Worker 输出 -->
 	<ItemGroup>
-	  <None Include="$(PkgManagedWimLib)\runtimes\win-x64\native\libwim-15.dll"
-	        Link="runtimes\win-x64\native\libwim-15.dll"
-	        CopyToOutputDirectory="PreserveNewest"
-	        CopyToPublishDirectory="PreserveNewest"
-	        Visible="false" />
+	  <None Include="$(PkgManagedWimLib)\runtimes\win-x64\native\libwim-15.dll" Link="runtimes\win-x64\native\libwim-15.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Visible="false" />
 	</ItemGroup>
 </Project>

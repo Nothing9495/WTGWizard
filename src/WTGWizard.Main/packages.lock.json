@@ -302,51 +302,51 @@
       },
       "Vanara.Core": {
         "type": "Transitive",
-        "resolved": "5.0.5",
-        "contentHash": "e3+5FNx0tJGKXCl/2yieiiU2WoIQN3A3AO6xuKIQVhQlo45CGBrM5riU6FYDPC4iX3WBypty/h0EZL4xWV2ucA=="
+        "resolved": "5.0.7",
+        "contentHash": "h395/Y8B3nOiaO+wisRcEOPKO88mqM5XS738L6IX3WjWWT6hH2x5erWZeGHSl8ea9QAqpiCnT9v4wu2dp8DOXg=="
       },
       "Vanara.PInvoke.CfgMgr32": {
         "type": "Transitive",
-        "resolved": "5.0.5",
-        "contentHash": "BSqYz09uTFEYvtM7pPLFBYg99AX24i39RIbQ3qqi7STJWPZv92tWm8AzUSYpVq2sNC0/4vt7H6xIMbhbDWs46A==",
+        "resolved": "5.0.7",
+        "contentHash": "mDtT4E9IjRL/DmfIUfd43zBYc4HIMK1iOoHZ/L50W1lvw9uQVuQmbH+RiivLMf8Z53cRrnK8NrjknFIl8Q7MKg==",
         "dependencies": {
-          "Vanara.Core": "5.0.5",
-          "Vanara.PInvoke.Security": "5.0.5",
-          "Vanara.PInvoke.SetupAPI": "5.0.5"
+          "Vanara.Core": "5.0.7",
+          "Vanara.PInvoke.Security": "5.0.7",
+          "Vanara.PInvoke.SetupAPI": "5.0.7"
         }
       },
       "Vanara.PInvoke.Cryptography": {
         "type": "Transitive",
-        "resolved": "5.0.5",
-        "contentHash": "lXcUtjy3vy+hjqrT2YnHFtAl56UdDPpNnqQaAuQ3+FoNlkeA7k1yFxvqMKOVJ3tM88NJPniOiJHl/tSF2eSW+A==",
+        "resolved": "5.0.7",
+        "contentHash": "4Xmif8z8yuHB9TayJbvY94QQnYWE/BlIOliO+gQ5D2awRqIY3XdWKNPhTPGXYmAgJ9BS2j6q8zbCAfXG4yCD8g==",
         "dependencies": {
-          "Vanara.Core": "5.0.5"
+          "Vanara.Core": "5.0.7"
         }
       },
       "Vanara.PInvoke.Kernel32": {
         "type": "Transitive",
-        "resolved": "5.0.5",
-        "contentHash": "RyUEG8DN5BUttC82xTdiVz/HpCKa/zeqv2j7kNfABSj3m/3hyH9PSQdeg/fwkOY5VbIWyBegnp+2AKfYAJL3PA==",
+        "resolved": "5.0.7",
+        "contentHash": "09AqZGM/qWvsNuqd3I0VVXka+Dx9JJ3IWIGgIl5Z/3y39PU4/1M/l/EAnhO3hafXFpInso2tXnz/cICwgLa5Rw==",
         "dependencies": {
-          "Vanara.Core": "5.0.5"
+          "Vanara.Core": "5.0.7"
         }
       },
       "Vanara.PInvoke.Security": {
         "type": "Transitive",
-        "resolved": "5.0.5",
-        "contentHash": "XgZoG4GnU4Xetur8saYJqxQGJw5HCTu2hAz28sMuCqmy66//cNSvsroEClnxHF+f6jy4LG0K7esniZb6y7dOPg==",
+        "resolved": "5.0.7",
+        "contentHash": "3D6rnO0tL7xPgPQkIuLC1EZ5IFvvyjYbPf5ITLUJWGMPbU/0h0O18JbtOVOL+rbOXkEazok4CZ4iYKirRVwSQg==",
         "dependencies": {
-          "Vanara.Core": "5.0.5",
-          "Vanara.PInvoke.Cryptography": "5.0.5",
-          "Vanara.PInvoke.Kernel32": "5.0.5"
+          "Vanara.Core": "5.0.7",
+          "Vanara.PInvoke.Cryptography": "5.0.7",
+          "Vanara.PInvoke.Kernel32": "5.0.7"
         }
       },
       "Vanara.PInvoke.SetupAPI": {
         "type": "Transitive",
-        "resolved": "5.0.5",
-        "contentHash": "tMDWiNsBWdFAfQn+WOGbBW4261McfhNt1DETcQbQbauc5LUOKqITkla2pamynoLT+lIha0kBkZq7mmYJ6A/n/Q==",
+        "resolved": "5.0.7",
+        "contentHash": "8WEcd/q0T6awCk+WOLwdRZCE6M1/6BjH0kaBQnTCjo1JLkxiPiJc0a6IUwsksbUNF0Z63q7nc3fZoF745txpLw==",
         "dependencies": {
-          "Vanara.Core": "5.0.5"
+          "Vanara.Core": "5.0.7"
         }
       },
       "wtgwizard.main.deploymentcore": {
@@ -373,9 +373,9 @@
           "Serilog.Extensions.Logging": "[10.0.0, )",
           "Serilog.Sinks.Debug": "[3.0.0, )",
           "Serilog.Sinks.File": "[7.0.0, )",
-          "Vanara.PInvoke.CfgMgr32": "[5.0.5, )",
-          "Vanara.PInvoke.Kernel32": "[5.0.5, )",
-          "Vanara.PInvoke.SetupAPI": "[5.0.5, )"
+          "Vanara.PInvoke.CfgMgr32": "[5.0.7, )",
+          "Vanara.PInvoke.Kernel32": "[5.0.7, )",
+          "Vanara.PInvoke.SetupAPI": "[5.0.7, )"
         }
       }
     },
