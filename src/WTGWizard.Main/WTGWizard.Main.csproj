@@ -19,7 +19,6 @@
 
 	<PropertyGroup>
 		<ApplicationIcon>Assets\AppLogo.ico</ApplicationIcon>
-		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
