@@ -9,6 +9,7 @@ on:
       - 'assets/*'
       - 'docs/*'
       - '.git*'
+      - 'THIRD-PARTY-NOTICES'
 
 jobs:
   run-dotnet-build:
