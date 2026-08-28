@@ -837,4 +837,33 @@ Enable "Clear in-image answer files" option if you want to use a new answer file
   <data name="Page.WizStep.ImageConfig.VerifyImg.BtnContent" xml:space="preserve">
     <value>Start</value>
   </data>
+  <data name="Page.Settings.ReferencesGroup" xml:space="preserve">
+    <value>References</value>
+  </data>
+  <data name="Page.Settings.References.Header" xml:space="preserve">
+    <value>Referenced Documents</value>
+  </data>
+  <data name="Page.Settings.References.Desc" xml:space="preserve">
+    <value>Documents referred in development progress.</value>
+  </data>
+  <data name="Page.Settings.AboutSectionGroup" xml:space="preserve">
+    <value>About this project</value>
+  </data>
+  <data name="Page.Settings.AboutSection.Desc1" xml:space="preserve">
+    <value>WTGWizard v{0}
+Developed by Acheron101.</value>
+  </data>
+  <data name="Page.Settings.AboutSection.Desc2" xml:space="preserve">
+    <value>Distributed under GPLv3 license.
+WTGWizard is an open-source and free software.</value>
+  </data>
+  <data name="Page.Settings.AboutSection.HyperlinkBtn.Repo" xml:space="preserve">
+    <value>Project Repository</value>
+  </data>
+  <data name="Page.Settings.AboutSection.HyperlinkBtn.License" xml:space="preserve">
+    <value>General Public License v3</value>
+  </data>
+  <data name="Page.Settings.AboutSection.HyperlinkBtn.ThirdPartyNotices" xml:space="preserve">
+    <value>Third Party Notices</value>
+  </data>
 </root>

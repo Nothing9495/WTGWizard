@@ -369,6 +369,62 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 WTGWizard v{0}
+        ///Developed by Acheron101. 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AboutSection_Desc1 {
+            get {
+                return ResourceManager.GetString("Page.Settings.AboutSection.Desc1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Distributed under GPLv3 license.
+        ///WTGWizard is an open-source and free software. 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AboutSection_Desc2 {
+            get {
+                return ResourceManager.GetString("Page.Settings.AboutSection.Desc2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 General Public License v3 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AboutSection_HyperlinkBtn_License {
+            get {
+                return ResourceManager.GetString("Page.Settings.AboutSection.HyperlinkBtn.License", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Project Repository 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AboutSection_HyperlinkBtn_Repo {
+            get {
+                return ResourceManager.GetString("Page.Settings.AboutSection.HyperlinkBtn.Repo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Third Party Notices 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AboutSection_HyperlinkBtn_ThirdPartyNotices {
+            get {
+                return ResourceManager.GetString("Page.Settings.AboutSection.HyperlinkBtn.ThirdPartyNotices", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 About this project 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_AboutSectionGroup {
+            get {
+                return ResourceManager.GetString("Page.Settings.AboutSectionGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Dark 的本地化字符串。
         /// </summary>
         public static string Page_Settings_AppTheme_Dark {
@@ -419,6 +475,33 @@ namespace WTGWizard.Main.Language {
         public static string Page_Settings_AppThemeGroup {
             get {
                 return ResourceManager.GetString("Page.Settings.AppThemeGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Documents referred in development progress. 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_References_Desc {
+            get {
+                return ResourceManager.GetString("Page.Settings.References.Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Referenced Documents 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_References_Header {
+            get {
+                return ResourceManager.GetString("Page.Settings.References.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 References 的本地化字符串。
+        /// </summary>
+        public static string Page_Settings_ReferencesGroup {
+            get {
+                return ResourceManager.GetString("Page.Settings.ReferencesGroup", resourceCulture);
             }
         }
         

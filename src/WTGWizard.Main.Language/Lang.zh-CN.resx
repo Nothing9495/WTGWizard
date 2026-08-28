@@ -837,4 +837,33 @@
   <data name="Page.WizStep.ImageConfig.VerifyImg.BtnContent" xml:space="preserve">
     <value>开始校验</value>
   </data>
+  <data name="Page.Settings.ReferencesGroup" xml:space="preserve">
+    <value>参考文献</value>
+  </data>
+  <data name="Page.Settings.References.Header" xml:space="preserve">
+    <value>参考文献</value>
+  </data>
+  <data name="Page.Settings.References.Desc" xml:space="preserve">
+    <value>开发过程中参考过的文献资料</value>
+  </data>
+  <data name="Page.Settings.AboutSectionGroup" xml:space="preserve">
+    <value>关于本项目</value>
+  </data>
+  <data name="Page.Settings.AboutSection.Desc1" xml:space="preserve">
+    <value>WTGWizard v{0}
+Developed by Acheron101</value>
+  </data>
+  <data name="Page.Settings.AboutSection.Desc2" xml:space="preserve">
+    <value>本项目在 GPLv3 许可证条款下分发
+WTGWizard 是一个免费的开源项目</value>
+  </data>
+  <data name="Page.Settings.AboutSection.HyperlinkBtn.Repo" xml:space="preserve">
+    <value>项目代码仓库</value>
+  </data>
+  <data name="Page.Settings.AboutSection.HyperlinkBtn.License" xml:space="preserve">
+    <value>GPLv3 许可证</value>
+  </data>
+  <data name="Page.Settings.AboutSection.HyperlinkBtn.ThirdPartyNotices" xml:space="preserve">
+    <value>第三方许可声明</value>
+  </data>
 </root>

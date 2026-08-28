@@ -1,7 +1,10 @@
+using System;
+using System.Reflection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WTGWizard.Main;
 using WTGWizard.Main.DeploymentCore.Worker;
+using WTGWizard.Main.Language;
 
 namespace WTGWizard.Pages;
 
@@ -10,6 +13,9 @@ namespace WTGWizard.Pages;
 /// </summary>
 public sealed partial class SettingsPage : Page
 {
+    public string AboutDesc1 => string.Format(
+        Lang.Page_Settings_AboutSection_Desc1, GetProductVersion());
+
     public SettingsPage()
     {
         InitializeComponent();
@@ -30,6 +36,15 @@ public sealed partial class SettingsPage : Page
                 break;
             }
         }
+    }
+
+    private static string GetProductVersion()
+    {
+        var info = typeof(App).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        if (string.IsNullOrEmpty(info)) return "?";
+        var plus = info.IndexOf('+', StringComparison.Ordinal);
+        return plus >= 0 ? info[..plus] : info;
     }
 
     private void DebugToggle_Toggled(object sender, RoutedEventArgs e)

@@ -13,39 +13,87 @@
 
   <Grid>
     <ScrollViewer Padding="36,40,36,0" MaxWidth="{StaticResource PageContentMaxWidth}">
-      <StackPanel Spacing="32">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
         <StackPanel Spacing="3">
           <TextBlock Text="{x:Bind lang:Lang.Page_Settings_Title}"
-                     Style="{ThemeResource TitleTextBlockStyle}" />
+               Style="{ThemeResource TitleTextBlockStyle}" />
 
           <TextBlock Text="{x:Bind lang:Lang.Page_Settings_WorkerGroup}"
-                     FontSize="14"
-                     Margin="0,12,0,6"
-                     FontWeight="SemiBold"/>
+               FontSize="14"
+               Margin="0,12,0,6"
+               FontWeight="SemiBold"/>
           <cc:SettingsCard Header="{x:Bind lang:Lang.Page_Settings_WorkerDbgOutput_Header}" 
-                           Description="{x:Bind lang:Lang.Page_Settings_WorkerDbgOutput_Desc}"
-                           HeaderIcon="{ui:FontIcon Glyph=&#xEBE8;}">
+                     Description="{x:Bind lang:Lang.Page_Settings_WorkerDbgOutput_Desc}"
+                     HeaderIcon="{ui:FontIcon Glyph=&#xEBE8;}">
             <ToggleSwitch x:Name="DebugToggle" Toggled="DebugToggle_Toggled" />
           </cc:SettingsCard>
 
           <!--  主题设置  -->
           <TextBlock Text="{x:Bind lang:Lang.Page_Settings_AppThemeGroup}"
-                     FontSize="14"
-                     Margin="0,12,0,6"
-                     FontWeight="SemiBold"/>
+               FontSize="14"
+               Margin="0,12,0,6"
+               FontWeight="SemiBold"/>
           <cc:SettingsCard Header="{x:Bind lang:Lang.Page_Settings_AppTheme_Header}"
-                           Description="{x:Bind lang:Lang.Page_Settings_AppTheme_Desc}"
-                           HeaderIcon="{ui:FontIcon Glyph=&#xE793;}">
+                     Description="{x:Bind lang:Lang.Page_Settings_AppTheme_Desc}"
+                     HeaderIcon="{ui:FontIcon Glyph=&#xE793;}">
             <ComboBox x:Name="ThemeComboBox"
-                      MinWidth="150"
-                      SelectionChanged="ThemeComboBox_SelectionChanged">
+                MinWidth="150"
+                SelectionChanged="ThemeComboBox_SelectionChanged">
               <ComboBoxItem Content="{x:Bind lang:Lang.Page_Settings_AppTheme_Default}" Tag="default" />
               <ComboBoxItem Content="{x:Bind lang:Lang.Page_Settings_AppTheme_Light}" Tag="light" />
               <ComboBoxItem Content="{x:Bind lang:Lang.Page_Settings_AppTheme_Dark}" Tag="dark" />
             </ComboBox>
           </cc:SettingsCard>
+
+          <TextBlock Text="{x:Bind lang:Lang.Page_Settings_ReferencesGroup}"
+                     FontSize="14"
+                     Margin="0,12,0,6"
+                     FontWeight="SemiBold"/>
+          <Expander HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" IsExpanded="True">
+            <Expander.Header>
+              <Grid ColumnSpacing="20" Padding="0,16">
+                <Grid.RowDefinitions>
+                  <RowDefinition/>
+                  <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <FontIcon Grid.RowSpan="2" Glyph="&#xF000;" HorizontalAlignment="Left"/>
+
+                <TextBlock Grid.Column="1" Text="{x:Bind lang:Lang.Page_Settings_References_Header}" Style="{ThemeResource BodyTextBlockStyle}"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{x:Bind lang:Lang.Page_Settings_References_Desc}" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.8"/>
+              </Grid>
+            </Expander.Header>
+
+            <StackPanel>
+              <HyperlinkButton Content="Microsoft Learn | Deploy Windows To Go in your organization" NavigateUri="https://learn.microsoft.com/previous-versions/windows/it-pro/windows-10/deployment/windows-to-go/deploy-windows-to-go"/>
+              <HyperlinkButton Content="Microsoft Learn | Win32 Provider" NavigateUri="https://learn.microsoft.com/windows/win32/cimwin32prov/win32-provider"/>
+              <HyperlinkButton Content="Microsoft Learn | Manufacture | Implicit Answer File Search Order" NavigateUri="https://learn.microsoft.com/windows-hardware/manufacture/desktop/windows-setup-automation-overview?view=windows-11#implicit-answer-file-search-order"/>
+              <HyperlinkButton Content="Microsoft Learn | Tutorial: Open files and folders with pickers in WinUI" NavigateUri="https://learn.microsoft.com/windows/apps/develop/files/using-file-folder-pickers"/>
+              <HyperlinkButton Content="Microsoft Learn | Microsoft.UI.Xaml.Controls Namespace | Symbol Enum" NavigateUri="https://learn.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.symbol?view=windows-app-sdk-2.0"/>
+              <HyperlinkButton Content="Microsoft Learn | Components | Microsoft-Windows-SecureStartup-FilterDriver" NavigateUri="https://learn.microsoft.com/windows-hardware/customize/desktop/unattend/microsoft-windows-securestartup-filterdriver"/>
+            </StackPanel>
+          </Expander>
         </StackPanel>
-      </StackPanel>
+
+        <StackPanel Grid.Column="1" Spacing="4" Margin="36,42,0,0">
+          <TextBlock Text="{x:Bind lang:Lang.Page_Settings_AboutSectionGroup}" FontWeight="Bold" Margin="10,8"/>
+          <TextBlock Text="{x:Bind AboutDesc1, Mode=OneTime}" Margin="10,0"/>
+          <TextBlock Text="{x:Bind lang:Lang.Page_Settings_AboutSection_Desc2}" Margin="10,0,10,8"/>
+
+          <HyperlinkButton Content="{x:Bind lang:Lang.Page_Settings_AboutSection_HyperlinkBtn_Repo}" NavigateUri="https://github.com/Nothing9495/WTGWizard"/>
+          <HyperlinkButton Content="{x:Bind lang:Lang.Page_Settings_AboutSection_HyperlinkBtn_License}" NavigateUri="https://choosealicense.com/licenses/gpl-3.0"/>
+          <HyperlinkButton Content="{x:Bind lang:Lang.Page_Settings_AboutSection_HyperlinkBtn_ThirdPartyNotices}" NavigateUri="https://github.com/Nothing9495/WTGWizard/blob/master/THIRD-PARTY-NOTICES"/>
+        </StackPanel>
+      </Grid>
     </ScrollViewer>
   </Grid>
 </Page>
