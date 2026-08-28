@@ -58,7 +58,7 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=SCD-x64
 dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\publish\FDD
 ```
 
-- **SDK**: .NET 10.0.302 (rollForward: latestMajor)
+- **SDK**: .NET 10.0.400 (`global.json` `rollForward: disable` 精确锁定；升级 SDK = 显式提交 global.json 变更)
 - **Target Framework**: `net10.0-windows10.0.26100.0`
 - **Language Version**: `preview`
 - **Platform**: x64 only

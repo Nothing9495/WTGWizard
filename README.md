@@ -53,7 +53,7 @@
 
 Requirements:
 
-- [.NET 10 SDK x64]((https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.302-windows-x64-installer)) (pinned to `10.0.302` via `global.json`)
+- [.NET 10 SDK x64]((https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.400-windows-x64-installer)) (pinned to `10.0.400` via `global.json`)
 - Windows ADK 10.0.26100 (bundled with Visual Studio 2022 or the standalone Windows ADK)
 
 ```powershell

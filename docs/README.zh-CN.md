@@ -49,7 +49,7 @@
 
 要求：
 
-- [.NET 10 SDK x64](https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.302-windows-x64-installer)（由 `global.json` 锁定为 `10.0.302`）
+- [.NET 10 SDK x64](https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.400-windows-x64-installer)（由 `global.json` 锁定为 `10.0.400`）
 - Windows ADK 10.0.26100（随 Visual Studio 2022 附带，或单独安装 Windows ADK）
 
 ```powershell
