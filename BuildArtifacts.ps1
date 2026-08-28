@@ -1214,6 +1214,14 @@ try {
     Write-Log "Timestamp: $(Get-Date -Format o)"
     Write-Log "Root: $Root"
 
+    # SDK 精确锁定观测（global.json rollForward=disable）：解析失败在此快速报错，
+    # 不带 2>&1 合并（Pitfall 20：native stderr 会抛 RemoteException）
+    $dotnetSdkVersion = & dotnet --version
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet SDK resolution failed (global.json exact-match). Exit code: $LASTEXITCODE"
+    }
+    Write-Log "dotnet SDK: $dotnetSdkVersion"
+
     if ($Diagnostics) {
         Collect-EnvironmentInfo
         Collect-ProjectInfo
