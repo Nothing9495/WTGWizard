@@ -1,4 +1,9 @@
 <Project>
+  <PropertyGroup>
+    <!-- 源码路径映射：本地与 CI 产物内嵌路径统一
+         Release 已 DebugType=None（无 PDB），此映射为其防御层。 -->
+    <PathMap>$(MSBuildThisFileDirectory)=src/</PathMap>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>None</DebugType>
     <DebugSymbols>false</DebugSymbols>
