@@ -121,7 +121,7 @@ The application icon contains a conceptual, recolored re-interpretation of the W
 WTGWizard used/referred these projects below. Thanks for their excellent works!
 
 - [wimlib](https://wimlib.net) / [ManagedWimLib](https://github.com/MircoBabin/ManagedWimLib) — WIM related operations, core component of WTGWizard.
-- [Vanara](https://github.com/dahall/Vanara) — Core of DiskIOService implementation.
+- [Vanara](https://github.com/dahall/Vanara) — Solid foundation of DiskIOService implementation.
 - [Windows CommunityToolkit](https://github.com/CommunityToolkit) — MVVM and WinUI controls.
 - [Serilog](https://serilog.net) — App logging service.
 - [Starward](https://github.com/Scighost/Starward) — One solution with multi-project architecture and localization implementation. Starward is a very beautiful and easy-to-use HoYoverse game launcher with a set of enhancements.

@@ -1,54 +1,73 @@
 WTGWizard Third-Party Notices
-==============================
+=============================
 
-This project bundles or references the following third-party components.
+This project bundles, references or distributes the following third-party components.
 Their licenses are reproduced or linked below.
 
-1. wimlib (libwim-15.dll)
-   - License: GPL-3.0-or-later (distributed via ManagedWimLib under LGPL-3.0-or-later)
-   - Source: https://github.com/ebiggers/wimlib
+Entries are sorted alphabetically by component name.
 
-2. ManagedWimLib
-   - License: LGPL-3.0-or-later
-   - Source: https://github.com/MircoBabin/ManagedWimLib
-   - License text: https://www.gnu.org/licenses/lgpl-3.0.txt
+1. CommunityToolkit.Mvvm
+   - License: MIT
+   - License text: https://licenses.nuget.org/MIT
+
+2. CommunityToolkit.WinUI (Controls, Converters, etc.)
+   - License: MIT
+   - License text: https://licenses.nuget.org/MIT
 
 3. Joveler.DynLoader
    - License: MIT
    - Source: https://github.com/ied206/Joveler.DynLoader
    - License text: https://licenses.nuget.org/MIT
 
-4. CommunityToolkit.Mvvm
+4. ManagedWimLib
+   - License: LGPL-3.0-or-later
+   - Source: https://github.com/MircoBabin/ManagedWimLib
+   - License text: https://www.gnu.org/licenses/lgpl-3.0.txt
+
+5. Microsoft.Extensions.* (DependencyInjection, DependencyInjection.Abstractions, Logging, Logging.Abstractions, Options, Primitives)
    - License: MIT
    - License text: https://licenses.nuget.org/MIT
 
-5. CommunityToolkit.WinUI (Controls, Converters, etc.)
+6. Microsoft.Web.WebView2
    - License: MIT
    - License text: https://licenses.nuget.org/MIT
 
-6. Microsoft.WindowsAppSDK
+7. Microsoft.WindowsAppSDK
    - License: MIT
    - License text: https://github.com/microsoft/WindowsAppSDK/blob/main/LICENSE
-
-7. Microsoft.Extensions.DependencyInjection
-   - License: MIT
-   - License text: https://licenses.nuget.org/MIT
 
 8. Serilog
    - License: Apache-2.0
    - License text: https://licenses.nuget.org/Apache-2.0
 
-9. Serilog.Sinks.Debug
+9. Serilog.Extensions.Logging
    - License: Apache-2.0
    - License text: https://licenses.nuget.org/Apache-2.0
 
-10. Serilog.Sinks.File
+10. Serilog.Sinks.Debug
     - License: Apache-2.0
     - License text: https://licenses.nuget.org/Apache-2.0
 
-11. System.Reactive
+11. Serilog.Sinks.File
+    - License: Apache-2.0
+    - License text: https://licenses.nuget.org/Apache-2.0
+
+12. System.Numerics.Tensors
     - License: MIT
     - License text: https://licenses.nuget.org/MIT
+
+13. System.Reactive
+    - License: MIT
+    - License text: https://licenses.nuget.org/MIT
+
+14. Vanara (Core, PInvoke.CfgMgr32, PInvoke.Cryptography, PInvoke.Kernel32, PInvoke.Security, PInvoke.SetupAPI)
+    - License: MIT
+    - Source: https://github.com/dahall/Vanara
+    - License text: https://licenses.nuget.org/MIT
+
+15. wimlib (libwim-15.dll)
+    - License: GPL-3.0-or-later (distributed via ManagedWimLib under LGPL-3.0-or-later)
+    - Source: https://github.com/ebiggers/wimlib
 
 Trademark notice
 ----------------
