@@ -412,6 +412,8 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 | DiskIOWriter | ⚠️ Stub | `Shared.Services/DiskServices/DiskIOService/DiskIOWriter.cs` (PInvoke Implementation to replace Powershell disk layout creation script.) |
 | 常量收敛（三份重叠） | ✅ Resolved | `WinBuildConstants`（UI 构建阈值）/ `DeploymentConstants`（Worker 超时）/ `DiskConstants`（磁盘布局唯一来源）——见 Pitfall 18 |
 | 构建脚本（PublishProfile 化，单模式） | ✅ Complete | `BuildArtifacts.ps1`（`-BuildType FDD/SCD` 单模式 + 发布参数由 `Properties/PublishProfiles/*.pubxml` 提供 + 并行/隔离机制已移除；机制与坑见 Pitfall 20；Profile 化见 Pitfall 22） |
+| SCD 裁剪 + PDB 源头消除 | ✅ Complete | SCD pubxml `PublishTrimmed=true` + `TrimMode=partial`（FDD 关闭，无运行时可裁）；`Directory.Build.props` Release `DebugType=None` 消除 ProjectReference PDB——zip 110→90MB；代价见 Pitfall 24 |
+| WASDK 子包白名单（产物瘦身） | ✅ Complete | `Main.csproj` 11 引用锁集（metapackage 锚 + 白名单 5 + 黑名单 5 `ExcludeAssets="all"`）——SCD 解压 250→182MB / 497 文件，desktop runtime pack（WPF/WinForms ~50MB）随 AI/ML 黑名单顺带消失；结构与更新流程见 Pitfall 23 |
 
 ---
 
@@ -466,7 +468,7 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
    - **native stderr + `$ErrorActionPreference=Stop`**：`& exe 2>&1 | Out-Null` 中 stderr 行会抛 `RemoteException` 终止脚本。调用 7za 等外部命令时**不要合并 stderr**（`-bso0 -bsp0` 静默即可）。
    - **裸 token 通配符解析**：`-x!*.pdb` 作为裸参数会被 PS 5.1 做通配符解析导致参数错位（7za 归档名被当作输入文件）。排除模式须**经变量传递**（`$excludePdb = '-x!*.pdb'`）。
    - **`Expand-Archive` 仅接受 `.zip` 扩展名**（不校验内容）：nupkg 解包前需复制改名 `.zip`。
-   - **`DefaultItemExcludes` vs `ItemGroup Remove`（Directory.Build.props）**：SDK 默认 Compile glob 在 targets 阶段（props 之后）添加，props 里的 `Remove` 不作用于后加项（CS0579 特性重复）。须用 `DefaultItemExcludes`（props 中设置，控制默认 glob 排除）。
+   - **`DefaultItemExcludes` vs `ItemGroup Remove`（Directory.Build.props）**：SDK 默认 Compile glob 在 targets 阶段（props 之后）添加，props 里的 `Remove` 不作用于后加项（CS0579 特性重复）。须用 `DefaultItemExcludes`（props 中设置，控制默认 glob 排除）。（历史条目：多模式 obj\fdd\obj\scd 时代必需；Profile 化后单 obj 由 SDK 默认排除覆盖，该配置已随 PDB 改动移除——见 Pitfall 24。）
    - **makepri dump 阻塞**：`makepri dump` 在 stdout 经管道时等待 stdin（覆盖确认/EOF）。须 `Start-Process` + `-RedirectStandardInput`（空文件）+ `WaitForExit(60s)` 超时 Kill + 以输出文件存在作成功判据。（历史条目：`param` 与 `$script:` 同名冲突、`Start-Process` ExitCode 空、子进程成功标记文件等坑已随并行子进程模式移除——2026-08 并行机制不再使用。）
 
 21. **构建脚本 PublishProfile 化（BuildArtifacts.ps1 + Properties/PublishProfiles）**: 发布参数（`SelfContained`/`WindowsAppSDKSelfContained`/`PublishTrimmed`/`Platform`/`RuntimeIdentifier`/`Configuration`）**唯一来源是 `Properties/PublishProfiles/{FDD|SCD}-x64.pubxml`**，脚本/CI 只传 `-p:PublishProfile=…` + `-p:PublishDir=…` + `-p:Version=…`：
@@ -476,3 +478,15 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
    - **Worker 独立验证目录**：Worker 先 publish 到 `build/Worker-{mode}/`（不进 zip，仅验证其 Profile 可用），Main publish 后经 csproj `CopyWorkerBuildOutputToPublish` 把 Worker 的 **Build 输出**（非 Publish 输出）注入 Main 输出——Main SCD 的 .NET/WASDK 运行时由 Main 提供，Worker 共享同目录运行时。
 
 22. **Worker copy target 路径必须含 RID 段（WTGWizard.Main.csproj）**: `CopyWorkerBuildOutput*` 的 `WorkerOutputPath` 为 `..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)`（`RuntimeIdentifier` 非空时追加）。**缺 RID 段时 target 静默复制零文件**——早期版本仅因"Worker 先 publish 到同一目录 + `-o` 不清理残留"而表面上"工作"，Profile 化后该隐式链路已移除。另外：`dotnet publish -o`/`-p:PublishDir` **不会清理目标目录**；依赖"发布目录可能残留旧文件"的行为视为 bug。
+
+23. **WASDK 子包白名单锁集（Main.csproj，产物瘦身）**: metapackage `Microsoft.WindowsAppSDK` 2.4.0 会拖入 AI/ML/Search/Widgets 组件（onnxruntime.dll 20.7MB + DirectML.dll 17.8MB + Search/Widgets/AI 投影，合计 ~45MB 解压），Main 源码零使用——`Main.csproj` 以 **11 引用锁集**替代裸 metapackage（SCD 解压 250→182MB / 497 文件）：
+    - **结构**：metapackage 锚（`ExcludeAssets="all"`，仅参与版本解析）+ 白名单 5 正常引用（`WinUI 2.3.6`/`Foundation 2.3.9`/`Base 2.0.4`/`Runtime 2.4.0`/`DWrite 2.1.0`）+ 黑名单 5（`AI 2.4.4`/`ML 2.1.74`/`Search 2.4.4`/`Widgets 2.0.5`/`Windows.AI.MachineLearning 2.1.74`，均 `ExcludeAssets="all"` 静默其 buildTransitive 复制）。
+    - **坑 a（锚必需）**：CommunityToolkit 三包传递要求 `Microsoft.WindowsAppSDK >= 1.6.250108002`——裸白名单（无锚）会让 1.x 旧 metapackage 浮上，其内嵌 WinUI targets 与 `microsoft.windowsappsdk.winui` 2.3.6 重复导入（MSB4011 + MSIX `CustomBeforeMicrosoftCommonTargets` 报错）。
+    - **坑 b（MinVersion 检查）**：`Microsoft.Windows.AI.MachineLearning` 2.1.74 targets 强制 `SupportedOSPlatformVersion >= 18362`（项目 min 17763）——必须黑名单，不能靠"不引用"绕过（传递依赖仍在图中）。
+    - **坑 c（Pickers 归属）**：`Microsoft.Windows.Storage.Pickers`（FileOpenPicker/FileSavePicker）的 winmd 在 **Foundation** 包——白名单勿移除 Foundation。
+    - **副产物（desktop pack 顺带消失）**：WindowsDesktop.App runtime pack（WPF/WinForms 全家桶 ~50MB）的注入与 **AI/ML 资产导入在 build 期耦合**（.NET 10 windows TFM 框架 `Microsoft.Windows.SDK.NET.Ref.Windows`；evaluation 期无 desktop FrameworkReference，WASDK 全部包 targets 零命中，常规 `FrameworkReference Remove` 无处下手）——AI/ML 黑名单静默后 runtimeconfig `includedFrameworks`/deps.json/产物三处 desktop 全消失。产物仅剩 16KB `WindowsBase.dll`（trim 空壳，deps.json 一致，无害）。
+    - **更新流程（版本互不相同，不能只改一个号）**：① 临时把锚改普通引用（或仓库外探针工程）restore，读 lock.json 各子包 resolved 版本；② 11 处版本号全部对齐，锚恢复 `ExcludeAssets="all"`；③ diff lock.json——metapackage 新增未知子包逐一判定（用到→白名单，没用→黑名单）；④ `dotnet restore` 更新 lock → 脚本 `--locked-mode` 全流程；⑤ 产物验证：probe publish diff 无 onnxruntime/DirectML/Search/Widgets/AI、白名单核心在位、**runtimeconfig includedFrameworks 仅 Microsoft.NETCore.App**（desktop pack 回流＝注入机制变了，停下排查）、FileOpenPicker/image verify/启动冒烟 + FDD 同过。
+    - **逃生门**：一行回退裸 metapackage → 回到 ~250MB 状态，无功能代价。
+    - 验证基线：SCD 启动冒烟 ✅ / Worker 命令分发 ✅ / FDD 79 文件 ✅。
+
+24. **Release 无 PDB（源头消除）**: `src/Directory.Build.props` 对 Release 全仓设 `DebugType=None` + `DebugSymbols=false`——pubxml 属性非全局、ProjectReference 工程不可见，PDB 须在 props 层源头消除（BuildArtifacts.ps1 的 7za `-x!*.pdb`/ZipFile 回退排除降级为冗余保险）。**代价**：Release 构建无符号，崩溃栈无行号；排查需本地临时带符号重建（移除该块或改 `DebugType=embedded`）。同文件历史上的 `PathMap`/`DefaultItemExcludes`（多模式 obj 排除）已随本次重写移除——前者仅影响内嵌路径确定性，后者在 Profile 化单 obj 后由 SDK 默认排除覆盖（见 Pitfall 20）。

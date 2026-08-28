@@ -30,13 +30,30 @@
 	</ItemGroup>
 
 	<!-- Referenced NuGet Packages -->
+	<!-- WASDK 瘦身（替代裸 metapackage，省 AI/ML/Search/Widgets ~45MB 解压）：
+	     - metapackage 2.4.0 保留为版本锚（CommunityToolkit 传递要求 >=1.6；ExcludeAssets="all"
+	       使其仅参与版本解析、不导入 1.x 内嵌 WinUI targets，否则与子包 MSB4011 重复导入）
+	     - 白名单五包正常引用（FileOpenPicker 位于 Foundation，勿移除；DWrite 保守保留）
+	     - 黑名单四包（AI/ML/Search/Widgets，Main 源码零使用）保留依赖图一致性但
+	       ExcludeAssets="all" 静默其 buildTransitive 复制（onnxruntime/DirectML 等）
+	     - 升级 WASDK 时需重新对齐全部版本（见 AGENTS.md pitfall） -->
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.251219" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" ExcludeAssets="all" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.6" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.3.9" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Base" Version="2.0.4" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.4.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.DWrite" Version="2.1.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.AI" Version="2.4.4" ExcludeAssets="all" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.ML" Version="2.1.74" ExcludeAssets="all" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Search" Version="2.4.4" ExcludeAssets="all" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Widgets" Version="2.0.5" ExcludeAssets="all" />
+		<PackageReference Include="Microsoft.Windows.AI.MachineLearning" Version="2.1.74" ExcludeAssets="all" />
 	</ItemGroup>
 
 	<!-- Project References -->
