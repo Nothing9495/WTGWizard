@@ -26,6 +26,7 @@ src/
 ├── WTGWizard.Main.DeploymentCore/  # 部署引擎（模型/步骤/编排器/Worker 桥接）
 ├── WTGWizard.Shared.Services/ # 核心服务：磁盘、WIM、日志、终端缓冲
 ├── WTGWizard.Shared.Common/   # Named Pipe IPC 协议
+├── WTGWizard.Launcher/        # 原生启动器 (vcxproj/C++，不入 slnx，由构建脚本 msbuild 调用)
 └── WTGWizard.Worker/          # Worker 子进程 (Exe)
 ```
 
@@ -415,6 +416,7 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 | SCD 裁剪 + PDB 源头消除 | ✅ Complete | SCD pubxml `PublishTrimmed=true` + `TrimMode=partial`（FDD 关闭，无运行时可裁）；`Directory.Build.props` Release `DebugType=None` 消除 ProjectReference PDB——zip 110→90MB；代价见 Pitfall 24 |
 | WASDK 子包白名单（产物瘦身） | ✅ Complete | `Main.csproj` 11 引用锁集（metapackage 锚 + 白名单 5 + 黑名单 5 `ExcludeAssets="all"`）——SCD 解压 250→182MB / 497 文件，desktop runtime pack（WPF/WinForms ~50MB）随 AI/ML 黑名单顺带消失；结构与更新流程见 Pitfall 23 |
 | 产物确定性（文件内容级） | ✅ 496/497 | 同提交 + SDK 锁定 + lock 包图下，跨机逐文件 SHA256 一致；`WTGWizard.Main.dll` 为已归因例外（XAML 编译器 objN 编号非确定）——范围/Runbook/豁免依据见 Pitfall 25 |
+| Launcher + 新发布结构 | ✅ Complete | 原生 C 启动器 `src/WTGWizard.Launcher`（产物 `WTGWizard.exe`，定位 `WTGWizard-v{version}\WTGWizard.Main.exe` 启动）；zip 根 = launcher + 应用子目录；选型/构建坑见 Pitfall 26 |
 
 ---
 
@@ -496,3 +498,11 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
     - **Main.dll 豁免依据（已归因，非环境差异）**: WinUI XAML 编译器为 x:Bind 绑定类按**并行处理完成顺序**分配全局递增编号（`{Page}_objN_Bindings`），编号非确定 → 生成类型名不同（实测 GA `DeployMethodPage_obj42` vs 本机 `obj20`）→ CsWinRT 源生成器随之生成不同的 `VtableClasses`/`WinRTTypeDetails` → Main.dll 元数据/IL/布局漂移。**同机两次 Clean 重建哈希亦不同**（`0D9D5FA5…` vs `49C60A12…`）——编译器内在非确定性，非 locale/路径/环境问题。唯一 XAML 程序集才受影响（其余 496 文件佐证）。尚无公开编译器开关可固定编号；如需上游修复可向 microsoft-ui-xaml 报 issue。
     - **误诊排除记录（勿重复排查）**: `-Diagnostics` 的 MSBuild 属性快照中 `ShouldComputeInputPris`/`EnableCoreMrtTooling`/`WindowsSdkBuildToolsVersion` 在 GA 侧为空、本地有值——这是**采集时机假象**（`Collect-ProjectInfo` 在 restore 之前执行，GA 全新 checkout 时 obj 无 assets → 包 props 未导入），与产物差异无关（Worker 侧快照零差异且 Worker.dll 一致）。
     - **Runbook（跨构建/跨机对比）**: ① `BuildArtifacts.ps1 -BuildType SCD -Diagnostics`（默认即 Clean + 固定 Version，manifest 落盘 `build/BuildDiagnostics/SCD-x64.csv`，含环境快照）；② 对比两份 CSV 时**必须投影掉 `LastWriteTimeUtc` 列**（文件时间戳每次构建必不同，直接 diff 永远报差异）——`Import-Csv` 后仅比 `RelativePath`+`SHA256`（可加 `Length`）；③ 差异文件归因顺序：Main.dll（已知豁免）→ 新出现的文件 → 其余。
+
+26. **Launcher（原生启动器）与发布结构**: zip 根 = `WTGWizard.exe`（原生 C 启动器）+ `WTGWizard-v{version}\`（Main 全部产物）；启动器读取自身 VERSIONINFO 的 FileVersion 数字段拼 `WTGWizard-v{a.b.c}` 精确命中，失败则回退搜索 `WTGWizard` 开头且含 `WTGWizard.Main.exe` 的一级子目录，仍无命中则 MessageBox 引导至 GitHub Releases。
+    - **为何是原生 C（vcxproj）而非 .NET**: FDD 形态的 launcher 置于 zip 根时，SCD 包的 .NET 运行时在子目录里，hostfxr 不跨目录解析 → 根目录 .NET launcher 无法启动；原生 exe 零依赖且 `/subsystem:windows` 天然无窗口。vcxproj **不入 slnx**，由 `BuildArtifacts.ps1` 经 vswhere 定位 VS MSBuild 构建（`dotnet msbuild` 不能构建 vcxproj）。
+    - **PlatformToolset 必须用 `$(DefaultPlatformToolset)`**: 写死 v143 在 VS18（v145）上 MSB8020，写死 v145 在 CI VS2022（v143）上同炸——由构建所用 VS 的 Cpp targets 自动提供，本地/CI 自适应。
+    - **MSBuild 命令行坑（Build-Launcher）**: ① 含逗号的属性值必须内嵌引号 `/p:X="1,0,0,0"`（裸逗号 = MSB1006）；② `/p:OutDir|IntDir` 包引号时**不能以 `\` 结尾**（`\"` 被 Windows 命令行解析吞引号 → 参数粘连），一律以 `/` 结尾。
+    - **版本同源强约束**: rc 的 `ProductVersion`（字符串）与 Main 版本共用 `$MainVer`（`LauncherVersionNumeric/String` 属性注入）→ 目录名 `WTGWizard-v{ver}` 与 launcher 探测严格一致；prerelease（如 `1.0.0-preview1`）的 FileVersion 数字段不含后缀 → 精确命中退化为回退搜索（功能不受损）。
+    - **UAC 链**: Main 是 `requireAdministrator`——launcher 必须用 `ShellExecuteExW`（`CreateProcess` 报 `ERROR_ELEVATION_REQUIRED`）；用户拒绝 UAC（`ERROR_CANCELLED`）静默退出。
+    - **署名**: `WTGWizard.Launcher.cpp` 含 Starward.Launcher（MIT）改写片段，文件头保留 Scighost 版权声明；THIRD-PARTY-NOTICES 条目 12。

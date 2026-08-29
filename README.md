@@ -44,8 +44,16 @@
 
 1. Download the latest release ZIP from the [Releases](../../releases) page. Choose `WTGWizard-vX.Y.Z-x64-FDD.zip` or `WTGWizard-vX.Y.Z-x64-SCD.zip`.
 2. Install the required runtimes **before** running the app. See [Requirements](#requirements)
-3. Extract the archive and run `WTGWizard.Main.exe`. The program will request for **elevation**.
+3. Extract the archive and run **`WTGWizard.exe`**. The launcher automatically locates the app (`WTGWizard-vX.Y.Z\WTGWizard.Main.exe`) and starts it. The program will request for **elevation**.
 4. Follow the wizard to complete every setup page, confirm your configurations, then start the deployment. It will take some time to finish the setup affected by disk performance.
+
+```text
+WTGWizard-vX.Y.Z-x64-SCD.zip
+├── WTGWizard.exe            # Launcher — locates and starts the app
+└── WTGWizard-vX.Y.Z\        # Application
+    ├── WTGWizard.Main.exe
+    └── ...
+```
 
 > **Warning**: Deployment erases the target disk or partition. Verify your selections carefully before starting.
 
@@ -55,6 +63,7 @@ Requirements:
 
 - [.NET 10 SDK x64]((https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.400-windows-x64-installer)) (pinned to `10.0.400` via `global.json`)
 - Windows ADK 10.0.26100 (bundled with Visual Studio 2022 or the standalone Windows ADK)
+- **Visual Studio 2022 or Build Tools** with the *Desktop development with C++* workload (builds the launcher, `src/WTGWizard.Launcher`)
 
 ```powershell
 dotnet build WTGWizard.slnx
@@ -124,7 +133,7 @@ WTGWizard used/referred these projects below. Thanks for their excellent works!
 - [Vanara](https://github.com/dahall/Vanara) — Solid foundation of DiskIOService implementation.
 - [Windows CommunityToolkit](https://github.com/CommunityToolkit) — MVVM and WinUI controls.
 - [Serilog](https://serilog.net) — App logging service.
-- [Starward](https://github.com/Scighost/Starward) — One solution with multi-project architecture and localization implementation. Starward is a very beautiful and easy-to-use HoYoverse game launcher with a set of enhancements.
+- [Starward](https://github.com/Scighost/Starward) — One solution with multi-project architecture, localization implementation and Launcher project. Starward is a very beautiful and easy-to-use HoYoverse game launcher with a set of enhancements.
 - [TaskMonitor](https://github.com/linesoft2/TaskMonitor) — The calculation formula of disk performance monitor's average response time. TaskMonitor is a young but powerful system performance monitor allowing you to monitor system performance from taskbar.
 
 ## Disclaimer

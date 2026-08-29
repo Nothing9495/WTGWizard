@@ -40,8 +40,16 @@
 
 1. 从 [Releases](../../../releases) 页面下载 `WTGWizard-vX.Y.Z-x64-FDD.zip`或者`WTGWizard-vX.Y.Z-x64-SCD.zip`。
 2. 在启动前安装必要的运行库，详见[使用要求](#使用要求)
-3. 解压并运行 `WTGWizard.Main.exe`。程序将请求获取**管理员权限**。
+3. 解压并运行 **`WTGWizard.exe`**。启动器会自动定位应用（`WTGWizard-vX.Y.Z\WTGWizard.Main.exe`）并启动它。程序将请求获取**管理员权限**。
 4. 按向导完成每个设置页面，确认配置后开始部署。部署时长受磁盘性能影响，可能需要一定时间。
+
+```text
+WTGWizard-vX.Y.Z-x64-SCD.zip
+├── WTGWizard.exe            # 启动器 —— 定位并启动应用
+└── WTGWizard-vX.Y.Z\        # 应用程序
+    ├── WTGWizard.Main.exe
+    └── ...
+```
 
 > **警告**：部署会擦除目标磁盘或分区。开始前请仔细核对您的选择。
 
@@ -51,6 +59,7 @@
 
 - [.NET 10 SDK x64](https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.400-windows-x64-installer)（由 `global.json` 锁定为 `10.0.400`）
 - Windows ADK 10.0.26100（随 Visual Studio 2022 附带，或单独安装 Windows ADK）
+- **Visual Studio 2022 或 Build Tools**，需勾选*使用 C++ 的桌面开发*工作负载（用于构建启动器 `src/WTGWizard.Launcher`）
 
 ```powershell
 dotnet build WTGWizard.slnx
@@ -119,7 +128,7 @@ WTGWizard 使用/参考了以下项目。感谢它们的出色工作！
 - [Vanara](https://github.com/dahall/Vanara) — DiskIOService 实现的坚实基础。
 - [Windows CommunityToolkit](https://github.com/CommunityToolkit) — MVVM 与 WinUI 控件。
 - [Serilog](https://serilog.net) — 应用日志服务。
-- [Starward](https://github.com/Scighost/Starward) — 单解决方案多项目架构与本地化实现。Starward 是一款美观易用的米哈游游戏启动器，附带丰富的增强功能。
+- [Starward](https://github.com/Scighost/Starward) — 单解决方案多项目架构、本地化实现和启动器项目。Starward 是一款美观易用的米哈游游戏启动器，附带丰富的增强功能。
 - [TaskMonitor](https://github.com/linesoft2/TaskMonitor) — 磁盘性能监视器平均响应时间的计算公式。TaskMonitor 是一款年轻但功能强大的系统性能监视器，让你可以在任务栏中监视系统性能。
 
 ## 免责声明

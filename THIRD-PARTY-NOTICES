@@ -52,20 +52,26 @@ Entries are sorted alphabetically by component name.
     - License: Apache-2.0
     - License text: https://licenses.nuget.org/Apache-2.0
 
-12. System.Numerics.Tensors
+12. Starward.Launcher (adapted portions in src/WTGWizard.Launcher)
+    - License: MIT
+    - Copyright (c) 2023 Scighost
+    - Source: https://github.com/Scighost/Starward
+    - License text: https://licenses.nuget.org/MIT
+
+13. System.Numerics.Tensors
     - License: MIT
     - License text: https://licenses.nuget.org/MIT
 
-13. System.Reactive
+14. System.Reactive
     - License: MIT
     - License text: https://licenses.nuget.org/MIT
 
-14. Vanara (Core, PInvoke.CfgMgr32, PInvoke.Cryptography, PInvoke.Kernel32, PInvoke.Security, PInvoke.SetupAPI)
+15. Vanara (Core, PInvoke.CfgMgr32, PInvoke.Cryptography, PInvoke.Kernel32, PInvoke.Security, PInvoke.SetupAPI)
     - License: MIT
     - Source: https://github.com/dahall/Vanara
     - License text: https://licenses.nuget.org/MIT
 
-15. wimlib (libwim-15.dll)
+16. wimlib (libwim-15.dll)
     - License: GPL-3.0-or-later (distributed via ManagedWimLib under LGPL-3.0-or-later)
     - Source: https://github.com/ebiggers/wimlib
 
