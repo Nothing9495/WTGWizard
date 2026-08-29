@@ -27,12 +27,6 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
 
-# pwsh 7.3+（GitHub Actions Windows 默认 shell）native 传参默认 Standard 模式：
-# 对含引号参数二次转义（\"），MSBuild 收到字面引号 → MSB1008 "Only one project can be specified"。
-# Windows 模式 = PS 5.1 传统规则，Build-Launcher 的参数形式已按该规则在本机验证；
-# PS 5.1 无此偏好变量，赋值仅为创建普通变量，无副作用。
-$PSNativeCommandArgumentPassing = 'Windows'
-
 # ============================================================================
 # Paths
 # ============================================================================
@@ -547,17 +541,21 @@ function Build-Launcher {
     $intDir = "$LauncherOutput/obj/"
     New-Item -ItemType Directory -Force -Path $LauncherOutput | Out-Null
 
+    # 版本经环境变量注入（msbuild 子进程继承）：含逗号的 Numeric 值不经过任何 shell
+    # 命令行层——pwsh 7 与 PS 5.1 对含引号参数的转义规则不同（曾致 CI MSB1008/RC1109），
+    # 消灭命令行引号是跨 shell 唯一稳定解。显式 /p: 覆盖仍可用。
+    $env:WTGW_LAUNCHER_VER_NUM = $versionNumeric
+    $env:WTGW_LAUNCHER_VER_STR = $MainVer
+
     Invoke-CommandLogged `
         -FilePath $msbuild `
         -Arguments @(
-            "`"$LauncherProject`"",
+            $LauncherProject,
             "/m", "/nologo", "/v:m",
             "/p:Configuration=Release",
             "/p:Platform=x64",
-            "`"/p:OutDir=$LauncherOutput/`"",
-            "`"/p:IntDir=$intDir`"",
-            # 逗号在 MSBuild 属性语法中是列表分隔符：值必须内嵌引号，否则 MSB1006
-            "/p:LauncherVersionNumeric=`"$versionNumeric`"",
+            "/p:OutDir=$LauncherOutput/",
+            "/p:IntDir=$intDir",
             "/p:LauncherVersionString=$MainVer"
         ) `
         -LogName "build-launcher.txt"

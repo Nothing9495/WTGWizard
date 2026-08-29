@@ -23,8 +23,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>WTGWizard</TargetName>
     <LinkIncremental>false</LinkIncremental>
-    <!-- 脚本注入：LauncherVersionNumeric=1,0,0,0（FileVersion 数字段）；LauncherVersionString=$MainVer 原样（ProductVersion，prerelease 安全） -->
+    <!-- 脚本经环境变量注入（WTGW_LAUNCHER_VER_NUM="1,0,0,0" / WTGW_LAUNCHER_VER_STR=$MainVer）：
+         环境变量自动成为 MSBuild 属性。逗号值走环境变量可避免 shell 命令行引号转义
+         （pwsh 7 / PS 5.1 对含引号参数的转义规则不同，曾致 CI MSB1008）。
+         显式 /p: 覆盖仍可用；未注入时回退默认值。 -->
+    <LauncherVersionNumeric Condition="'$(LauncherVersionNumeric)'=='' and '$(WTGW_LAUNCHER_VER_NUM)'!=''">$(WTGW_LAUNCHER_VER_NUM)</LauncherVersionNumeric>
     <LauncherVersionNumeric Condition="'$(LauncherVersionNumeric)'==''">0,0,0,0</LauncherVersionNumeric>
+    <LauncherVersionString Condition="'$(LauncherVersionString)'=='' and '$(WTGW_LAUNCHER_VER_STR)'!=''">$(WTGW_LAUNCHER_VER_STR)</LauncherVersionString>
     <LauncherVersionString Condition="'$(LauncherVersionString)'==''">0.0.0</LauncherVersionString>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
