@@ -35,6 +35,7 @@ $Root = (Resolve-Path $PSScriptRoot).Path
 
 $MainProject   = Join-Path $Root "src\WTGWizard.Main\WTGWizard.Main.csproj"
 $WorkerProject = Join-Path $Root "src\WTGWizard.Worker\WTGWizard.Worker.csproj"
+$LauncherProject = Join-Path $Root "src\WTGWizard.Launcher\WTGWizard.Launcher.vcxproj"
 
 $BuildRoot     = Join-Path $Root "build"
 $OutputRoot    = Join-Path $BuildRoot "WTGWizard"
@@ -43,6 +44,12 @@ $DiagnosticsRoot = Join-Path $BuildRoot "BuildDiagnostics"
 
 $FddOutput = Join-Path $OutputRoot "FDD"
 $ScdOutput = Join-Path $OutputRoot "SCD"
+
+# Launcher（vcxproj，由 Build-Launcher 经 vswhere + VS MSBuild 构建）
+$LauncherOutput = Join-Path $BuildRoot "Launcher"
+
+# 打包 staging：publish 内容 → WTGWizard-v{version}\ 子目录，Launcher exe 置根
+$StagingRoot   = Join-Path $BuildRoot "staging"
 
 # Worker 独立验证输出目录（不进 zip；最终 Main 输出内的 Worker 由 csproj 的
 # CopyWorkerBuildOutput* target 从其 Build 输出注入——注意：因此完成后 Worker 目录仅作校验用）
@@ -388,6 +395,13 @@ function Remove-ProjectBuildArtifacts {
             -Force
     }
 
+    foreach ($dir in @($LauncherOutput, $StagingRoot)) {
+        if (Test-Path $dir) {
+            Write-Log "Removing: $dir"
+            Remove-Item -LiteralPath $dir -Recurse -Force
+        }
+    }
+
     # 陈旧 zip（历史实验/不同模式残留）会污染 CI upload 通配符 build/WTGWizard-*.zip，
     # Clean 阶段一并清除。
     Get-ChildItem `
@@ -502,6 +516,52 @@ function Build-Main {
 # ============================================================================
 # Artifact diagnostics
 # ============================================================================
+
+function Build-Launcher {
+    Write-Section "Launcher Build"
+
+    $vswhere = Join-Path (${env:ProgramFiles(x86)}) "Microsoft Visual Studio\Installer\vswhere.exe"
+    if (-not (Test-Path $vswhere)) {
+        throw "vswhere.exe not found. Install Visual Studio 2022 (or Build Tools) with the 'Desktop development with C++' workload to build the launcher."
+    }
+
+    # 不合并 stderr（Pitfall 20）：native 工具 stderr 行会抛 RemoteException
+    $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\Current\Bin\MSBuild.exe" |
+        Select-Object -First 1
+    if (-not ($msbuild -and (Test-Path $msbuild))) {
+        throw "MSBuild.exe for C++ projects (vcxproj) not found via vswhere. Install the 'Desktop development with C++' workload."
+    }
+    Write-Log "VS MSBuild: $msbuild"
+
+    # $MainVer（可含 prerelease 后缀，如 1.0.0-preview1）→ FileVersion 数字四段 "1,0,0,0"
+    $segs = (($MainVer -replace '-.*$', '' -replace '[^0-9.]', '') -split '\.') + @('0', '0', '0', '0')
+    $versionNumeric = "{0},{1},{2},{3}" -f $segs[0], $segs[1], $segs[2], $segs[3]
+    Write-Log "Launcher version: string='$MainVer' numeric=$versionNumeric"
+
+    $intDir = "$LauncherOutput/obj/"
+    New-Item -ItemType Directory -Force -Path $LauncherOutput | Out-Null
+
+    Invoke-CommandLogged `
+        -FilePath $msbuild `
+        -Arguments @(
+            "`"$LauncherProject`"",
+            "/m", "/nologo", "/v:m",
+            "/p:Configuration=Release",
+            "/p:Platform=x64",
+            "`"/p:OutDir=$LauncherOutput/`"",
+            "`"/p:IntDir=$intDir`"",
+            # 逗号在 MSBuild 属性语法中是列表分隔符：值必须内嵌引号，否则 MSB1006
+            "/p:LauncherVersionNumeric=`"$versionNumeric`"",
+            "/p:LauncherVersionString=$MainVer"
+        ) `
+        -LogName "build-launcher.txt"
+
+    $launcherExe = Join-Path $LauncherOutput "WTGWizard.exe"
+    if (-not (Test-Path $launcherExe)) {
+        throw "Launcher build did not produce WTGWizard.exe (expected: $launcherExe)."
+    }
+    Write-Log "Launcher: $launcherExe" "SUCCESS"
+}
 
 function Get-FileManifest {
     param(
@@ -1129,6 +1189,8 @@ function Build-Variant {
 
     New-Item -ItemType Directory -Force -Path $Output | Out-Null
 
+    Build-Launcher
+
     # Worker 先单独 publish 到独立验证目录：确认其 PublishProfile 可用，
     # 同时把 Worker 的 Build 输出（bin\x64\...）留下，供 Main publish 后的 copy target 注入
     Build-Worker `
@@ -1189,16 +1251,40 @@ function Build-SCD {
 function Package-Artifacts {
     Write-Section "Package Artifacts"
 
-    if ($BuildType -eq "FDD") {
-        Compress-Artifact `
-            -Directory (Join-Path $FddOutput $Architecture) `
-            -Name "WTGWizard-$ZipTag-$Architecture-FDD"
+    $publishDir = if ($BuildType -eq "FDD") { Join-Path $FddOutput $Architecture } else { Join-Path $ScdOutput $Architecture }
+    if (-not (Test-Path $publishDir)) {
+        throw "Publish output not found: $publishDir"
     }
-    else {
-        Compress-Artifact `
-            -Directory (Join-Path $ScdOutput $Architecture) `
-            -Name "WTGWizard-$ZipTag-$Architecture-SCD"
+
+    $launcherExe = Join-Path $LauncherOutput "WTGWizard.exe"
+    if (-not (Test-Path $launcherExe)) {
+        throw "Launcher exe not found: $launcherExe (Build-Launcher must run before packaging)."
     }
+
+    # staging：publish 全部内容 → WTGWizard-v{version}\ 子目录；Launcher exe 置 zip 根
+    if (Test-Path $StagingRoot) {
+        Remove-Item -LiteralPath $StagingRoot -Recurse -Force
+    }
+    $appDirName = "WTGWizard-v" + $MainVer
+    $appDir = Join-Path $StagingRoot $appDirName
+    New-Item -ItemType Directory -Force -Path $appDir | Out-Null
+
+    Copy-Item `
+        -Path (Join-Path $publishDir "*") `
+        -Destination $appDir `
+        -Recurse `
+        -Force
+    Copy-Item -LiteralPath $launcherExe -Destination $StagingRoot -Force
+
+    $appCount = (Get-ChildItem $appDir -Recurse -File).Count
+    Write-Log "Staging: $appDirName <- $publishDir ($appCount files)"
+    Write-Log "Staging: WTGWizard.exe <- $launcherExe"
+
+    Compress-Artifact `
+        -Directory $StagingRoot `
+        -Name "WTGWizard-$ZipTag-$Architecture-$BuildType"
+
+    Remove-Item -LiteralPath $StagingRoot -Recurse -Force
 }
 
 # ============================================================================
