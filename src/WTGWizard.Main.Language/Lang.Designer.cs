@@ -795,8 +795,8 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Use the CA 2023-signed boot binaries for boot creation.
-        ///This setting is available only on Windows 11 version 26100.8037 and later. 的本地化字符串。
+        ///   查找类似 Use the CA 2023-signed Windows bootloaders for boot creation.
+        ///This is only available when image version is 26100.8037 or higher. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_AdvOptions_BootEx_Desc {
             get {
@@ -805,7 +805,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Use updated boot binaries 的本地化字符串。
+        ///   查找类似 Use Windows CA 2023 Bootloaders 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_AdvOptions_BootEx_Header {
             get {
@@ -1121,7 +1121,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Updated Boot Binaries 的本地化字符串。
+        ///   查找类似 Windows CA 2023 Bootloaders 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_Confirm_InfoCard_AdvancedOptions_EnableBootEx {
             get {
@@ -1553,7 +1553,8 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Set the capacity of the system partition; the minimum value is the size of the expanded image. If no reserved partition is specified, use all remaining space. 的本地化字符串。
+        ///   查找类似 Set the capacity of the system partition; the minimum value is the size of the expanded image.
+        ///If no reserved partition is specified, use all remaining space. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployMethod_OsSize_Desc {
             get {
