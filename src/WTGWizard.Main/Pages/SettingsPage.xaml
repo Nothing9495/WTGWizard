@@ -80,6 +80,7 @@
               <HyperlinkButton Content="Microsoft Learn | Tutorial: Open files and folders with pickers in WinUI" NavigateUri="https://learn.microsoft.com/windows/apps/develop/files/using-file-folder-pickers"/>
               <HyperlinkButton Content="Microsoft Learn | Microsoft.UI.Xaml.Controls Namespace | Symbol Enum" NavigateUri="https://learn.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.symbol?view=windows-app-sdk-2.0"/>
               <HyperlinkButton Content="Microsoft Learn | Components | Microsoft-Windows-SecureStartup-FilterDriver" NavigateUri="https://learn.microsoft.com/windows-hardware/customize/desktop/unattend/microsoft-windows-securestartup-filterdriver"/>
+              <HyperlinkButton Content="Microsoft Learn | BCDBoot Command-Line Options" NavigateUri="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/bcdboot-command-line-options-techref-di"/>
             </StackPanel>
           </Expander>
         </StackPanel>
