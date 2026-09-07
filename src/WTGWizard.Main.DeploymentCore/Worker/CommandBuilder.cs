@@ -37,9 +37,10 @@ public static class CommandBuilder
     /// <summary>
     /// 检测宿主 bcdboot.exe 是否支持 /offline（版本 ≥ 10.0.26100.0）。
     /// 与 Rufus 逻辑一致：检测工具自身版本而非宿主机 OS 版本。
-    /// TANKS TO Microsoft, I CANNOT pinpoint exactly when or in which version they introduced the `/offline` switche to bcdboot.
+    /// THANKS TO Microsoft, I CANNOT pinpoint exactly when or in which update they introduced the `/offline` switch to bcdboot.
     /// So I had to follow Rufus's approach instead.
     /// Microsoft's documents are a kind of mess, especially the Chinese version.
+    /// </summary>
     public static bool SupportsOffline()
     {
         var bcdbootPath = Path.Combine(Environment.SystemDirectory, "bcdboot.exe");
