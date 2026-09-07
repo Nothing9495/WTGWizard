@@ -24,7 +24,7 @@
 
 ## 使用要求
 
-- 系统：Windows 10 1809（Build 17763）或更高版本，**x64**。在 **Windows 11** 上使用以获得最佳体验。
+- 系统：Windows 10 2004（Build 19041）或更高版本，**x64**。在 **Windows 11** 上使用以获得最佳体验。
 - 运行时: 
   - 对于 `-SCD` 版本: 包含了所有必要运行时，你不需要额外安装任何运行时或框架。
   - 对于 `-FDD` 版本: 需要提前安装[.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) 和 [Windows App SDK 2.4.0 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) 

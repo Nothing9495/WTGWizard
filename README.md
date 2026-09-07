@@ -28,7 +28,7 @@
 
 ## Requirements
 
-- System: Windows 10 version 1809 (Build 17763) or later, **x64**. Best experienced on **Windows 11**.
+- System: Windows 10 version 2004 (Build 19041) or later, **x64**. Best experience on **Windows 11**.
 - Runtimes: 
   - For `-SCD` version: All required runtimes and frameworks are bundled; nothing extra needs to be installed.
   - For `-FDD` version: Both [.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) and [Windows App SDK 2.4.0 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) is reqiured to be installed beforehand.
