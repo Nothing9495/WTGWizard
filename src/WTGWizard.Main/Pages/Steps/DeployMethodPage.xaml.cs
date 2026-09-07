@@ -185,7 +185,10 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
     private void OnOsSizeChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
         if (double.IsNaN(sender.Value))
+        {
+            sender.Value = VM.Image.ImageExpandedSizeGB;
             return;
+        }
         VM.Method.OsDriveSize = sender.Value;
     }
 
