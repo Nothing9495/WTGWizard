@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace WTGWizard.Main.DeploymentCore.Worker;
 
@@ -32,12 +34,28 @@ public static class CommandBuilder
         return $"/Image:{applyDir} /Apply-Unattend:\"{filePath}\"";
     }
 
+    /// <summary>
+    /// 检测宿主 bcdboot.exe 是否支持 /offline（版本 ≥ 10.0.26100.0）。
+    /// 与 Rufus 逻辑一致：检测工具自身版本而非宿主机 OS 版本。
+    /// TANKS TO Microsoft, I CANNOT pinpoint exactly when or in which version they introduced the `/offline` switche to bcdboot.
+    /// So I had to follow Rufus's approach instead.
+    /// Microsoft's documents are a kind of mess, especially the Chinese version.
+    public static bool SupportsOffline()
+    {
+        var bcdbootPath = Path.Combine(Environment.SystemDirectory, "bcdboot.exe");
+        var fileVersion = FileVersionInfo.GetVersionInfo(bcdbootPath);
+        return fileVersion.FileMajorPart == 10 && fileVersion.FileMinorPart == 0 && fileVersion.FileBuildPart >= 26100;
+    }
+
+
     public static string BuildBcdbootArgs(string applyDir, char espDriveLetter,
-        bool enableBootEx, bool enableBootVerbose)
+        bool enableBootEx, bool enableBootVerbose, bool enableOffline)
     {
         ValidateApplyDir(applyDir);
 
-        string args = $"{applyDir}Windows /s {espDriveLetter}: /f UEFI /offline";
+        string args = enableOffline
+            ? $"{applyDir}Windows /s {espDriveLetter}: /f UEFI /offline"
+            : $"{applyDir}Windows /s {espDriveLetter}: /f UEFI";
 
         if (enableBootEx)
             args += " /bootex";

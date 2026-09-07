@@ -20,8 +20,10 @@ public sealed class BcdbootStep : DeploymentStepBase
         if (string.IsNullOrWhiteSpace(ctx.Config.OsDriveLetter.ToString()) || ctx.Config.OsDriveLetter == '\0')
             return StepResult.Fail("osApplyDir is not resolved — partition step may not have run");
 
+        
+
         string bcdArgs = CommandBuilder.BuildBcdbootArgs($"{ctx.Config.OsDriveLetter}:\\",
-            ctx.Config.EspDriveLetter, ctx.Config.EnableBootEx, ctx.Config.EnableBootVerbose);
+            ctx.Config.EspDriveLetter, ctx.Config.EnableBootEx, ctx.Config.EnableBootVerbose, CommandBuilder.SupportsOffline());
 
         ctx.Logger.Debug("Bcdboot", "Args: {Args}", bcdArgs);
 
