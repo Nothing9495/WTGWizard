@@ -1,32 +1,10 @@
-<#
+﻿<#
 .SYNOPSIS
     WTGWizard BuildArtifacts.ps1 —— 构建发布产物并打包为分发包（单模式，FDD 或 SCD）。
 
 .DESCRIPTION
-    依次执行：环境/工程诊断（可选）→ Clean → NuGet restore → 发布 Main/Worker →
-    构建原生 Launcher → 校验产物 → staging → zip 打包。
-
-    输出布局：
-      未指定 -OutputDir（默认，<repo>\build 下平铺，CI 依赖）：
-        <repo>\build\WTGWizard\{FDD|SCD}\x64\          Main 发布产物
-        <repo>\build\WTGWizard-<ZipTag>-x64-<模式>.zip 最终分发包
-        <repo>\build\BuildDiagnostics\                 日志与诊断（含 Build.log）
-        <repo>\build\Launcher\                         原生启动器构建输出
-        <repo>\build\Worker-<模式>\                    Worker 独立验证输出
-        <repo>\build\tools\                            7za 缓存
-        <repo>\build\staging\                          打包临时目录（结束后删除）
-
-      指定 -OutputDir（全部中间产物收敛到 <OutputDir>\WTGWizard）：
-        <OutputDir>\WTGWizard\{FDD|SCD}\x64\                  Main 发布产物
-        <OutputDir>\WTGWizard\WTGWizard-<ZipTag>-x64-<模式>.zip 最终分发包
-        <OutputDir>\WTGWizard\BuildDiagnostics\               日志与诊断（含 Build.log）
-        <OutputDir>\WTGWizard\tools\                          7za 缓存
-        <OutputDir>\WTGWizard\Temp\Launcher\                  原生启动器构建输出
-        <OutputDir>\WTGWizard\Temp\Worker-<模式>\             Worker 独立验证输出
-        <OutputDir>\WTGWizard\Temp\staging\                   打包临时目录（结束后删除）
-
-.PARAMETER Architecture
-    目标架构，目前仅支持 x64。
+    依次执行：诊断（可选）→ Clean → restore → publish Main/Worker → Launcher → 校验 → staging → zip。
+    默认输出到 <repo>\build；指定 -OutputDir 时所有中间产物收敛到 <OutputDir>\WTGWizard。
 
 .PARAMETER BuildType
     发布形态：FDD（依赖框架）或 SCD（自包含）；由 Properties/PublishProfiles/{FDD|SCD}-x64.pubxml 定义。
@@ -41,8 +19,7 @@
     分发包名称中的标签：WTGWizard-<ZipTag>-x64-<BuildType>.zip。
 
 .PARAMETER OutputDir
-    构建输出根目录；指定后所有中间产物收敛到其下 WTGWizard 子目录（见 .DESCRIPTION）。
-    可为绝对路径，或相对仓库根目录的路径。默认 <repo>\build（布局与是否指定无关，不受影响）。
+    输出根目录（绝对或相对仓库根）；指定后中间产物收敛到其下 WTGWizard。默认 <repo>\build。
 
 .PARAMETER SkipClean
     跳过 bin/obj 与旧输出清理。
@@ -50,8 +27,8 @@
 .PARAMETER Diagnostics
     采集环境/工程信息与产物清单（manifest、PRI/XBF 校验等），用于跨机对比。
 
-.PARAMETER MinXbfCount
-    PRI 完整性校验所需的最少 XBF 条目数（默认 20）。
+.PARAMETER Help
+    显示完整脚本用法并退出；亦可使用 `-?` 或 `-h`。
 
 .EXAMPLE
     .\BuildArtifacts.ps1 -BuildType SCD
@@ -63,7 +40,7 @@
     .\BuildArtifacts.ps1 -BuildType SCD -OutputDir ..\artifacts -ZipTag v1.0.0
 
 .NOTES
-    PowerShell 5.1 兼容；本地不支持多实例并发（并行由 CI matrix 承担）。
+    PowerShell 5.1 兼容。
 #>
 
 [CmdletBinding()]
@@ -86,8 +63,20 @@ param(
 
     [switch]$Diagnostics,
 
-    [int]$MinXbfCount = 20
+    [int]$MinXbfCount = 20,
+
+    [Alias("?", "h")]
+    [switch]$Help
 )
+
+# 强制 UTF-8 输出：脚本/诊断含中文，PowerShell 5.1 默认 OEM 代码页会乱码
+try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
+$OutputEncoding = [Text.Encoding]::UTF8
+
+if ($Help) {
+    Get-Help -Full $PSCommandPath | Out-String -Width 120
+    exit 0
+}
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
