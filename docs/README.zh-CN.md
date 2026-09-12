@@ -57,7 +57,7 @@ WTGWizard-vX.Y.Z-x64-SCD.zip
 
 要求：
 
-- [.NET 10 SDK x64](https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.400-windows-x64-installer)（由 `global.json` 锁定为 `10.0.400`）
+- [.NET 10 SDK x64](https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.400-windows-x64-installer)（`global.json` 基线为 `10.0.400`，`rollForward: latestMinor` 允许更高的 `10.0.x` 补丁/次要版本）
 - Windows ADK 10.0.26100（随 Visual Studio 2022 附带，或单独安装 Windows ADK）
 - **Visual Studio 2022 或 Build Tools**，需勾选*使用 C++ 的桌面开发*工作负载（用于构建启动器 `src/WTGWizard.Launcher`）
 

@@ -61,7 +61,7 @@ WTGWizard-vX.Y.Z-x64-SCD.zip
 
 Requirements:
 
-- [.NET 10 SDK x64]((https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.400-windows-x64-installer)) (pinned to `10.0.400` via `global.json`)
+- [.NET 10 SDK x64](https://dotnet.microsoft.com/download/dotnet/thank-you/sdk-10.0.400-windows-x64-installer) (baseline `10.0.400` via `global.json`, `rollForward: latestMinor` allows a later `10.0.x`)
 - Windows ADK 10.0.26100 (bundled with Visual Studio 2022 or the standalone Windows ADK)
 - **Visual Studio 2022 or Build Tools** with the *Desktop development with C++* workload (builds the launcher, `src/WTGWizard.Launcher`)
 
