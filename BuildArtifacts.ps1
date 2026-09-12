@@ -1,4 +1,70 @@
-# WTGWizard BuildArtifacts.ps1
+<#
+.SYNOPSIS
+    WTGWizard BuildArtifacts.ps1 —— 构建发布产物并打包为分发包（单模式，FDD 或 SCD）。
+
+.DESCRIPTION
+    依次执行：环境/工程诊断（可选）→ Clean → NuGet restore → 发布 Main/Worker →
+    构建原生 Launcher → 校验产物 → staging → zip 打包。
+
+    输出布局：
+      未指定 -OutputDir（默认，<repo>\build 下平铺，CI 依赖）：
+        <repo>\build\WTGWizard\{FDD|SCD}\x64\          Main 发布产物
+        <repo>\build\WTGWizard-<ZipTag>-x64-<模式>.zip 最终分发包
+        <repo>\build\BuildDiagnostics\                 日志与诊断（含 Build.log）
+        <repo>\build\Launcher\                         原生启动器构建输出
+        <repo>\build\Worker-<模式>\                    Worker 独立验证输出
+        <repo>\build\tools\                            7za 缓存
+        <repo>\build\staging\                          打包临时目录（结束后删除）
+
+      指定 -OutputDir（全部中间产物收敛到 <OutputDir>\WTGWizard）：
+        <OutputDir>\WTGWizard\{FDD|SCD}\x64\                  Main 发布产物
+        <OutputDir>\WTGWizard\WTGWizard-<ZipTag>-x64-<模式>.zip 最终分发包
+        <OutputDir>\WTGWizard\BuildDiagnostics\               日志与诊断（含 Build.log）
+        <OutputDir>\WTGWizard\tools\                          7za 缓存
+        <OutputDir>\WTGWizard\Temp\Launcher\                  原生启动器构建输出
+        <OutputDir>\WTGWizard\Temp\Worker-<模式>\             Worker 独立验证输出
+        <OutputDir>\WTGWizard\Temp\staging\                   打包临时目录（结束后删除）
+
+.PARAMETER Architecture
+    目标架构，目前仅支持 x64。
+
+.PARAMETER BuildType
+    发布形态：FDD（依赖框架）或 SCD（自包含）；由 Properties/PublishProfiles/{FDD|SCD}-x64.pubxml 定义。
+
+.PARAMETER MainVer
+    Main 应用版本（写入产物并决定 staging 子目录名 WTGWizard-v{版本}）。
+
+.PARAMETER WorkerVer
+    Worker 应用版本。
+
+.PARAMETER ZipTag
+    分发包名称中的标签：WTGWizard-<ZipTag>-x64-<BuildType>.zip。
+
+.PARAMETER OutputDir
+    构建输出根目录；指定后所有中间产物收敛到其下 WTGWizard 子目录（见 .DESCRIPTION）。
+    可为绝对路径，或相对仓库根目录的路径。默认 <repo>\build（布局与是否指定无关，不受影响）。
+
+.PARAMETER SkipClean
+    跳过 bin/obj 与旧输出清理。
+
+.PARAMETER Diagnostics
+    采集环境/工程信息与产物清单（manifest、PRI/XBF 校验等），用于跨机对比。
+
+.PARAMETER MinXbfCount
+    PRI 完整性校验所需的最少 XBF 条目数（默认 20）。
+
+.EXAMPLE
+    .\BuildArtifacts.ps1 -BuildType SCD
+
+.EXAMPLE
+    .\BuildArtifacts.ps1 -BuildType FDD -OutputDir D:\out -Diagnostics
+
+.EXAMPLE
+    .\BuildArtifacts.ps1 -BuildType SCD -OutputDir ..\artifacts -ZipTag v1.0.0
+
+.NOTES
+    PowerShell 5.1 兼容；本地不支持多实例并发（并行由 CI matrix 承担）。
+#>
 
 [CmdletBinding()]
 param(
@@ -14,9 +80,9 @@ param(
 
     [string]$ZipTag = "Build-Artifacts",
 
-    [switch]$SkipClean,
+    [string]$OutputDir = "",
 
-    [switch]$SkipTests,
+    [switch]$SkipClean,
 
     [switch]$Diagnostics,
 
@@ -37,23 +103,49 @@ $MainProject   = Join-Path $Root "src\WTGWizard.Main\WTGWizard.Main.csproj"
 $WorkerProject = Join-Path $Root "src\WTGWizard.Worker\WTGWizard.Worker.csproj"
 $LauncherProject = Join-Path $Root "src\WTGWizard.Launcher\WTGWizard.Launcher.vcxproj"
 
-$BuildRoot     = Join-Path $Root "build"
+# 构建输出根目录：-OutputDir 覆盖，默认 <root>\build（相对路径按仓库根解析）
+if ([string]::IsNullOrWhiteSpace($OutputDir)) {
+    $BuildRoot = Join-Path $Root "build"
+}
+elseif ([System.IO.Path]::IsPathRooted($OutputDir)) {
+    $BuildRoot = [System.IO.Path]::GetFullPath($OutputDir)
+}
+else {
+    $BuildRoot = [System.IO.Path]::GetFullPath((Join-Path $Root $OutputDir))
+}
+
 $OutputRoot    = Join-Path $BuildRoot "WTGWizard"
 
-$DiagnosticsRoot = Join-Path $BuildRoot "BuildDiagnostics"
+# 指定 -OutputDir 时把所有中间产物收敛到 <OutputRoot>（WTGWizard）；
+# 未指定时保持历史布局（build\ 下平铺，CI 依赖该布局）不变。
+$ConsolidateOutput = -not [string]::IsNullOrWhiteSpace($OutputDir)
+
+if ($ConsolidateOutput) {
+    # <OutputRoot>\
+    #   FDD|SCD\x64\       发布产物
+    #   BuildDiagnostics\  日志与诊断
+    #   tools\             7za 缓存
+    #   Temp\              Launcher / Worker-* / staging
+    #   WTGWizard-*.zip    分发包
+    $DiagnosticsRoot = Join-Path $OutputRoot "BuildDiagnostics"
+    $ToolRoot        = Join-Path $OutputRoot "tools"
+    $TempRoot        = Join-Path $OutputRoot "Temp"
+    $LauncherOutput  = Join-Path $TempRoot "Launcher"
+    $StagingRoot     = Join-Path $TempRoot "staging"
+    $WorkerOutput    = Join-Path $TempRoot ("Worker-" + $BuildType.ToLower())
+    $ArchiveRoot     = $OutputRoot
+}
+else {
+    $DiagnosticsRoot = Join-Path $BuildRoot "BuildDiagnostics"
+    $ToolRoot        = Join-Path $BuildRoot "tools"
+    $LauncherOutput  = Join-Path $BuildRoot "Launcher"
+    $StagingRoot     = Join-Path $BuildRoot "staging"
+    $WorkerOutput    = Join-Path $BuildRoot ("Worker-" + $BuildType.ToLower())
+    $ArchiveRoot     = $BuildRoot
+}
 
 $FddOutput = Join-Path $OutputRoot "FDD"
 $ScdOutput = Join-Path $OutputRoot "SCD"
-
-# Launcher（vcxproj，由 Build-Launcher 经 vswhere + VS MSBuild 构建）
-$LauncherOutput = Join-Path $BuildRoot "Launcher"
-
-# 打包 staging：publish 内容 → WTGWizard-v{version}\ 子目录，Launcher exe 置根
-$StagingRoot   = Join-Path $BuildRoot "staging"
-
-# Worker 独立验证输出目录（不进 zip；最终 Main 输出内的 Worker 由 csproj 的
-# CopyWorkerBuildOutput* target 从其 Build 输出注入——注意：因此完成后 Worker 目录仅作校验用）
-$WorkerOutput = Join-Path $BuildRoot ("Worker-" + $BuildType.ToLower())
 
 # ============================================================================
 # Logging
@@ -145,22 +237,34 @@ function Invoke-CommandLogged {
 
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-    if ($outputFile) {
-        & $FilePath @Arguments 2>&1 |
-            Tee-Object -FilePath $outputFile |
-            ForEach-Object {
-                Write-Log "$_"
-            }
+    # 原生命令的 stderr 在 $ErrorActionPreference=Stop 下经 2>&1 合并会被提升为
+    # terminating RemoteException（Pitfall 20），真实错误信息随之中断丢失。
+    # 故调用期间临时降为 Continue，让 stderr 进入管道被记录；
+    # 命令失败仍由下方 $LASTEXITCODE 显式判定。
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
 
-        $exitCode = $LASTEXITCODE
+    try {
+        if ($outputFile) {
+            & $FilePath @Arguments 2>&1 |
+                Tee-Object -FilePath $outputFile |
+                ForEach-Object {
+                    Write-Log "$_"
+                }
+
+            $exitCode = $LASTEXITCODE
+        }
+        else {
+            & $FilePath @Arguments 2>&1 |
+                ForEach-Object {
+                    Write-Log "$_"
+                }
+
+            $exitCode = $LASTEXITCODE
+        }
     }
-    else {
-        & $FilePath @Arguments 2>&1 |
-            ForEach-Object {
-                Write-Log "$_"
-            }
-
-        $exitCode = $LASTEXITCODE
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
     }
 
     $stopwatch.Stop()
@@ -221,7 +325,6 @@ function Collect-EnvironmentInfo {
 
     Write-SubSection "Build parameters"
 
-    Write-Log "Root: $Root"
     Write-Log "Architecture: $Architecture"
     Write-Log "BuildType: $BuildType"
     Write-Log "MainVer: $MainVer"
@@ -357,15 +460,8 @@ function Collect-ProjectInfo {
 function Remove-ProjectBuildArtifacts {
     Write-Section "Clean Build"
 
-    $directories = @(
-        (Join-Path $Root "src\WTGWizard.Main\bin"),
-        (Join-Path $Root "src\WTGWizard.Main\obj"),
-        (Join-Path $Root "src\WTGWizard.Worker\bin"),
-        (Join-Path $Root "src\WTGWizard.Worker\obj")
-    )
-
     # Clean all project bin/obj directories.
-    $directories += Get-ChildItem `
+    $directories = Get-ChildItem `
         -Path (Join-Path $Root "src") `
         -Directory `
         -Recurse `
@@ -386,26 +482,38 @@ function Remove-ProjectBuildArtifacts {
         }
     }
 
-    if (Test-Path $OutputRoot) {
-        Write-Log "Removing output root: $OutputRoot"
-
-        Remove-Item `
-            -LiteralPath $OutputRoot `
-            -Recurse `
-            -Force
+    if ($ConsolidateOutput) {
+        # 收敛布局（-OutputDir）：仅清理发布产物与临时中间产物；
+        # BuildDiagnostics / tools / Worker 验证输出的保留行为与默认布局一致
+        foreach ($dir in @($FddOutput, $ScdOutput, $LauncherOutput, $StagingRoot)) {
+            if (Test-Path $dir) {
+                Write-Log "Removing: $dir"
+                Remove-Item -LiteralPath $dir -Recurse -Force
+            }
+        }
     }
+    else {
+        if (Test-Path $OutputRoot) {
+            Write-Log "Removing output root: $OutputRoot"
 
-    foreach ($dir in @($LauncherOutput, $StagingRoot)) {
-        if (Test-Path $dir) {
-            Write-Log "Removing: $dir"
-            Remove-Item -LiteralPath $dir -Recurse -Force
+            Remove-Item `
+                -LiteralPath $OutputRoot `
+                -Recurse `
+                -Force
+        }
+
+        foreach ($dir in @($LauncherOutput, $StagingRoot)) {
+            if (Test-Path $dir) {
+                Write-Log "Removing: $dir"
+                Remove-Item -LiteralPath $dir -Recurse -Force
+            }
         }
     }
 
-    # 陈旧 zip（历史实验/不同模式残留）会污染 CI upload 通配符 build/WTGWizard-*.zip，
+    # 陈旧 zip（历史实验/不同模式残留）会污染 CI upload 通配符 WTGWizard-*.zip，
     # Clean 阶段一并清除。
     Get-ChildItem `
-        -LiteralPath $BuildRoot `
+        -LiteralPath $ArchiveRoot `
         -File `
         -Force |
         Where-Object { $_.Name -like "WTGWizard-*.zip" } |
@@ -624,73 +732,6 @@ function Get-FileManifest {
 
     Write-Log "Manifest: $manifestPath"
     Write-Log "Files: $($manifest.Count)"
-
-    return $manifest
-}
-
-function Write-ImportantFiles {
-    param(
-        [Parameter(Mandatory)]
-        [string]$Directory,
-
-        [Parameter(Mandatory)]
-        [string]$Name
-    )
-
-    Write-SubSection "Important files: $Name"
-
-    $patterns = @(
-        "WTGWizard.*",
-        "Microsoft.WindowsAppRuntime.*",
-        "Microsoft.ui.xaml.dll",
-        "MrtCore*.dll",
-        "hostfxr.dll",
-        "hostpolicy.dll",
-        "coreclr.dll",
-        "System.Private.CoreLib.dll",
-        "vcruntime*.dll",
-        "msvcp*.dll"
-    )
-
-    $files = foreach ($pattern in $patterns) {
-        Get-ChildItem `
-            -LiteralPath $Directory `
-            -File `
-            -Recurse `
-            -Force `
-            -ErrorAction SilentlyContinue |
-            Where-Object {
-                $_.Name -like $pattern
-            }
-    }
-
-    $files = $files |
-        Sort-Object FullName -Unique
-
-    foreach ($file in $files) {
-        $hash = Get-FileHash `
-            -LiteralPath $file.FullName `
-            -Algorithm SHA256
-
-        $version = $null
-
-        if ($file.Extension -in @(".exe", ".dll")) {
-            try {
-                $version = $file.VersionInfo.FileVersion
-            }
-            catch {
-                $version = $null
-            }
-        }
-
-        Write-Log (
-            "FILE={0} SIZE={1} SHA256={2} VERSION={3}" -f
-            $file.Name,
-            $file.Length,
-            $hash.Hash,
-            $version
-        )
-    }
 }
 
 # ============================================================================
@@ -984,9 +1025,6 @@ function Assert-MainPriComplete {
         throw "WTGWizard.Main.pri missing: $pri"
     }
 
-    $size = (Get-Item $pri).Length
-    Write-Log "PRI size: $size bytes (informational; size check removed)"
-
     $makePri = Get-MakePriPath
 
     if ($makePri) {
@@ -1014,8 +1052,8 @@ function Assert-MainPriComplete {
 
 function Get-ZipTool {
     # 7za.exe（7-Zip 命令行）按需从 NuGet 获取：缓存存在即用（不检查更新），
-    # 缺失时下载最新版并用官方 .nupkg.sha512 校验；任何失败返回 $null 由调用方回退。
-    $toolDir = Join-Path $BuildRoot "tools"
+    # 缺失时下载最新版并用官方 blob SHA512 元数据校验；任何失败返回 $null 由调用方回退。
+    $toolDir = $ToolRoot
     $toolPath = Join-Path $toolDir "7za.exe"
 
     if (Test-Path $toolPath) {
@@ -1034,9 +1072,23 @@ function Get-ZipTool {
 
         $base = "https://api.nuget.org/v3-flatcontainer/7-zip.commandline/$version"
         $nupkg = Join-Path $toolDir "7-zip.commandline.$version.nupkg"
+        $nupkgUrl = "$base/7-zip.commandline.$version.nupkg"
 
-        Invoke-WebRequest "$base/7-zip.commandline.$version.nupkg" -OutFile $nupkg -UseBasicParsing
+        # 完整性校验：flat container 无 .sha512 sidecar；官方源把 SHA512（Base64）
+        # 存放在 nupkg blob 的 x-ms-meta-SHA512 元数据里，须 HEAD 获取。本地用
+        # SHA512 + ToBase64String 计算（Get-FileHash 返回 Hex，不可直接比较）；
+        # 缺失或不匹配由外层 catch 记 WARN 并回退 ZipFile。
+        $expectedHash = (Invoke-WebRequest $nupkgUrl -Method Head -UseBasicParsing).Headers["x-ms-meta-SHA512"]
+
+        Invoke-WebRequest $nupkgUrl -OutFile $nupkg -UseBasicParsing
         Write-Log "Downloaded 7-Zip.CommandLine $version (HTTPS NuGet official source)." "SUCCESS"
+
+        $actualHash = [Convert]::ToBase64String(
+            [System.Security.Cryptography.SHA512]::Create().ComputeHash(
+                [System.IO.File]::ReadAllBytes($nupkg)))
+        if ((-not $expectedHash) -or ($actualHash -ne $expectedHash)) {
+            throw "7-Zip.CommandLine $version SHA512 mismatch"
+        }
 
         $extractDir = Join-Path $toolDir "pkg-$version"
         # PS 5.1 Expand-Archive 仅接受 .zip 扩展名（不校验内容），nupkg 实为 zip → 复制改名
@@ -1133,7 +1185,7 @@ function Compress-Artifact {
 
     Write-SubSection "Create archive: $Name"
 
-    $archive = Join-Path $BuildRoot "$Name.zip"
+    $archive = Join-Path $ArchiveRoot "$Name.zip"
 
     if (Test-Path $archive) {
         Remove-Item $archive -Force
@@ -1169,8 +1221,6 @@ function Compress-Artifact {
         -Algorithm SHA256
 
     Write-Log "Archive SHA256: $($hash.Hash)"
-
-    return $archive
 }
 
 # ============================================================================
@@ -1221,10 +1271,6 @@ function Build-Variant {
             -Name "$ModeLabel-$Architecture"
 
         Get-FileManifest `
-            -Directory $Output `
-            -Name "$ModeLabel-$Architecture"
-
-        Write-ImportantFiles `
             -Directory $Output `
             -Name "$ModeLabel-$Architecture"
 
@@ -1303,12 +1349,13 @@ try {
     Write-Log "Build started."
     Write-Log "Timestamp: $(Get-Date -Format o)"
     Write-Log "Root: $Root"
+    Write-Log "OutputDir: $BuildRoot"
 
-    # SDK 精确锁定观测（global.json rollForward=disable）：解析失败在此快速报错，
+    # SDK 解析观测（global.json rollForward=latestMinor）：解析失败在此快速报错，
     # 不带 2>&1 合并（Pitfall 20：native stderr 会抛 RemoteException）
     $dotnetSdkVersion = & dotnet --version
     if ($LASTEXITCODE -ne 0) {
-        throw "dotnet SDK resolution failed (global.json exact-match). Exit code: $LASTEXITCODE"
+        throw "dotnet SDK resolution failed (global.json). Exit code: $LASTEXITCODE"
     }
     Write-Log "dotnet SDK: $dotnetSdkVersion"
 
@@ -1325,13 +1372,6 @@ try {
     }
 
     Restore-Projects
-
-    if (-not $SkipTests) {
-        Write-Section "Tests"
-
-        Write-Log "Test execution is currently disabled by default."
-        Write-Log "Enable explicitly if the solution has a stable test target."
-    }
 
     # 单模式构建：发布形态由 PublishProfile（Properties/PublishProfiles/*.pubxml）决定
     if ($BuildType -eq "FDD") { Build-FDD } else { Build-SCD }
@@ -1360,7 +1400,7 @@ try {
     else {
         # 默认：仅核心产物（zip）
         Get-ChildItem `
-            -LiteralPath $BuildRoot `
+            -LiteralPath $ArchiveRoot `
             -File `
             -Force |
             Where-Object { $_.Name -like "WTGWizard-*.zip" } |
