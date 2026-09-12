@@ -59,7 +59,7 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=SCD-x64
 dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\publish\FDD
 ```
 
-- **SDK**: .NET 10.0.400 (`global.json` `rollForward: disable` 精确锁定；升级 SDK = 显式提交 global.json 变更)
+- **SDK**: `global.json` 基线 `.NET 10.0.400` + `rollForward: latestMinor`（允许 10.0.x 次要/补丁升级，实际解析以本机安装为准，如 10.0.401；升级策略变更 = 显式提交 global.json）
 - **Target Framework**: `net10.0-windows10.0.26100.0`
 - **Language Version**: `preview`
 - **Platform**: x64 only
@@ -494,7 +494,7 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 
 24. **Release 无 PDB（源头消除）**: `src/Directory.Build.props` 对 Release 全仓设 `DebugType=None` + `DebugSymbols=false`——pubxml 属性非全局、ProjectReference 工程不可见，PDB 须在 props 层源头消除（BuildArtifacts.ps1 的 7za `-x!*.pdb`/ZipFile 回退排除降级为冗余保险）。**代价**：Release 构建无符号，崩溃栈无行号；排查需本地临时带符号重建（移除该块或改 `DebugType=embedded`）。同文件历史上的 `PathMap` 曾随重写移除、后已恢复（无条件应用，Debug 的 PDB 同样受益；`DefaultItemExcludes` 的多模式 obj 排除在 Profile 化单 obj 后由 SDK 默认排除覆盖，保持移除——见 Pitfall 20）。
 
-25. **产物确定性（文件内容级，496/497 + Main.dll 豁免）**: 等输入定义 = 同提交 + SDK 恰为 `global.json` 锁定版（`rollForward: disable`，本仓 10.0.400）+ lock `--locked-mode` 包图 + 相同 `-p:Version`（脚本默认常量 1.0.0）+ `Directory.Build.props` 的 `PathMap`（源路径映射，Release 无 PDB 时为防御层）。验证结论（2026-08-28，本机 zh-CN vs GA en-US runner，SCD 497 文件）：**除 `WTGWizard.Main.dll` 外全部跨机 SHA256 一致**。
+25. **产物确定性（文件内容级，496/497 + Main.dll 豁免）**: 等输入定义 = 同提交 + SDK 为 `global.json` 基线版（`rollForward: latestMinor`，本仓基线 10.0.400，实际可漂移为 10.0.x——跨机对比须以诊断日志中记录的 `dotnet --version` 实际值为准）+ lock `--locked-mode` 包图 + 相同 `-p:Version`（脚本默认常量 1.0.0）+ `Directory.Build.props` 的 `PathMap`（源路径映射，Release 无 PDB 时为防御层）。验证结论（2026-08-28，本机 zh-CN vs GA en-US runner，SCD 497 文件）：**除 `WTGWizard.Main.dll` 外全部跨机 SHA256 一致**。
     - **Main.dll 豁免依据（已归因，非环境差异）**: WinUI XAML 编译器为 x:Bind 绑定类按**并行处理完成顺序**分配全局递增编号（`{Page}_objN_Bindings`），编号非确定 → 生成类型名不同（实测 GA `DeployMethodPage_obj42` vs 本机 `obj20`）→ CsWinRT 源生成器随之生成不同的 `VtableClasses`/`WinRTTypeDetails` → Main.dll 元数据/IL/布局漂移。**同机两次 Clean 重建哈希亦不同**（`0D9D5FA5…` vs `49C60A12…`）——编译器内在非确定性，非 locale/路径/环境问题。唯一 XAML 程序集才受影响（其余 496 文件佐证）。尚无公开编译器开关可固定编号；如需上游修复可向 microsoft-ui-xaml 报 issue。
     - **误诊排除记录（勿重复排查）**: `-Diagnostics` 的 MSBuild 属性快照中 `ShouldComputeInputPris`/`EnableCoreMrtTooling`/`WindowsSdkBuildToolsVersion` 在 GA 侧为空、本地有值——这是**采集时机假象**（`Collect-ProjectInfo` 在 restore 之前执行，GA 全新 checkout 时 obj 无 assets → 包 props 未导入），与产物差异无关（Worker 侧快照零差异且 Worker.dll 一致）。
     - **Runbook（跨构建/跨机对比）**: ① `BuildArtifacts.ps1 -BuildType SCD -Diagnostics`（默认即 Clean + 固定 Version，manifest 落盘 `build/BuildDiagnostics/SCD-x64.csv`，含环境快照）；② 对比两份 CSV 时**必须投影掉 `LastWriteTimeUtc` 列**（文件时间戳每次构建必不同，直接 diff 永远报差异）——`Import-Csv` 后仅比 `RelativePath`+`SHA256`（可加 `Length`）；③ 差异文件归因顺序：Main.dll（已知豁免）→ 新出现的文件 → 其余。
