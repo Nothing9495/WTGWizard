@@ -2,8 +2,8 @@
 
 ## Agent Constraints
 **Whatever content you're trying to write into AGENTS.md, use English first.**
-**Before running any command or starting any session, run `powershell -NoLogo -Command 'Get-Culture'`(on Windows) or `locale`(on Unix/Linux) first to determine the language for the ToC and messages.**
-**If the user determined what language you should use, ignore the system culture language and do as they want.**
+**You MUST first — before running any command or starting any session — run `powershell -NoLogo -Command 'Get-Culture'` on Windows or `locale` on Unix/Linux to check the system language setting. Use the result to determine the primary language for human-agent interaction in the current session. Always provide the final answer and all user-facing responses according to system culture. Do not mix languages in the final output. Do NOT infer the output language from the user's message.**
+**If the user instructed what language you should use, IGNORE the system culture language and DO AS THEY WANT.**
 **When trying to write any content to project files, use `CRLF` first on Windows and `LF` on Unix/Linux.**
 
 ## Project Overview
