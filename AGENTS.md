@@ -1,5 +1,10 @@
 # AGENTS.md
 
+## Agent Constraints
+**Whatever content you're trying to write into AGENTS.md, use English first.**
+**Before running any command or starting any session, run `powershell -NoLogo -Command 'Get-Culture | Select DisplayName'` first to determine the language for the ToC and messages.**
+**When trying to write any content to project files, use `CRLF` first on Windows and `LF` on Unix/Linux.**
+
 ## Project Overview
 
 **WTGWizard** is a Windows To Go (WTG) deployment wizard — a WinUI 3 desktop application that guides users through creating Windows To Go workstations.
@@ -14,20 +19,20 @@
 
 ```
 src/
-├── WTGWizard.Main/            # WinUI 3 主应用 (WinExe)
+├── WTGWizard.Main/            # WinUI 3 main app (WinExe)
 │   ├── Pages/                 #   MainWindow, TaskPage, WizardHost, SettingsPage, Steps/
-│   ├── ViewModels/            #   WizardViewModel + 5 子 VM
+│   ├── ViewModels/            #   WizardViewModel + 5 sub-VMs
 │   ├── UserControls/          #   TaskContentCard, TerminalBox, ImageInfoCard, File/FolderPicker
 │   ├── Helpers/               #   TitleBarHelper, WindowHelper, WindowsBuildHelper
-│   ├── Models/                #   WinBuildConstants.cs（构建号阈值）
+│   ├── Models/                #   WinBuildConstants.cs (build-number thresholds)
 │   ├── Messages/              #   NavigateToPageMessage
-│   └── Styles/                #   AbortButtonResources.xaml（TaskPage 局部引用）
-├── WTGWizard.Main.Language/   # 本地化资源 (.resx) + Localization.cs 访问器
-├── WTGWizard.Main.DeploymentCore/  # 部署引擎（模型/步骤/编排器/Worker 桥接）
-├── WTGWizard.Shared.Services/ # 核心服务：磁盘、WIM、日志、终端缓冲
-├── WTGWizard.Shared.Common/   # Named Pipe IPC 协议
-├── WTGWizard.Launcher/        # 原生启动器 (vcxproj/C++，不入 slnx，由构建脚本 msbuild 调用)
-└── WTGWizard.Worker/          # Worker 子进程 (Exe)
+│   └── Styles/                #   AbortButtonResources.xaml (referenced locally by TaskPage)
+├── WTGWizard.Main.Language/   # Localization resources (.resx) + Localization.cs accessor
+├── WTGWizard.Main.DeploymentCore/  # Deployment engine (models/steps/orchestrator/Worker bridge)
+├── WTGWizard.Shared.Services/ # Core services: disk, WIM, logging, terminal buffer
+├── WTGWizard.Shared.Common/   # Named Pipe IPC protocol
+├── WTGWizard.Launcher/        # Native launcher (vcxproj/C++; not in slnx, invoked by the build script via msbuild)
+└── WTGWizard.Worker/          # Worker child process (Exe)
 ```
 
 ### Dependency Graph
@@ -50,16 +55,42 @@ Worker is NOT a project reference — MSBuild targets copy Worker output to Main
 
 ## Build & Run
 
+### Build Path Selection (Agent constraints)
+
+**Prefer the DevVM remote build.** Before building, check three conditions in order:
+
+1. The `devvm-remote-build` skill is installed (available in the skills list)
+2. The DevVM build environment is available (`ssh -o ConnectTimeout=8 devvm "dotnet --version"` succeeds)
+3. The project manifest `.devvm-build.json` exists (at the project root)
+
+| Result | Action |
+|---|---|
+| All three satisfied | **DevVM remote build** (below) |
+| Any not satisfied | **Fall back to local build** (below), and state the reason for the fallback in your reply |
+
+### Remote Build (preferred)
+
+```powershell
+# Any PowerShell on the Host (pwsh preferred; use powershell 5.1 when pwsh is absent — the script is 5.1-compatible)
+powershell -NoProfile -File "$env:USERPROFILE\.config\opencode\skills\devvm-remote-build\scripts\Remote-Build.ps1" -ProjectPath "E:\Development\Local_Projects\WTGWizard.AOT"
+```
+
+- Manifest command: `BuildArtifacts.ps1 -BuildType FDD -OutputDir {artifactDir}`, timeout 600s
+- Artifact retrieval: `E:\Development\BuildArtifacts\WTGWizard.AOT`
+- The bash tool timeout must be set to ≥ 1800000 ms
+
+### Local Build (fallback)
+
 ```powershell
 # Build
 dotnet build WTGWizard.slnx
 
-# Publish (发布参数唯一来源：Properties/PublishProfiles/*.pubxml，见 Pitfall 22)
+# Publish (single source of publish parameters: Properties/PublishProfiles/*.pubxml; see Pitfall 22)
 dotnet publish src/WTGWizard.Main -p:PublishProfile=SCD-x64
 dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\publish\FDD
 ```
 
-- **SDK**: `global.json` 基线 `.NET 10.0.400` + `rollForward: latestMinor`（允许 10.0.x 次要/补丁升级，实际解析以本机安装为准，如 10.0.401；升级策略变更 = 显式提交 global.json）
+- **SDK**: `global.json` baseline `.NET 10.0.400` + `rollForward: latestMinor` (allows 10.0.x minor/patch upgrades; the actual resolution depends on the local installation, e.g. 10.0.401; a change of the upgrade policy = an explicit commit to global.json)
 - **Target Framework**: `net10.0-windows10.0.26100.0`
 - **Language Version**: `preview`
 - **Platform**: x64 only
@@ -75,11 +106,11 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\
 
 **Helpers/**: `TitleBarHelper` (custom title bar), `WindowHelper` (window sizing/centering), `WindowsBuildHelper` (BootEx build-number threshold check — `MeetsBootExThreshold` via `BuildMajor*`/`BuildRevisionThreshold` from `Models/WinBuildConstants.cs`)
 
-**Models/**: `WinBuildConstants.cs` — UI 侧唯一常量类（Windows 构建号阈值：`BuildMajor26100`/`BuildMajor26200`/`BuildRevisionThreshold`，仅供 WindowsBuildHelper）。磁盘/部署常量不在此处（见 DiskConstants/DeploymentConstants）。
+**Models/**: `WinBuildConstants.cs` — the only constant class on the UI side (Windows build-number thresholds: `BuildMajor26100`/`BuildMajor26200`/`BuildRevisionThreshold`, used only by WindowsBuildHelper). Disk/deployment constants are not here (see DiskConstants/DeploymentConstants).
 
-**Messages/**: `NavigateToPageMessage` — WeakReferenceMessenger 跨页导航（发送到 MainWindow → Frame 切换）
+**Messages/**: `NavigateToPageMessage` — WeakReferenceMessenger cross-page navigation (sent to MainWindow → Frame switch)
 
-**Debug-Build Warning**: `RootGrid_Loaded` 末尾 `#if DEBUG ShowDebugBuildWarning()` → ContentDialog（每次 DEBUG 启动弹出，本地化键 `App.Dialog.DebugBuild.*`）
+**Debug-Build Warning**: `RootGrid_Loaded` ends with `#if DEBUG ShowDebugBuildWarning()` → ContentDialog (shown on every DEBUG launch; localization keys `App.Dialog.DebugBuild.*`)
 
 **5-Step Wizard** (`Pages/Steps/`):
 
@@ -107,10 +138,10 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\
 
 | Directory | Responsibility |
 |-----------|---------------|
-| `Models/` | `DeploymentConfig`, `DeploymentConstants`（部署执行参数唯一来源：Worker 命令超时 Timeout*Ms）, `DeployTaskId` (verb-object), `DeployTaskItem`, `TaskUpdate`, `StepResult`, `WorkerCommand`, `DeploymentResult`, `DeployTaskStatus`, `WorkerExecutionResult` |
+| `Models/` | `DeploymentConfig`, `DeploymentConstants` (single source of deployment execution parameters: Worker command timeouts Timeout*Ms), `DeployTaskId` (verb-object), `DeployTaskItem`, `TaskUpdate`, `StepResult`, `WorkerCommand`, `DeploymentResult`, `DeployTaskStatus`, `WorkerExecutionResult` |
 | `Contracts/` | `IDeploymentOrchestrator`, `IDeploymentStep` (+`TitleKey`/`DescriptionKey`), `IWorkerProcess`, `IStepContext`, `IDeploymentPipeline`, `IAnswerFileProvider` |
 | `Orchestrator/` | `DeploymentOrchestrator` (pipeline + `DiskNumber` + localized task list), `StepContext`, `DeploymentPipeline`, `DeploymentStepBase` |
-| `Steps/` | 7 steps（类名以行为命名，TaskId 用 verb-object——映射见 DeployTaskId 表）: `PartitionStep`, `ExtractStep`, `DriverStep`, `ImportAnsFileStep`, `ApplyWtgStep`, `BcdbootStep`, `CleanupStep` |
+| `Steps/` | 7 steps (class names are behavior-based; TaskId uses verb-object — see the DeployTaskId table for the mapping): `PartitionStep`, `ExtractStep`, `DriverStep`, `ImportAnsFileStep`, `ApplyWtgStep`, `BcdbootStep`, `CleanupStep` |
 | `Worker/` | `WorkerProcess` (UTF-8 stdout/stderr read → `TerminalOutputBuffer`), `WorkerCommandFactory`, `CommandBuilder`, `WorkerSettings` |
 | `Builders/` | `DiskScriptBuilder` (PowerShell scripts, forces `[Console]::OutputEncoding=UTF8`), `AnswerFileGenerator`, `TempFileManager` |
 
@@ -118,14 +149,14 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\
 
 | Service | Purpose |
 |---------|---------|
-| `DiskIOService` | Disk enumeration (SetupAPI), partition queries, safety checks, device monitoring — split into `DiskIOReader` / `DiskIOWriter`（⚠️ PInvoke 重写中,见 TODO）/ `DiskIOWatcher` |
-| `DriveLetterService` | Two-phase drive letter assignment（fallback chains 见 `Models/DiskConstants.cs`） |
+| `DiskIOService` | Disk enumeration (SetupAPI), partition queries, safety checks, device monitoring — split into `DiskIOReader` / `DiskIOWriter` (⚠️ PInvoke rewrite in progress; see TODO) / `DiskIOWatcher` |
+| `DriveLetterService` | Two-phase drive letter assignment (fallback chains in `Models/DiskConstants.cs`) |
 | `DiskPerformanceMonitor` | Disk perf counters (TaskPage toolbar) |
 | `WimService` (namespace `WTGWizard.Shared.Services.WimService`) | WIM operations via ManagedWimLib — **single wimlib load point** (`Wim.GlobalInit`); `ExtractImageAsync` reports progress **only on EXTRACT_STREAMS** messages (stage messages via `WimExtractStage` callback); `DiskConstants.BytesPerGiB` |
 | `LoggerService` | Serilog: Debug sink + optional File sink (day rolling, `fileNameTemplate`, retains 7 days) |
 | `TerminalOutputBuffer` | Thread-safe snapshot buffer (Worker stdout writes, TaskPage reads; skips snapshot build when no subscribers) |
 
-**Disk Models** (`DiskServices/Models/`): `DiskBasicInfo`, `PartitionBasicInfo`, `DiskConstants`（磁盘物理布局**唯一来源**：GPT GUID（Guid + PS 字符串）、分区布局参数、CleanInstall 固定分区号、盘符回退链、EFI 尺寸范围；预留项供 DiskIOWriter PInvoke 使用）
+**Disk Models** (`DiskServices/Models/`): `DiskBasicInfo`, `PartitionBasicInfo`, `DiskConstants` (the **single source** of disk physical layout: GPT GUIDs (Guid + PS strings), partition layout parameters, CleanInstall fixed partition numbers, drive-letter fallback chains, EFI size range; reserved entries for DiskIOWriter PInvoke)
 
 ### WTGWizard.Shared.Common — IPC Protocol
 
@@ -148,7 +179,7 @@ Entry point: `Program.cs` → parse command → dispatch to handler
 | `filecopy` | ✅ | File copy operations |
 | `extract` | ✅ | WIM extraction via `SharedServices.WimService` (progress on EXTRACT_STREAMS; stage messages + 5s-throttled progress via stdout) |
 
-**Files**: `Commands/` (5 command classes + `CommandArgs`), `Encoding/EncodingResolver.cs`, `ProcessRunner.cs`, `PipeHelper.cs`（复用 `Shared.Common.PipeWriter` + 三次握手）, `WorkerCancellation.cs`, `WorkerDebug.cs`, `Models/WorkerResult.cs`
+**Files**: `Commands/` (5 command classes + `CommandArgs`), `Encoding/EncodingResolver.cs`, `ProcessRunner.cs`, `PipeHelper.cs` (reuses `Shared.Common.PipeWriter` + three-way handshake), `WorkerCancellation.cs`, `WorkerDebug.cs`, `Models/WorkerResult.cs`
 
 **Encoding** (`Encoding/EncodingResolver.cs`): per-executable output decoding — PowerShell = UTF-8 (scripts force it), DISM/BCDBoot = system OEM code page (adaptive: zh-CN 936 / en-US 437 / ja-JP 932). Worker stdout/stderr are UTF-8 (stream-wrapped, no `Console.OutputEncoding` dependency).
 
@@ -243,7 +274,7 @@ WeakReferenceMessenger.Default.Register<NavigateToPageMessage>(this, (r, m) => {
 
 ### IPC Protocol
 
-Newline-delimited JSON over Named Pipes — **every message must end with `PipeProtocol.NewLine`** (`ReadLine()` frames on `\n`)：
+Newline-delimited JSON over Named Pipes — **every message must end with `PipeProtocol.NewLine`** (`ReadLine()` frames on `\n`):
 
 ```json
 {"type":"task_progress","task":"extract","percent":45.2}
@@ -295,7 +326,7 @@ XAML bindings use the C# property name:
 
 ### DeployTaskId Naming (verb-object)
 
-| Step 类 | Field | Value | TitleKey |
+| Step class | Field | Value | TitleKey |
 |---------|-------|-------|----------|
 | `PartitionStep` | `CreateDiskLayout` | create-disk-layout | Task.CreateDiskLayout.Title |
 | `ExtractStep` | `ExtractImage` | extract-image | Task.ExtractImage.Title |
@@ -395,10 +426,10 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 | Area | Status | Location |
 |------|--------|----------|
 | 5-Step Wizard UI | ✅ Complete | `Pages/Steps/` |
-| TaskPage (full framework) | ✅ Complete | `Pages/TaskPage.xaml` + `.cs`, `UserControls/TaskContentCard.xaml`, `TerminalBox.xaml`（含 SwitchPresenter 双态） |
+| TaskPage (full framework) | ✅ Complete | `Pages/TaskPage.xaml` + `.cs`, `UserControls/TaskContentCard.xaml`, `TerminalBox.xaml` (with dual-state SwitchPresenter) |
 | Disk Services | ✅ Complete | `Shared.Services/DiskServices/` |
 | WIM Service (extract + stages) | ✅ Complete | `Shared.Services/WimService/` |
-| Image Verification (manual, 4-state) | ✅ Complete | `ImageConfigVM.VerifyStatus`（Idle/Verifying/Succeeded/NotPass/Failed/Unknown）+ 三态 InfoBar + 进度/取消 |
+| Image Verification (manual, 4-state) | ✅ Complete | `ImageConfigVM.VerifyStatus` (Idle/Verifying/Succeeded/NotPass/Failed/Unknown) + three-state InfoBar + progress/cancel |
 | ImageFileGuard (program-lifetime handle) | ✅ Complete | `Shared.Services/WimService/ImageFileGuard.cs` |
 | WimVerificationException (verify-fail vs open-fail) | ✅ Complete | `Shared.Services/WimService/WimVerificationException.cs` |
 | IPC Protocol | ✅ Complete | `Shared.Common/` |
@@ -407,16 +438,16 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 | Deployment Orchestrator | ✅ Complete | `Main.DeploymentCore/Orchestrator/` |
 | Encoding Adapter | ✅ Complete | `Worker/Encoding/EncodingResolver.cs` |
 | Terminal Buffer + Logging | ✅ Complete | `Shared.Services/TerminalOutputBuffer.cs`, `LoggerService/` |
-| SettingsPage | ✅ Complete | `Pages/SettingsPage.xaml`（Worker `--debug` Toggle，本地化） |
-| Global CardBorderStyle | ✅ Complete | `App.xaml`（`CardBorderStyle`，供 ConfirmPage/ImageInfoCard/WizardHost 复用） |
-| Debug Build Dialog | ✅ Complete | `MainWindow.xaml.cs`（`#if DEBUG` 启动弹窗，键 `App.Dialog.DebugBuild.*`） |
+| SettingsPage | ✅ Complete | `Pages/SettingsPage.xaml` (Worker `--debug` toggle, localized) |
+| Global CardBorderStyle | ✅ Complete | `App.xaml` (`CardBorderStyle`, reused by ConfirmPage/ImageInfoCard/WizardHost) |
+| Debug Build Dialog | ✅ Complete | `MainWindow.xaml.cs` (`#if DEBUG` startup dialog; keys `App.Dialog.DebugBuild.*`) |
 | DiskIOWriter | ⚠️ Stub | `Shared.Services/DiskServices/DiskIOService/DiskIOWriter.cs` (PInvoke Implementation to replace Powershell disk layout creation script.) |
-| 常量收敛（三份重叠） | ✅ Resolved | `WinBuildConstants`（UI 构建阈值）/ `DeploymentConstants`（Worker 超时）/ `DiskConstants`（磁盘布局唯一来源）——见 Pitfall 18 |
-| 构建脚本（PublishProfile 化，单模式） | ✅ Complete | `BuildArtifacts.ps1`（`-BuildType FDD/SCD` 单模式 + 发布参数由 `Properties/PublishProfiles/*.pubxml` 提供 + 并行/隔离机制已移除；机制与坑见 Pitfall 20；Profile 化见 Pitfall 22） |
-| SCD 裁剪 + PDB 源头消除 | ✅ Complete | SCD pubxml `PublishTrimmed=true` + `TrimMode=partial`（FDD 关闭，无运行时可裁）；`Directory.Build.props` Release `DebugType=None` 消除 ProjectReference PDB——zip 110→90MB；代价见 Pitfall 24 |
-| WASDK 子包白名单（产物瘦身） | ✅ Complete | `Main.csproj` 11 引用锁集（metapackage 锚 + 白名单 5 + 黑名单 5 `ExcludeAssets="all"`）——SCD 解压 250→182MB / 497 文件，desktop runtime pack（WPF/WinForms ~50MB）随 AI/ML 黑名单顺带消失；结构与更新流程见 Pitfall 23 |
-| 产物确定性（文件内容级） | ✅ 496/497 | 同提交 + SDK 锁定 + lock 包图下，跨机逐文件 SHA256 一致；`WTGWizard.Main.dll` 为已归因例外（XAML 编译器 objN 编号非确定）——范围/Runbook/豁免依据见 Pitfall 25 |
-| Launcher + 新发布结构 | ✅ Complete | 原生 C 启动器 `src/WTGWizard.Launcher`（产物 `WTGWizard.exe`，定位 `WTGWizard-v{version}\WTGWizard.Main.exe` 启动）；zip 根 = launcher + 应用子目录；选型/构建坑见 Pitfall 26 |
+| Constant consolidation (three overlapping copies) | ✅ Resolved | `WinBuildConstants` (UI build thresholds) / `DeploymentConstants` (Worker timeouts) / `DiskConstants` (single source of disk layout) — see Pitfall 18 |
+| Build script (PublishProfile-based, single mode) | ✅ Complete | `BuildArtifacts.ps1` (`-BuildType FDD/SCD` single mode + publish parameters provided by `Properties/PublishProfiles/*.pubxml` + parallel/isolation mechanisms removed; see Pitfall 20 for the mechanism and gotchas; see Pitfall 22 for the Profile transition) |
+| SCD trimming + PDB source elimination | ✅ Complete | SCD pubxml `PublishTrimmed=true` + `TrimMode=partial` (disabled for FDD — nothing to trim without a runtime); `Directory.Build.props` Release `DebugType=None` eliminates ProjectReference PDBs — zip 110→90MB; see Pitfall 24 for the cost |
+| WASDK subpackage allowlist (artifact slimming) | ✅ Complete | `Main.csproj` 11-reference lock set (metapackage anchor + allowlist of 5 + denylist of 5 with `ExcludeAssets="all"`) — SCD extraction 250→182MB / 497 files; the desktop runtime pack (WPF/WinForms ~50MB) disappears along with the AI/ML denylist; see Pitfall 23 for the structure and update procedure |
+| Artifact determinism (file-content level) | ✅ 496/497 | Under the same commit + locked SDK + locked package graph, per-file SHA256 matches across machines; `WTGWizard.Main.dll` is an attributed exception (non-deterministic XAML compiler objN numbering) — see Pitfall 25 for scope/runbook/exemption rationale |
+| Launcher + new release structure | ✅ Complete | Native C launcher `src/WTGWizard.Launcher` (produces `WTGWizard.exe`; locates and launches `WTGWizard-v{version}\WTGWizard.Main.exe`); zip root = launcher + application subdirectory; see Pitfall 26 for the choice and build gotchas |
 
 ---
 
@@ -456,53 +487,53 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 
 17. **ExtractFileAsync semantics**: `targetFilePath` is a FILE path (not a directory). Internally it extracts to the target's parent dir with `ExtractFlags.NoPreserveDirStructure | ExtractFlags.NoAcls`, then `File.Move(overwrite: true)`. Using a bare `ExtractPath(target=filePath, ...)` would create `<filePath>\Windows\Panther\...` with full WIM ACLs.
 
-18. **常量三处重叠（已收敛）**: 历史上 GPT GUID/分区布局/回退链/超时在 `Main/Models/Constants.cs`、`DeploymentCore/Models/DeploymentConstants.cs`、`Shared.Services/DiskServices/Models/DiskConstants.cs` 三处重复定义（部分重叠）。2026-08-06 已收敛为三个单一来源：**`DiskConstants`**（磁盘物理布局唯一来源，Main/DeploymentCore 均可引用）、**`DeploymentConstants`**（仅 Worker 命令超时 Timeout*Ms）、**`WinBuildConstants`**（仅 Windows 构建号阈值）。新增磁盘/部署常量按此归属；旧文件 `Constants.cs`/`WimConstants.cs` 已删除，`DiskConstants` 中为 DiskIOWriter PInvoke 预留的项标注 `reserved` 注释。
+18. **Three overlapping constant copies (consolidated)**: Historically GPT GUIDs/partition layout/fallback chains/timeouts were defined (partially overlapping) in three places: `Main/Models/Constants.cs`, `DeploymentCore/Models/DeploymentConstants.cs`, and `Shared.Services/DiskServices/Models/DiskConstants.cs`. On 2026-08-06 they were consolidated into three single sources: **`DiskConstants`** (the single source of disk physical layout; referencable by both Main and DeploymentCore), **`DeploymentConstants`** (only Worker command timeouts Timeout*Ms), and **`WinBuildConstants`** (only Windows build-number thresholds). New disk/deployment constants belong in these; the old files `Constants.cs`/`WimConstants.cs` have been deleted, and entries reserved in `DiskConstants` for DiskIOWriter PInvoke are annotated with a `reserved` comment.
 
-19. **WASDK unpackaged self-contained 启动崩溃（仅论据）**: 以下为 `WindowsAppSDKSelfContained=true` + unpackaged（`WindowsPackageType=None`）构建的观测事实，不做结论推导：
-   - SCD 产物启动崩溃：`0xc000027b`（stowed）/ `E_FAIL` @ `Application.Start`（Microsoft.UI.Xaml.dll `FailFastWithStowedExceptions`）；FDD 产物正常。
-   - 产物差异：SCD Main.dll 内嵌 `UndockedRegFreeWinRTCS` 与 `Microsoft.WindowsAppRuntime.dll` 类型引用（较 FDD +127KB）；SCD apphost 内嵌 `WindowsAppRuntime`/activation 引用（400KB vs FDD 271KB）。
-   - 二分替换实验（pri 保持 82KB 不变，pri 非崩溃因素）：SCD exe + FDD dll → 崩于 Microsoft.UI.Xaml.dll（0xc000027b）；FDD exe + SCD dll → 崩于 CoreMessagingXP.dll（0xc0000602）；FDD exe + dll → 正常。
-   - 本机安装有 `Microsoft.WindowsAppRuntime.2` 2.3.1.0（与项目 PackageReference 同版本），FDD 走共享注册运行时。
-   - 版本实验：WASDK `1.8.260710003`、`2.3.2-experimentala` 仍复现崩溃；`1.7.260224002` 缺 `Microsoft.Windows.Storage.Pickers`（`FileOpenPicker`/`FileSavePicker` 不可用）。
-   - 上游参照：[microsoft/WindowsAppSDK#6248](https://github.com/microsoft/WindowsAppSDK/issues/6248)（1.8+ unpackaged self-contained 崩溃，1.7 及更早不重现；Open）。
-   - 当前处置：SCD 构建保留 `SelfContained=true` + `WindowsAppSDKSelfContained=true`（均在 `SCD-x64.pubxml`）；FDD 用 `WindowsAppSDKSelfContained=false`（`FDD-x64.pubxml`）；构建顺序无关——每次 `BuildArtifacts.ps1` 运行都会 Clean（Pitfall 19 的崩溃仅在共享 obj/bin 中间产物时复现）。
+19. **WASDK unpackaged self-contained startup crash (observations only)**: The following are observed facts about `WindowsAppSDKSelfContained=true` + unpackaged (`WindowsPackageType=None`) builds, without drawing conclusions:
+   - SCD artifact crashes on startup: `0xc000027b` (stowed) / `E_FAIL` at `Application.Start` (Microsoft.UI.Xaml.dll `FailFastWithStowedExceptions`); the FDD artifact is fine.
+   - Artifact differences: the SCD Main.dll embeds `UndockedRegFreeWinRTCS` and `Microsoft.WindowsAppRuntime.dll` type references (+127KB vs FDD); the SCD apphost embeds `WindowsAppRuntime`/activation references (400KB vs FDD 271KB).
+   - Binary-swap experiments (pri stays at 82KB; pri is not a crash factor): SCD exe + FDD dll → crashes in Microsoft.UI.Xaml.dll (0xc000027b); FDD exe + SCD dll → crashes in CoreMessagingXP.dll (0xc0000602); FDD exe + dll → fine.
+   - The local machine has `Microsoft.WindowsAppRuntime.2` 2.3.1.0 installed (same version as the project's PackageReference); FDD uses the shared registered runtime.
+   - Version experiments: WASDK `1.8.260710003` and `2.3.2-experimentala` still reproduce the crash; `1.7.260224002` lacks `Microsoft.Windows.Storage.Pickers` (`FileOpenPicker`/`FileSavePicker` unavailable).
+   - Upstream reference: [microsoft/WindowsAppSDK#6248](https://github.com/microsoft/WindowsAppSDK/issues/6248) (unpackaged self-contained crash on 1.8+; not reproduced on 1.7 and earlier; Open).
+   - Current handling: the SCD build keeps `SelfContained=true` + `WindowsAppSDKSelfContained=true` (both in `SCD-x64.pubxml`); FDD uses `WindowsAppSDKSelfContained=false` (`FDD-x64.pubxml`); build order is irrelevant — every `BuildArtifacts.ps1` run performs a Clean (the Pitfall 19 crash only reproduces with shared obj/bin intermediates).
 
-20. **构建脚本 PowerShell 5.1 陷阱（BuildArtifacts.ps1）**:
-   - **native stderr + `$ErrorActionPreference=Stop`**：`& exe 2>&1 | Out-Null` 中 stderr 行会抛 `RemoteException` 终止脚本。调用 7za 等外部命令时**不要合并 stderr**（`-bso0 -bsp0` 静默即可）。
-   - **裸 token 通配符解析**：`-x!*.pdb` 作为裸参数会被 PS 5.1 做通配符解析导致参数错位（7za 归档名被当作输入文件）。排除模式须**经变量传递**（`$excludePdb = '-x!*.pdb'`）。
-   - **`Expand-Archive` 仅接受 `.zip` 扩展名**（不校验内容）：nupkg 解包前需复制改名 `.zip`。
-   - **`DefaultItemExcludes` vs `ItemGroup Remove`（Directory.Build.props）**：SDK 默认 Compile glob 在 targets 阶段（props 之后）添加，props 里的 `Remove` 不作用于后加项（CS0579 特性重复）。须用 `DefaultItemExcludes`（props 中设置，控制默认 glob 排除）。（历史条目：多模式 obj\fdd\obj\scd 时代必需；Profile 化后单 obj 由 SDK 默认排除覆盖，该配置已随 PDB 改动移除——见 Pitfall 24。）
-   - **makepri dump 阻塞**：`makepri dump` 在 stdout 经管道时等待 stdin（覆盖确认/EOF）。须 `Start-Process` + `-RedirectStandardInput`（空文件）+ `WaitForExit(60s)` 超时 Kill + 以输出文件存在作成功判据。（历史条目：`param` 与 `$script:` 同名冲突、`Start-Process` ExitCode 空、子进程成功标记文件等坑已随并行子进程模式移除——2026-08 并行机制不再使用。）
+20. **Build script PowerShell 5.1 gotchas (BuildArtifacts.ps1)**:
+   - **Native stderr + `$ErrorActionPreference=Stop`**: in `& exe 2>&1 | Out-Null`, stderr lines throw a `RemoteException` that terminates the script. When calling external commands such as 7za, do **not** merge stderr (`-bso0 -bsp0` to silence it is enough).
+   - **Bare-token wildcard expansion**: `-x!*.pdb` as a bare argument gets wildcard-expanded by PS 5.1, shifting arguments (the 7za archive name gets treated as an input file). Exclusion patterns must be **passed via a variable** (`$excludePdb = '-x!*.pdb'`).
+   - **`Expand-Archive` only accepts the `.zip` extension** (it does not validate content): before extracting a nupkg, copy/rename it to `.zip`.
+   - **`DefaultItemExcludes` vs `ItemGroup Remove` (Directory.Build.props)**: the SDK's default Compile glob is added during the targets phase (after props), so a `Remove` in props does not affect items added later (CS0579 duplicate attribute). Use `DefaultItemExcludes` instead (set in props; it controls default-glob exclusion). (Historical entry: required in the multi-mode obj\fdd\obj\scd era; after the Profile transition a single obj is covered by the SDK's default exclusion, and this configuration was removed along with the PDB change — see Pitfall 24.)
+   - **`makepri dump` blocks**: when its stdout is piped, `makepri dump` waits on stdin (overwrite confirmation/EOF). Must use `Start-Process` + `-RedirectStandardInput` (an empty file) + a `WaitForExit(60s)` timeout kill + the existence of the output file as the success criterion. (Historical entry: gotchas such as `param`/`$script:` name collisions, empty `Start-Process` ExitCode, and child-process success marker files were removed along with the parallel child-process mode — the parallel mechanism is no longer used as of 2026-08.)
 
-21. **构建脚本 PublishProfile 化（BuildArtifacts.ps1 + Properties/PublishProfiles）**: 发布参数（`SelfContained`/`WindowsAppSDKSelfContained`/`PublishTrimmed`/`Platform`/`RuntimeIdentifier`/`Configuration`）**唯一来源是 `Properties/PublishProfiles/{FDD|SCD}-x64.pubxml`**，脚本/CI 只传 `-p:PublishProfile=…` + `-p:PublishDir=…` + `-p:Version=…`：
-   - **Profile 与构建布线正交**：`BaseIntermediateOutputPath`/`BaseOutputPath` 不再需要按模式注入；脚本每次运行自带 Clean，单模式本机构建（FDD、SCD 分两次跑）天然无中间产物污染。
-   - **本地不支持多实例并发**：同一时间只允许一个 `BuildArtifacts.ps1` 实例（默认 obj/bin 无隔离）；并行由 GitHub Actions matrix（`dotnet-ci.yml`/`dotnet-manual.yml`/`dotnet-tag.yml` 的 `[FDD, SCD]` 双 job，各自独立 VM）承担。
-   - **Restore 单次**：`--locked-mode` 单 obj，不按模式区分。
-   - **Worker 独立验证目录**：Worker 先 publish 到 `build/Worker-{mode}/`（不进 zip，仅验证其 Profile 可用），Main publish 后经 csproj `CopyWorkerBuildOutputToPublish` 把 Worker 的 **Build 输出**（非 Publish 输出）注入 Main 输出——Main SCD 的 .NET/WASDK 运行时由 Main 提供，Worker 共享同目录运行时。
+21. **Build script moved to PublishProfiles (BuildArtifacts.ps1 + Properties/PublishProfiles)**: the **single source of publish parameters** (`SelfContained`/`WindowsAppSDKSelfContained`/`PublishTrimmed`/`Platform`/`RuntimeIdentifier`/`Configuration`) is `Properties/PublishProfiles/{FDD|SCD}-x64.pubxml`; the script/CI only pass `-p:PublishProfile=…` + `-p:PublishDir=…` + `-p:Version=…`:
+   - **Profiles are orthogonal to build wiring**: `BaseIntermediateOutputPath`/`BaseOutputPath` no longer need per-mode injection; the script always performs a Clean per run, so single-mode local builds (FDD and SCD run separately) are naturally free of intermediate-product contamination.
+   - **Multiple concurrent local instances are not supported**: only one `BuildArtifacts.ps1` instance may run at a time (the default obj/bin has no isolation); parallelism is handled by the GitHub Actions matrix (`[FDD, SCD]` dual jobs in `dotnet-ci.yml`/`dotnet-manual.yml`/`dotnet-tag.yml`, each on its own VM).
+   - **Single restore**: `--locked-mode` with a single obj, not differentiated by mode.
+   - **Separate Worker verification directory**: the Worker is first published to `build/Worker-{mode}/` (not included in the zip; only to verify its Profile works); after Main is published, the csproj `CopyWorkerBuildOutputToPublish` injects the Worker's **Build output** (not Publish output) into Main's output — for Main SCD, Main provides the .NET/WASDK runtime and the Worker shares the runtime from the same directory.
 
-22. **Worker copy target 路径必须含 RID 段（WTGWizard.Main.csproj）**: `CopyWorkerBuildOutput*` 的 `WorkerOutputPath` 为 `..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)`（`RuntimeIdentifier` 非空时追加）。**缺 RID 段时 target 静默复制零文件**——早期版本仅因"Worker 先 publish 到同一目录 + `-o` 不清理残留"而表面上"工作"，Profile 化后该隐式链路已移除。另外：`dotnet publish -o`/`-p:PublishDir` **不会清理目标目录**；依赖"发布目录可能残留旧文件"的行为视为 bug。
+22. **The Worker copy target path must include the RID segment (WTGWizard.Main.csproj)**: the `WorkerOutputPath` of `CopyWorkerBuildOutput*` is `..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)` (with the RID appended when `RuntimeIdentifier` is non-empty). **Without the RID segment the target silently copies zero files** — an earlier version only appeared to "work" because "the Worker had already been published to the same directory + `-o` did not clean up leftovers"; that implicit path was removed after the Profile transition. Also: `dotnet publish -o`/`-p:PublishDir` **does not clean the target directory**; relying on "the publish directory may contain stale files" is considered a bug.
 
-23. **WASDK 子包白名单锁集（Main.csproj，产物瘦身）**: metapackage `Microsoft.WindowsAppSDK` 2.4.0 会拖入 AI/ML/Search/Widgets 组件（onnxruntime.dll 20.7MB + DirectML.dll 17.8MB + Search/Widgets/AI 投影，合计 ~45MB 解压），Main 源码零使用——`Main.csproj` 以 **11 引用锁集**替代裸 metapackage（SCD 解压 250→182MB / 497 文件）：
-    - **结构**：metapackage 锚（`ExcludeAssets="all"`，仅参与版本解析）+ 白名单 5 正常引用（`WinUI 2.3.6`/`Foundation 2.3.9`/`Base 2.0.4`/`Runtime 2.4.0`/`DWrite 2.1.0`）+ 黑名单 5（`AI 2.4.4`/`ML 2.1.74`/`Search 2.4.4`/`Widgets 2.0.5`/`Windows.AI.MachineLearning 2.1.74`，均 `ExcludeAssets="all"` 静默其 buildTransitive 复制）。
-    - **坑 a（锚必需）**：CommunityToolkit 三包传递要求 `Microsoft.WindowsAppSDK >= 1.6.250108002`——裸白名单（无锚）会让 1.x 旧 metapackage 浮上，其内嵌 WinUI targets 与 `microsoft.windowsappsdk.winui` 2.3.6 重复导入（MSB4011 + MSIX `CustomBeforeMicrosoftCommonTargets` 报错）。
-    - **坑 b（MinVersion 检查）**：`Microsoft.Windows.AI.MachineLearning` 2.1.74 targets 强制 `SupportedOSPlatformVersion >= 18362`（项目 min 17763）——必须黑名单，不能靠"不引用"绕过（传递依赖仍在图中）。
-    - **坑 c（Pickers 归属）**：`Microsoft.Windows.Storage.Pickers`（FileOpenPicker/FileSavePicker）的 winmd 在 **Foundation** 包——白名单勿移除 Foundation。
-    - **副产物（desktop pack 顺带消失）**：WindowsDesktop.App runtime pack（WPF/WinForms 全家桶 ~50MB）的注入与 **AI/ML 资产导入在 build 期耦合**（.NET 10 windows TFM 框架 `Microsoft.Windows.SDK.NET.Ref.Windows`；evaluation 期无 desktop FrameworkReference，WASDK 全部包 targets 零命中，常规 `FrameworkReference Remove` 无处下手）——AI/ML 黑名单静默后 runtimeconfig `includedFrameworks`/deps.json/产物三处 desktop 全消失。产物仅剩 16KB `WindowsBase.dll`（trim 空壳，deps.json 一致，无害）。
-    - **更新流程（版本互不相同，不能只改一个号）**：① 临时把锚改普通引用（或仓库外探针工程）restore，读 lock.json 各子包 resolved 版本；② 11 处版本号全部对齐，锚恢复 `ExcludeAssets="all"`；③ diff lock.json——metapackage 新增未知子包逐一判定（用到→白名单，没用→黑名单）；④ `dotnet restore` 更新 lock → 脚本 `--locked-mode` 全流程；⑤ 产物验证：probe publish diff 无 onnxruntime/DirectML/Search/Widgets/AI、白名单核心在位、**runtimeconfig includedFrameworks 仅 Microsoft.NETCore.App**（desktop pack 回流＝注入机制变了，停下排查）、FileOpenPicker/image verify/启动冒烟 + FDD 同过。
-    - **逃生门**：一行回退裸 metapackage → 回到 ~250MB 状态，无功能代价。
-    - 验证基线：SCD 启动冒烟 ✅ / Worker 命令分发 ✅ / FDD 79 文件 ✅。
+23. **WASDK subpackage allowlist lock set (Main.csproj, artifact slimming)**: the metapackage `Microsoft.WindowsAppSDK` 2.4.0 pulls in AI/ML/Search/Widgets components (onnxruntime.dll 20.7MB + DirectML.dll 17.8MB + Search/Widgets/AI projections, ~45MB extracted in total), none of which Main's source uses — `Main.csproj` replaces the bare metapackage with an **11-reference lock set** (SCD extraction 250→182MB / 497 files):
+     - **Structure**: metapackage anchor (`ExcludeAssets="all"`; participates only in version resolution) + an allowlist of 5 normal references (`WinUI 2.3.6`/`Foundation 2.3.9`/`Base 2.0.4`/`Runtime 2.4.0`/`DWrite 2.1.0`) + a denylist of 5 (`AI 2.4.4`/`ML 2.1.74`/`Search 2.4.4`/`Widgets 2.0.5`/`Windows.AI.MachineLearning 2.1.74`, all `ExcludeAssets="all"` to silence their buildTransitive copies).
+     - **Gotcha a (the anchor is required)**: the three CommunityToolkit packages transitively require `Microsoft.WindowsAppSDK >= 1.6.250108002` — a bare allowlist (no anchor) lets the old 1.x metapackage float up, whose embedded WinUI targets duplicate the import of `microsoft.windowsappsdk.winui` 2.3.6 (MSB4011 + MSIX `CustomBeforeMicrosoftCommonTargets` errors).
+     - **Gotcha b (MinVersion check)**: the `Microsoft.Windows.AI.MachineLearning` 2.1.74 targets enforce `SupportedOSPlatformVersion >= 18362` (the project min is 17763) — it must be denylisted; you cannot get around it by "not referencing" it (the transitive dependency is still in the graph).
+     - **Gotcha c (Pickers ownership)**: the winmd for `Microsoft.Windows.Storage.Pickers` (FileOpenPicker/FileSavePicker) is in the **Foundation** package — do not remove Foundation from the allowlist.
+     - **Side effect (the desktop pack disappears as well)**: the injection of the WindowsDesktop.App runtime pack (the full WPF/WinForms stack, ~50MB) is **coupled at build time to AI/ML asset import** (.NET 10 windows TFM framework `Microsoft.Windows.SDK.NET.Ref.Windows`; during evaluation there is no desktop FrameworkReference, so all WASDK package targets miss and the usual `FrameworkReference Remove` has nothing to target) — after the AI/ML denylist silences it, the desktop framework disappears from all three of the runtimeconfig `includedFrameworks`, deps.json, and the artifacts. Only a 16KB `WindowsBase.dll` remains (a trimmed empty shell; consistent with deps.json; harmless).
+     - **Update procedure (the versions differ from one another; you cannot just bump one number)**: (1) temporarily turn the anchor into a normal reference (or use an out-of-repo probe project) and restore, then read each subpackage's resolved version from lock.json; (2) align all 11 version numbers and restore the anchor to `ExcludeAssets="all"`; (3) diff lock.json — judge each newly added unknown metapackage subpackage individually (used → allowlist, unused → denylist); (4) `dotnet restore` to update the lock → the script's full `--locked-mode` flow; (5) artifact verification: probe publish diff shows no onnxruntime/DirectML/Search/Widgets/AI, the allowlist core is present, **runtimeconfig includedFrameworks contains only Microsoft.NETCore.App** (desktop pack returning = the injection mechanism changed, stop and investigate), FileOpenPicker/image verify/startup smoke test, and FDD passes the same.
+     - **Escape hatch**: reverting to the bare metapackage is one line → back to the ~250MB state, with no functional cost.
+     - Verification baseline: SCD startup smoke test ✅ / Worker command dispatch ✅ / FDD 79 files ✅.
 
-24. **Release 无 PDB（源头消除）**: `src/Directory.Build.props` 对 Release 全仓设 `DebugType=None` + `DebugSymbols=false`——pubxml 属性非全局、ProjectReference 工程不可见，PDB 须在 props 层源头消除（BuildArtifacts.ps1 的 7za `-x!*.pdb`/ZipFile 回退排除降级为冗余保险）。**代价**：Release 构建无符号，崩溃栈无行号；排查需本地临时带符号重建（移除该块或改 `DebugType=embedded`）。同文件历史上的 `PathMap` 曾随重写移除、后已恢复（无条件应用，Debug 的 PDB 同样受益；`DefaultItemExcludes` 的多模式 obj 排除在 Profile 化单 obj 后由 SDK 默认排除覆盖，保持移除——见 Pitfall 20）。
+24. **No PDBs in Release (eliminated at the source)**: `src/Directory.Build.props` sets `DebugType=None` + `DebugSymbols=false` repo-wide for Release — pubxml properties are not global and are invisible to ProjectReference projects, so PDBs must be eliminated at the props layer (the 7za `-x!*.pdb`/ZipFile fallback exclusion in BuildArtifacts.ps1 is downgraded to a redundant safeguard). **Cost**: Release builds have no symbols and crash stacks have no line numbers; investigation requires a temporary local rebuild with symbols (remove that block or change to `DebugType=embedded`). The `PathMap` in the same file was once removed during a rewrite and later restored (applied unconditionally; Debug PDBs benefit too; the multi-mode obj exclusion in `DefaultItemExcludes` is covered by the SDK's default exclusion after the Profile transition to a single obj and remains removed — see Pitfall 20).
 
-25. **产物确定性（文件内容级，496/497 + Main.dll 豁免）**: 等输入定义 = 同提交 + SDK 为 `global.json` 基线版（`rollForward: latestMinor`，本仓基线 10.0.400，实际可漂移为 10.0.x——跨机对比须以诊断日志中记录的 `dotnet --version` 实际值为准）+ lock `--locked-mode` 包图 + 相同 `-p:Version`（脚本默认常量 1.0.0）+ `Directory.Build.props` 的 `PathMap`（源路径映射，Release 无 PDB 时为防御层）。验证结论（2026-08-28，本机 zh-CN vs GA en-US runner，SCD 497 文件）：**除 `WTGWizard.Main.dll` 外全部跨机 SHA256 一致**。
-    - **Main.dll 豁免依据（已归因，非环境差异）**: WinUI XAML 编译器为 x:Bind 绑定类按**并行处理完成顺序**分配全局递增编号（`{Page}_objN_Bindings`），编号非确定 → 生成类型名不同（实测 GA `DeployMethodPage_obj42` vs 本机 `obj20`）→ CsWinRT 源生成器随之生成不同的 `VtableClasses`/`WinRTTypeDetails` → Main.dll 元数据/IL/布局漂移。**同机两次 Clean 重建哈希亦不同**（`0D9D5FA5…` vs `49C60A12…`）——编译器内在非确定性，非 locale/路径/环境问题。唯一 XAML 程序集才受影响（其余 496 文件佐证）。尚无公开编译器开关可固定编号；如需上游修复可向 microsoft-ui-xaml 报 issue。
-    - **误诊排除记录（勿重复排查）**: `-Diagnostics` 的 MSBuild 属性快照中 `ShouldComputeInputPris`/`EnableCoreMrtTooling`/`WindowsSdkBuildToolsVersion` 在 GA 侧为空、本地有值——这是**采集时机假象**（`Collect-ProjectInfo` 在 restore 之前执行，GA 全新 checkout 时 obj 无 assets → 包 props 未导入），与产物差异无关（Worker 侧快照零差异且 Worker.dll 一致）。
-    - **Runbook（跨构建/跨机对比）**: ① `BuildArtifacts.ps1 -BuildType SCD -Diagnostics`（默认即 Clean + 固定 Version，manifest 落盘 `build/BuildDiagnostics/SCD-x64.csv`，含环境快照）；② 对比两份 CSV 时**必须投影掉 `LastWriteTimeUtc` 列**（文件时间戳每次构建必不同，直接 diff 永远报差异）——`Import-Csv` 后仅比 `RelativePath`+`SHA256`（可加 `Length`）；③ 差异文件归因顺序：Main.dll（已知豁免）→ 新出现的文件 → 其余。
+25. **Artifact determinism (file-content level, 496/497 + Main.dll exemption)**: equal-input definition = same commit + SDK at the `global.json` baseline version (`rollForward: latestMinor`; this repo's baseline is 10.0.400, and the actual value may drift to 10.0.x — cross-machine comparison must use the actual `dotnet --version` recorded in the diagnostics log) + lock `--locked-mode` package graph + the same `-p:Version` (the script's default constant 1.0.0) + `Directory.Build.props`'s `PathMap` (source-path mapping; a defensive layer when Release has no PDBs). Verification conclusion (2026-08-28, local zh-CN vs GA en-US runner, SCD 497 files): **all files except `WTGWizard.Main.dll` have identical cross-machine SHA256**.
+     - **Main.dll exemption rationale (attributed; not an environment difference)**: the WinUI XAML compiler assigns globally increasing numbers to x:Bind binding classes (`{Page}_objN_Bindings`) in **parallel-processing completion order**; the numbers are non-deterministic → generated type names differ (measured: GA `DeployMethodPage_obj42` vs local `obj20`) → the CsWinRT source generator consequently produces different `VtableClasses`/`WinRTTypeDetails` → Main.dll metadata/IL/layout drifts. **Two Clean rebuilds on the same machine also yield different hashes** (`0D9D5FA5…` vs `49C60A12…`) — an intrinsic compiler non-determinism, not a locale/path/environment issue. Only the one XAML assembly is affected (the other 496 files confirm this). There is no known public compiler switch to fix the numbering; report an issue to microsoft-ui-xaml if an upstream fix is desired.
+     - **Misdiagnosis exclusion record (do not re-investigate)**: in the `-Diagnostics` MSBuild property snapshot, `ShouldComputeInputPris`/`EnableCoreMrtTooling`/`WindowsSdkBuildToolsVersion` are empty on the GA side but have values locally — this is a **collection-timing artifact** (`Collect-ProjectInfo` runs before restore; on a fresh GA checkout obj has no assets → package props are not imported) and is unrelated to the artifact difference (the Worker-side snapshot has zero differences and Worker.dll is identical).
+     - **Runbook (cross-build/cross-machine comparison)**: (1) `BuildArtifacts.ps1 -BuildType SCD -Diagnostics` (Clean + fixed Version by default; the manifest lands at `build/BuildDiagnostics/SCD-x64.csv` with an environment snapshot); (2) when comparing the two CSVs you **must project out the `LastWriteTimeUtc` column** (file timestamps always differ between builds, so a direct diff always reports differences) — after `Import-Csv`, compare only `RelativePath`+`SHA256` (`Length` optional); (3) attribution order for differing files: Main.dll (known exemption) → newly appearing files → the rest.
 
-26. **Launcher（原生启动器）与发布结构**: zip 根 = `WTGWizard.exe`（原生 C 启动器）+ `WTGWizard-v{version}\`（Main 全部产物）；启动器读取自身 VERSIONINFO 的 FileVersion 数字段拼 `WTGWizard-v{a.b.c}` 精确命中，失败则回退搜索 `WTGWizard` 开头且含 `WTGWizard.Main.exe` 的一级子目录，仍无命中则 MessageBox 引导至 GitHub Releases。
-    - **为何是原生 C（vcxproj）而非 .NET**: FDD 形态的 launcher 置于 zip 根时，SCD 包的 .NET 运行时在子目录里，hostfxr 不跨目录解析 → 根目录 .NET launcher 无法启动；原生 exe 零依赖且 `/subsystem:windows` 天然无窗口。vcxproj **不入 slnx**，由 `BuildArtifacts.ps1` 经 vswhere 定位 VS MSBuild 构建（`dotnet msbuild` 不能构建 vcxproj）。
-    - **PlatformToolset 必须用 `$(DefaultPlatformToolset)`**: 写死 v143 在 VS18（v145）上 MSB8020，写死 v145 在 CI VS2022（v143）上同炸——由构建所用 VS 的 Cpp targets 自动提供，本地/CI 自适应。
-    - **版本注入必须走环境变量（跨 shell 命令行引号陷阱）**: 逗号 Numeric 值（`1,0,0,0`）在命令行上必须包引号（裸逗号 = MSB1006），但含引号参数在不同 shell 下转义规则不同——pwsh 7（GA Windows 默认 shell，`PSNativeCommandArgumentPassing` 默认 Standard，`Windows` 模式亦不逐字节复刻 PS 5.1）会把内嵌引号转义为 `\"` 字面传递 → CI 曾连环炸出 MSB1008/RC1109。**解法**：`$env:WTGW_LAUNCHER_VER_NUM/STR` 注入（msbuild 子进程继承环境变量，自动成为 MSBuild 属性），msbuild 参数保持**零引号字符**；显式 `/p:` 覆盖仍可用。诊断手段：对照 MSBuild 报错的 Full command line 中 `\"` 出现与否。
-    - **版本同源强约束**: rc 的 `ProductVersion`（字符串）与 Main 版本共用 `$MainVer`（`LauncherVersionNumeric/String` 属性注入）→ 目录名 `WTGWizard-v{ver}` 与 launcher 探测严格一致；prerelease（如 `1.0.0-preview1`）的 FileVersion 数字段不含后缀 → 精确命中退化为回退搜索（功能不受损）。
-    - **UAC 链**: Main 是 `requireAdministrator`——launcher 必须用 `ShellExecuteExW`（`CreateProcess` 报 `ERROR_ELEVATION_REQUIRED`）；用户拒绝 UAC（`ERROR_CANCELLED`）静默退出。
-    - **署名**: `WTGWizard.Launcher.cpp` 含 Starward.Launcher（MIT）改写片段，文件头保留 Scighost 版权声明；THIRD-PARTY-NOTICES 条目 12。
+26. **Launcher (native launcher) and release structure**: zip root = `WTGWizard.exe` (native C launcher) + `WTGWizard-v{version}\` (all Main artifacts); the launcher reads the numeric FileVersion fields from its own VERSIONINFO, composes `WTGWizard-v{a.b.c}` for an exact hit, and on failure falls back to searching first-level subdirectories that start with `WTGWizard` and contain `WTGWizard.Main.exe`; if there is still no hit, a MessageBox directs the user to GitHub Releases.
+     - **Why native C (vcxproj) instead of .NET**: when an FDD-style launcher sits at the zip root, the SCD package's .NET runtime is in a subdirectory and hostfxr does not resolve across directories → a root-level .NET launcher cannot start; a native exe has zero dependencies and `/subsystem:windows` naturally means no window. The vcxproj is **not in the slnx**; `BuildArtifacts.ps1` locates VS MSBuild via vswhere to build it (`dotnet msbuild` cannot build a vcxproj).
+     - **PlatformToolset must use `$(DefaultPlatformToolset)`**: hard-coding v143 gives MSB8020 on VS18 (v145), and hard-coding v145 blows up the same way on CI VS2022 (v143) — it is provided automatically by the Cpp targets of the VS actually used, adapting to local/CI.
+     - **Version injection must go through environment variables (cross-shell command-line quoting traps)**: a comma numeric value (`1,0,0,0`) must be quoted on the command line (a bare comma = MSB1006), but how quoted arguments are escaped differs across shells — pwsh 7 (the default GA Windows shell; `PSNativeCommandArgumentPassing` defaults to Standard, and `Windows` mode does not byte-for-byte replicate PS 5.1 either) escapes embedded quotes into a literal `\"` → CI once produced a cascade of MSB1008/RC1109. **Solution**: inject via `$env:WTGW_LAUNCHER_VER_NUM/STR` (the msbuild child process inherits environment variables, which automatically become MSBuild properties), keeping the msbuild arguments **free of any quote characters**; explicit `/p:` overrides still work. Diagnostic method: check whether `\"` appears in the Full command line of the MSBuild error.
+     - **Strict same-source version constraint**: the rc's `ProductVersion` (string) and the Main version share `$MainVer` (injected via the `LauncherVersionNumeric/String` properties) → the directory name `WTGWizard-v{ver}` and the launcher probe stay strictly consistent; for a prerelease (e.g. `1.0.0-preview1`) the FileVersion numeric fields do not include the suffix → the exact hit degrades to the fallback search (no functional loss).
+     - **UAC chain**: Main is `requireAdministrator` — the launcher must use `ShellExecuteExW` (`CreateProcess` reports `ERROR_ELEVATION_REQUIRED`); if the user declines UAC (`ERROR_CANCELLED`), it exits silently.
+     - **Attribution**: `WTGWizard.Launcher.cpp` contains adapted fragments from Starward.Launcher (MIT); the file header retains Scighost's copyright notice; THIRD-PARTY-NOTICES entry 12.
