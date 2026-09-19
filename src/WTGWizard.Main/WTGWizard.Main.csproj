@@ -34,8 +34,8 @@
 	     - metapackage 2.4.0 保留为版本锚（CommunityToolkit 传递要求 >=1.6；ExcludeAssets="all"
 	       使其仅参与版本解析、不导入 1.x 内嵌 WinUI targets，否则与子包 MSB4011 重复导入）
 	     - 白名单五包正常引用（FileOpenPicker 位于 Foundation，勿移除；DWrite 保守保留）
-	     - 黑名单四包（AI/ML/Search/Widgets，Main 源码零使用）保留依赖图一致性但
-	       ExcludeAssets="all" 静默其 buildTransitive 复制（onnxruntime/DirectML 等）
+	     - 黑名单五包（AI/ML/Search/Widgets + Windows.AI.MachineLearning，Main 源码零使用）
+	       保留依赖图一致性但 ExcludeAssets="all" 静默其 buildTransitive 复制（onnxruntime/DirectML 等）
 	     - 升级 WASDK 时需重新对齐全部版本（见 AGENTS.md pitfall） -->
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
