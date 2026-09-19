@@ -1,6 +1,7 @@
 # AGENTS.md
 
 ## Agent Constraints
+
 **Whatever content you're trying to write into AGENTS.md, use English first.**
 **You MUST first — before running any command or starting any session — run `powershell -NoLogo -Command 'Get-Culture'` on Windows or `locale` on Unix/Linux to check the system language setting. Use the result to determine the primary language for human-agent interaction in the current session. Always provide the final answer and all user-facing responses according to system culture. Do not mix languages in the final output. Do NOT infer the output language from the user's message.**
 **If the user instructed what language you should use, IGNORE the system culture language and DO AS THEY WANT.**
@@ -10,8 +11,8 @@
 
 **WTGWizard** is a Windows To Go (WTG) deployment wizard — a WinUI 3 desktop application that guides users through creating Windows To Go workstations.
 
-- **Stack**: C# / .NET 10 / WinUI 3 (Windows App SDK 2.3)
-- **Platform**: x64 only, Windows 10 1809+ (min version 10.0.17763.0)
+- **Stack**: C# / .NET 10 / WinUI 3 (Windows App SDK 2.4.0 via an 11-reference allowlist lock set; see Pitfall 23)
+- **Platform**: x64 only, Windows 10 2004+ (min version 10.0.19041.0)
 - **Architecture**: Main (WinUI host) + Worker (out-of-process console app) communicating via Named Pipes
 
 ---
@@ -65,7 +66,7 @@ Worker is NOT a project reference — MSBuild targets copy Worker output to Main
 3. The project manifest `.devvm-build.json` exists (at the project root)
 
 | Result | Action |
-|---|---|
+| --- | --- |
 | All three satisfied | **DevVM remote build** (below) |
 | Any not satisfied | **Fall back to local build** (below), and state the reason for the fallback in your reply |
 
@@ -76,7 +77,7 @@ Worker is NOT a project reference — MSBuild targets copy Worker output to Main
 powershell -NoProfile -File "$env:USERPROFILE\.config\opencode\skills\devvm-remote-build\scripts\Remote-Build.ps1" -ProjectPath "E:\Development\Local_Projects\WTGWizard.AOT"
 ```
 
-- Manifest command: `BuildArtifacts.ps1 -BuildType FDD -OutputDir {artifactDir}`, timeout 600s
+- Manifest command: `BuildArtifacts.ps1 -BuildType SCD -OutputDir {artifactDir}`, timeout 600s
 - Artifact retrieval: `E:\Development\BuildArtifacts\WTGWizard.AOT`
 - The bash tool timeout must be set to ≥ 1800000 ms
 
@@ -96,6 +97,7 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\
 - **Language Version**: `preview`
 - **Platform**: x64 only
 - **Package Type**: Unpackaged (not MSIX), uses `app.manifest`
+- **Build script params**: full list lives in the `BuildArtifacts.ps1` param block (`Architecture` / `BuildType` / `MainVer` / `WorkerVer` / `ZipTag` / `OutputDir` / `SkipClean` / `Diagnostics` / `MinXbfCount` / `Help` with `-?`/`-h` aliases; run `-Help` for details). The script forces UTF-8 console output (PS 5.1 CJK garbling fix). When `-OutputDir` is set, all intermediate products converge under `<OutputDir>\WTGWizard` (see Pitfall 21); otherwise the historical flat `build\` layout is kept.
 
 ---
 
@@ -116,9 +118,9 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\
 **5-Step Wizard** (`Pages/Steps/`):
 
 | Step | Page | Purpose |
-|------|------|---------|
+| --- | --- | --- |
 | 1 | `ImageConfigPage` | WIM/ESD file selection + index picker (cached info load + verify) |
-| 2 | `DeployMethodPage` | Disk selection, clean/partition install |
+| 2 | `DeployMethodPage` | Disk selection, clean/partition install (NumberBox blank/`NaN` is backfilled: ESP → 300, OS → image expanded size) |
 | 3 | `DeployOptionsPage` | WTG settings (hide disks, drive letter, etc.) |
 | 4 | `AdvancedOptionsPage` | Driver integration, answer files, boot options (BootEx gated by image build) |
 | 5 | `ConfirmPage` | Summary + "Start Deployment" button |
@@ -126,6 +128,7 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\
 **ViewModels**: `WizardViewModel` is the orchestrator, composing 5 sub-VMs (`ImageConfigVM`, `DeployMethodVM`, `DeployOptionsVM`, `AdvancedOptionsVM`, `ConfirmVM`). `TakeOrchestrator()` hands the orchestrator to TaskPage and nulls it (prevents duplicate deployment).
 
 **TaskPage** (`Pages/TaskPage.xaml` + `.cs`): deployment progress UI — migrated from original WTGToolbox.Wizard framework:
+
 - `NavigationCacheMode="Required"` (page instance survives tab switches; A8 fix)
 - Three-state lifecycle: no-task → return / return-and-reconnect (snapshot replay) / new-deployment → full reset
 - `TerminalOutputBuffer.Shared` snapshot replay (history survives tab switch-away)
@@ -138,18 +141,18 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\
 ### WTGWizard.Main.DeploymentCore — Deployment Engine
 
 | Directory | Responsibility |
-|-----------|---------------|
+| --- | --- |
 | `Models/` | `DeploymentConfig`, `DeploymentConstants` (single source of deployment execution parameters: Worker command timeouts Timeout*Ms), `DeployTaskId` (verb-object), `DeployTaskItem`, `TaskUpdate`, `StepResult`, `WorkerCommand`, `DeploymentResult`, `DeployTaskStatus`, `WorkerExecutionResult` |
 | `Contracts/` | `IDeploymentOrchestrator`, `IDeploymentStep` (+`TitleKey`/`DescriptionKey`), `IWorkerProcess`, `IStepContext`, `IDeploymentPipeline`, `IAnswerFileProvider` |
 | `Orchestrator/` | `DeploymentOrchestrator` (pipeline + `DiskNumber` + localized task list), `StepContext`, `DeploymentPipeline`, `DeploymentStepBase` |
 | `Steps/` | 7 steps (class names are behavior-based; TaskId uses verb-object — see the DeployTaskId table for the mapping): `PartitionStep`, `ExtractStep`, `DriverStep`, `ImportAnsFileStep`, `ApplyWtgStep`, `BcdbootStep`, `CleanupStep` |
-| `Worker/` | `WorkerProcess` (UTF-8 stdout/stderr read → `TerminalOutputBuffer`), `WorkerCommandFactory`, `CommandBuilder`, `WorkerSettings` |
+| `Worker/` | `WorkerProcess` (UTF-8 stdout/stderr read → `TerminalOutputBuffer`), `WorkerCommandFactory`, `CommandBuilder` (`SupportsOffline()` gates bcdboot `/offline` on host `bcdboot.exe >= 10.0.26100.0`, Rufus-style tool-version check), `WorkerSettings` |
 | `Builders/` | `DiskScriptBuilder` (PowerShell scripts, forces `[Console]::OutputEncoding=UTF8`), `AnswerFileGenerator`, `TempFileManager` |
 
 ### WTGWizard.Shared.Services — Service Layer
 
 | Service | Purpose |
-|---------|---------|
+| --- | --- |
 | `DiskIOService` | Disk enumeration (SetupAPI), partition queries, safety checks, device monitoring — split into `DiskIOReader` / `DiskIOWriter` (⚠️ PInvoke rewrite in progress; see TODO) / `DiskIOWatcher` |
 | `DriveLetterService` | Two-phase drive letter assignment (fallback chains in `Models/DiskConstants.cs`) |
 | `DiskPerformanceMonitor` | Disk perf counters (TaskPage toolbar) |
@@ -162,7 +165,7 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\
 ### WTGWizard.Shared.Common — IPC Protocol
 
 | Class | Purpose |
-|-------|---------|
+| --- | --- |
 | `PipeProtocol` | Message type constants + JSON builders (AOT-compatible, hand-rolled) |
 | `PipeServer` | Main-side: creates NamedPipe server, waits for Worker connection |
 | `PipeReader` | Reads newline-delimited JSON, dispatches typed events |
@@ -173,7 +176,7 @@ dotnet publish src/WTGWizard.Main -p:PublishProfile=FDD-x64 -p:PublishDir=build\
 Entry point: `Program.cs` → parse command → dispatch to handler
 
 | Command | Status | Purpose |
-|---------|--------|---------|
+| --- | --- | --- |
 | `pwsh` | ✅ | PowerShell script execution |
 | `dism` | ✅ | DISM operations |
 | `bcdboot` | ✅ | Boot configuration |
@@ -328,7 +331,7 @@ XAML bindings use the C# property name:
 ### DeployTaskId Naming (verb-object)
 
 | Step class | Field | Value | TitleKey |
-|---------|-------|-------|----------|
+| --- | --- | --- | --- |
 | `PartitionStep` | `CreateDiskLayout` | create-disk-layout | Task.CreateDiskLayout.Title |
 | `ExtractStep` | `ExtractImage` | extract-image | Task.ExtractImage.Title |
 | `DriverStep` | `IntegrateDrivers` | integrate-drivers | Task.IntegrateDrivers.Title |
@@ -342,7 +345,7 @@ DeployTaskId is independent from Worker pipe task names (dism/bcdboot/pwsh/extra
 ### File Naming
 
 | Type | Naming | Example |
-|------|--------|---------|
+| --- | --- | --- |
 | Page | `{Name}Page.xaml` | `DeployOptionsPage.xaml` |
 | ViewModel | `{Name}VM.cs` | `DeployMethodVM.cs` |
 | Service Interface | `I{Name}Service.cs` | `IDiskIOService.cs` |
@@ -353,7 +356,7 @@ DeployTaskId is independent from Worker pipe task names (dism/bcdboot/pwsh/extra
 ### Namespace Convention
 
 | Project | Root Namespace |
-|---------|---------------|
+| --- | --- |
 | Main | `WTGWizard` (pages: `WTGWizard.Pages.Steps`, VMs: `WTGWizard.ViewModels`) |
 | DeploymentCore | `WTGWizard.Main.DeploymentCore` (Steps/Orchestrator/Worker/Builders) |
 | Shared.Services | `WTGWizard.Shared.Services` (Wim: `WTGWizard.Shared.Services.WimService`, Logger: `WTGWizard.Shared.Services.Logger`, Disk: `WTGWizard.Shared.Services.DiskServices`) |
@@ -417,15 +420,16 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 1. Add entries to `Lang.resx` (English)
 2. Add entries to `Lang.zh-CN.resx` (Chinese)
 3. Add properties to `Lang.Designer.cs` (or run `PublicResXFileCodeGenerator`)
-4. Use in XAML: `{x:Bind lang:Lang.Page_WizStep_XXX_YYY}`
-5. Use in code: `Lang.Page_WizStep_XXX_YYY`
+4. Use in resx: `Page.WizStep.XXX.YYY`
+5. Use in XAML: `{x:Bind lang:Lang.Page_WizStep_XXX_YYY}`
+6. Use in code: `Lang.Page_WizStep_XXX_YYY`
 
 ---
 
 ## Current State & TODOs
 
 | Area | Status | Location |
-|------|--------|----------|
+| --- | --- | --- |
 | 5-Step Wizard UI | ✅ Complete | `Pages/Steps/` |
 | TaskPage (full framework) | ✅ Complete | `Pages/TaskPage.xaml` + `.cs`, `UserControls/TaskContentCard.xaml`, `TerminalBox.xaml` (with dual-state SwitchPresenter) |
 | Disk Services | ✅ Complete | `Shared.Services/DiskServices/` |
@@ -444,11 +448,11 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 | Debug Build Dialog | ✅ Complete | `MainWindow.xaml.cs` (`#if DEBUG` startup dialog; keys `App.Dialog.DebugBuild.*`) |
 | DiskIOWriter | ⚠️ Stub | `Shared.Services/DiskServices/DiskIOService/DiskIOWriter.cs` (PInvoke Implementation to replace Powershell disk layout creation script.) |
 | Constant consolidation (three overlapping copies) | ✅ Resolved | `WinBuildConstants` (UI build thresholds) / `DeploymentConstants` (Worker timeouts) / `DiskConstants` (single source of disk layout) — see Pitfall 18 |
-| Build script (PublishProfile-based, single mode) | ✅ Complete | `BuildArtifacts.ps1` (`-BuildType FDD/SCD` single mode + publish parameters provided by `Properties/PublishProfiles/*.pubxml` + parallel/isolation mechanisms removed; see Pitfall 20 for the mechanism and gotchas; see Pitfall 22 for the Profile transition) |
+| Build script (PublishProfile-based, single mode) | ✅ Complete | `BuildArtifacts.ps1` (`-BuildType FDD/SCD` single mode + publish parameters provided by `Properties/PublishProfiles/*.pubxml` + parallel/isolation mechanisms removed; `-Help`/`-?`/`-h` help switch + forced UTF-8 output; `-OutputDir` converges intermediates under `<OutputDir>\WTGWizard`; see Pitfall 20 for the mechanism and gotchas; see Pitfall 22 for the Profile transition) |
 | SCD trimming + PDB source elimination | ✅ Complete | SCD pubxml `PublishTrimmed=true` + `TrimMode=partial` (disabled for FDD — nothing to trim without a runtime); `Directory.Build.props` Release `DebugType=None` eliminates ProjectReference PDBs — zip 110→90MB; see Pitfall 24 for the cost |
 | WASDK subpackage allowlist (artifact slimming) | ✅ Complete | `Main.csproj` 11-reference lock set (metapackage anchor + allowlist of 5 + denylist of 5 with `ExcludeAssets="all"`) — SCD extraction 250→182MB / 497 files; the desktop runtime pack (WPF/WinForms ~50MB) disappears along with the AI/ML denylist; see Pitfall 23 for the structure and update procedure |
 | Artifact determinism (file-content level) | ✅ 496/497 | Under the same commit + locked SDK + locked package graph, per-file SHA256 matches across machines; `WTGWizard.Main.dll` is an attributed exception (non-deterministic XAML compiler objN numbering) — see Pitfall 25 for scope/runbook/exemption rationale |
-| Launcher + new release structure | ✅ Complete | Native C launcher `src/WTGWizard.Launcher` (produces `WTGWizard.exe`; locates and launches `WTGWizard-v{version}\WTGWizard.Main.exe`); zip root = launcher + application subdirectory; see Pitfall 26 for the choice and build gotchas |
+| Launcher + new release structure | ✅ Complete | Native C launcher `src/WTGWizard.Launcher` (produces `WTGWizard.exe`; statically links CRT via `/MT`, zero host runtime DLL dependency; locates and launches `WTGWizard-v{version}\WTGWizard.Main.exe`); zip root = launcher + application subdirectory; see Pitfall 26 for the choice and build gotchas |
 
 ---
 
@@ -490,51 +494,59 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 
 18. **Three overlapping constant copies (consolidated)**: Historically GPT GUIDs/partition layout/fallback chains/timeouts were defined (partially overlapping) in three places: `Main/Models/Constants.cs`, `DeploymentCore/Models/DeploymentConstants.cs`, and `Shared.Services/DiskServices/Models/DiskConstants.cs`. On 2026-08-06 they were consolidated into three single sources: **`DiskConstants`** (the single source of disk physical layout; referencable by both Main and DeploymentCore), **`DeploymentConstants`** (only Worker command timeouts Timeout*Ms), and **`WinBuildConstants`** (only Windows build-number thresholds). New disk/deployment constants belong in these; the old files `Constants.cs`/`WimConstants.cs` have been deleted, and entries reserved in `DiskConstants` for DiskIOWriter PInvoke are annotated with a `reserved` comment.
 
-19. **WASDK unpackaged self-contained startup crash (observations only)**: The following are observed facts about `WindowsAppSDKSelfContained=true` + unpackaged (`WindowsPackageType=None`) builds, without drawing conclusions:
-   - SCD artifact crashes on startup: `0xc000027b` (stowed) / `E_FAIL` at `Application.Start` (Microsoft.UI.Xaml.dll `FailFastWithStowedExceptions`); the FDD artifact is fine.
-   - Artifact differences: the SCD Main.dll embeds `UndockedRegFreeWinRTCS` and `Microsoft.WindowsAppRuntime.dll` type references (+127KB vs FDD); the SCD apphost embeds `WindowsAppRuntime`/activation references (400KB vs FDD 271KB).
-   - Binary-swap experiments (pri stays at 82KB; pri is not a crash factor): SCD exe + FDD dll → crashes in Microsoft.UI.Xaml.dll (0xc000027b); FDD exe + SCD dll → crashes in CoreMessagingXP.dll (0xc0000602); FDD exe + dll → fine.
-   - The local machine has `Microsoft.WindowsAppRuntime.2` 2.3.1.0 installed (same version as the project's PackageReference); FDD uses the shared registered runtime.
-   - Version experiments: WASDK `1.8.260710003` and `2.3.2-experimentala` still reproduce the crash; `1.7.260224002` lacks `Microsoft.Windows.Storage.Pickers` (`FileOpenPicker`/`FileSavePicker` unavailable).
-   - Upstream reference: [microsoft/WindowsAppSDK#6248](https://github.com/microsoft/WindowsAppSDK/issues/6248) (unpackaged self-contained crash on 1.8+; not reproduced on 1.7 and earlier; Open).
-   - Current handling: the SCD build keeps `SelfContained=true` + `WindowsAppSDKSelfContained=true` (both in `SCD-x64.pubxml`); FDD uses `WindowsAppSDKSelfContained=false` (`FDD-x64.pubxml`); build order is irrelevant — every `BuildArtifacts.ps1` run performs a Clean (the Pitfall 19 crash only reproduces with shared obj/bin intermediates).
+19. **WASDK unpackaged self-contained startup crash (root cause: FDD/SCD obj pollution)**: For `WindowsAppSDKSelfContained=true` + unpackaged (`WindowsPackageType=None`) builds, the SCD startup crash (`0xc000027b` stowed / `E_FAIL` at `Application.Start` via `FailFastWithStowedExceptions`; FDD is fine) is caused by **FDD and SCD builds sharing obj/bin intermediates** — stale FDD outputs contaminate the SCD publish. Every `BuildArtifacts.ps1` run now performs a Clean with a single obj, so the polluting condition is eliminated by construction (build order is irrelevant):
+    
+    - SCD artifact crashes on startup: `0xc000027b` (stowed) / `E_FAIL` at `Application.Start` (Microsoft.UI.Xaml.dll `FailFastWithStowedExceptions`); the FDD artifact is fine.
+    - Artifact differences: the SCD Main.dll embeds `UndockedRegFreeWinRTCS` and `Microsoft.WindowsAppRuntime.dll` type references (+127KB vs FDD); the SCD apphost embeds `WindowsAppRuntime`/activation references (400KB vs FDD 271KB).
+    - Binary-swap experiments (pri stays at 82KB; pri is not a crash factor): SCD exe + FDD dll → crashes in Microsoft.UI.Xaml.dll (0xc000027b); FDD exe + SCD dll → crashes in CoreMessagingXP.dll (0xc0000602); FDD exe + dll → fine.
+    - Historical note: the 2.3.x-era machine had `Microsoft.WindowsAppRuntime.2` 2.3.1.0 installed (matching the PackageReference at the time); the project is now on 2.4.0 (see Pitfall 23) and FDD uses the shared registered runtime. No binary-swap re-test has been done after the allowlist change.
+    - Version experiments: WASDK `1.8.260710003` and `2.3.2-experimentala` still reproduce the crash; `1.7.260224002` lacks `Microsoft.Windows.Storage.Pickers` (`FileOpenPicker`/`FileSavePicker` unavailable).
+    - Upstream reference: [microsoft/WindowsAppSDK#6248](https://github.com/microsoft/WindowsAppSDK/issues/6248) (unpackaged self-contained crash on 1.8+; not reproduced on 1.7 and earlier; Open).
+    - Current handling: the SCD build keeps `SelfContained=true` + `WindowsAppSDKSelfContained=true` (both in `SCD-x64.pubxml`); FDD uses `WindowsAppSDKSelfContained=false` (`FDD-x64.pubxml`).
 
 20. **Build script PowerShell 5.1 gotchas (BuildArtifacts.ps1)**:
-   - **Native stderr + `$ErrorActionPreference=Stop`**: in `& exe 2>&1 | Out-Null`, stderr lines throw a `RemoteException` that terminates the script. When calling external commands such as 7za, do **not** merge stderr (`-bso0 -bsp0` to silence it is enough).
-   - **Bare-token wildcard expansion**: `-x!*.pdb` as a bare argument gets wildcard-expanded by PS 5.1, shifting arguments (the 7za archive name gets treated as an input file). Exclusion patterns must be **passed via a variable** (`$excludePdb = '-x!*.pdb'`).
-   - **`Expand-Archive` only accepts the `.zip` extension** (it does not validate content): before extracting a nupkg, copy/rename it to `.zip`.
-   - **`DefaultItemExcludes` vs `ItemGroup Remove` (Directory.Build.props)**: the SDK's default Compile glob is added during the targets phase (after props), so a `Remove` in props does not affect items added later (CS0579 duplicate attribute). Use `DefaultItemExcludes` instead (set in props; it controls default-glob exclusion). (Historical entry: required in the multi-mode obj\fdd\obj\scd era; after the Profile transition a single obj is covered by the SDK's default exclusion, and this configuration was removed along with the PDB change — see Pitfall 24.)
-   - **`makepri dump` blocks**: when its stdout is piped, `makepri dump` waits on stdin (overwrite confirmation/EOF). Must use `Start-Process` + `-RedirectStandardInput` (an empty file) + a `WaitForExit(60s)` timeout kill + the existence of the output file as the success criterion. (Historical entry: gotchas such as `param`/`$script:` name collisions, empty `Start-Process` ExitCode, and child-process success marker files were removed along with the parallel child-process mode — the parallel mechanism is no longer used as of 2026-08.)
+    
+    - **Native stderr + `$ErrorActionPreference=Stop`**: in `& exe 2>&1 | Out-Null`, stderr lines throw a `RemoteException` that terminates the script. When calling external commands such as 7za, do **not** merge stderr (`-bso0 -bsp0` to silence it is enough).
+    - **Bare-token wildcard expansion**: `-x!*.pdb` as a bare argument gets wildcard-expanded by PS 5.1, shifting arguments (the 7za archive name gets treated as an input file). Exclusion patterns must be **passed via a variable** (`$excludePdb = '-x!*.pdb'`).
+    - **`Expand-Archive` only accepts the `.zip` extension** (it does not validate content): before extracting a nupkg, copy/rename it to `.zip`.
+    - **`DefaultItemExcludes` vs `ItemGroup Remove` (Directory.Build.props)**: the SDK's default Compile glob is added during the targets phase (after props), so a `Remove` in props does not affect items added later (CS0579 duplicate attribute). Use `DefaultItemExcludes` instead (set in props; it controls default-glob exclusion). (Historical entry: required in the multi-mode obj\fdd\obj\scd era; after the Profile transition a single obj is covered by the SDK's default exclusion, and this configuration was removed along with the PDB change — see Pitfall 24.)
+    - **`makepri dump` blocks**: when its stdout is piped, `makepri dump` waits on stdin (overwrite confirmation/EOF). Must use `Start-Process` + `-RedirectStandardInput` (an empty file) + a `WaitForExit(60s)` timeout kill + the existence of the output file as the success criterion. (Historical entry: gotchas such as `param`/`$script:` name collisions, empty `Start-Process` ExitCode, and child-process success marker files were removed along with the parallel child-process mode — the parallel mechanism is no longer used as of 2026-08.)
+    - **`-OutputDir` convergence + `-Help`/UTF-8**: when `-OutputDir` is set, all intermediate products converge under `<OutputDir>\WTGWizard` (see Pitfall 21); otherwise the historical flat `build\` layout is kept. The script forces UTF-8 console output (PS 5.1 CJK garbling fix). The script exposes `-Help` with `-?`/`-h` aliases.
+    - **Cross-shell quoting (version injection)**: a comma numeric value (`1,0,0,0`) must never travel through a quoted command-line argument — pwsh 7 and PS 5.1 escape embedded quotes differently (once caused CI MSB1008/RC1109). Inject via `$env:WTGW_LAUNCHER_VER_NUM/STR` instead (see Pitfall 26).
 
 21. **Build script moved to PublishProfiles (BuildArtifacts.ps1 + Properties/PublishProfiles)**: the **single source of publish parameters** (`SelfContained`/`WindowsAppSDKSelfContained`/`PublishTrimmed`/`Platform`/`RuntimeIdentifier`/`Configuration`) is `Properties/PublishProfiles/{FDD|SCD}-x64.pubxml`; the script/CI only pass `-p:PublishProfile=…` + `-p:PublishDir=…` + `-p:Version=…`:
-   - **Profiles are orthogonal to build wiring**: `BaseIntermediateOutputPath`/`BaseOutputPath` no longer need per-mode injection; the script always performs a Clean per run, so single-mode local builds (FDD and SCD run separately) are naturally free of intermediate-product contamination.
-   - **Multiple concurrent local instances are not supported**: only one `BuildArtifacts.ps1` instance may run at a time (the default obj/bin has no isolation); parallelism is handled by the GitHub Actions matrix (`[FDD, SCD]` dual jobs in `dotnet-ci.yml`/`dotnet-manual.yml`/`dotnet-tag.yml`, each on its own VM).
-   - **Single restore**: `--locked-mode` with a single obj, not differentiated by mode.
-   - **Separate Worker verification directory**: the Worker is first published to `build/Worker-{mode}/` (not included in the zip; only to verify its Profile works); after Main is published, the csproj `CopyWorkerBuildOutputToPublish` injects the Worker's **Build output** (not Publish output) into Main's output — for Main SCD, Main provides the .NET/WASDK runtime and the Worker shares the runtime from the same directory.
+    
+    - **Profiles are orthogonal to build wiring**: `BaseIntermediateOutputPath`/`BaseOutputPath` no longer need per-mode injection; the script always performs a Clean per run, so single-mode local builds (FDD and SCD run separately) are naturally free of intermediate-product contamination.
+    - **Multiple concurrent local instances are not supported**: only one `BuildArtifacts.ps1` instance may run at a time (the default obj/bin has no isolation); parallelism is handled by the GitHub Actions matrix (`[FDD, SCD]` dual jobs in `dotnet-ci.yml`/`dotnet-manual.yml`/`dotnet-tag.yml`, each on its own VM).
+    - **Single restore**: `--locked-mode` with a single obj, not differentiated by mode.
+    - **Separate Worker verification directory**: the Worker is first published to `build/Worker-{mode}/` by default, or `<OutputDir>\WTGWizard\Temp\Worker-{mode}/` when `-OutputDir` is set (not included in the zip; only to verify its Profile works); after Main is published, the csproj `CopyWorkerBuildOutputToPublish` injects the Worker's **Build output** (not Publish output) into Main's output — for Main SCD, Main provides the .NET/WASDK runtime and the Worker shares the runtime from the same directory.
 
-22. **The Worker copy target path must include the RID segment (WTGWizard.Main.csproj)**: the `WorkerOutputPath` of `CopyWorkerBuildOutput*` is `..\WTGWizard.Worker\bin\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)` (with the RID appended when `RuntimeIdentifier` is non-empty). **Without the RID segment the target silently copies zero files** — an earlier version only appeared to "work" because "the Worker had already been published to the same directory + `-o` did not clean up leftovers"; that implicit path was removed after the Profile transition. Also: `dotnet publish -o`/`-p:PublishDir` **does not clean the target directory**; relying on "the publish directory may contain stale files" is considered a bug.
+22. **The Worker copy target must cover both RID and non-RID layouts (WTGWizard.Main.csproj)**: `CopyWorkerBuildOutput*` uses dual `Include` globs with `**` — `..\WTGWizard.Worker\bin\**\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\WTGWizard.Worker*` plus the same path without the `$(RuntimeIdentifier)` segment — because the pubxml `Platform` evaluates too late for a single `$(Platform)`-based `WorkerOutputPath` formula (covers CLI-global-Platform and pubxml-inner-Platform shapes). **A glob missing either shape silently copies zero files** — an earlier version only appeared to "work" because "the Worker had already been published to the same directory + `-o` did not clean up leftovers"; that implicit path was removed after the Profile transition. Also: `dotnet publish -o`/`-p:PublishDir` **does not clean the target directory**; relying on "the publish directory may contain stale files" is considered a bug.
 
 23. **WASDK subpackage allowlist lock set (Main.csproj, artifact slimming)**: the metapackage `Microsoft.WindowsAppSDK` 2.4.0 pulls in AI/ML/Search/Widgets components (onnxruntime.dll 20.7MB + DirectML.dll 17.8MB + Search/Widgets/AI projections, ~45MB extracted in total), none of which Main's source uses — `Main.csproj` replaces the bare metapackage with an **11-reference lock set** (SCD extraction 250→182MB / 497 files):
-     - **Structure**: metapackage anchor (`ExcludeAssets="all"`; participates only in version resolution) + an allowlist of 5 normal references (`WinUI 2.3.6`/`Foundation 2.3.9`/`Base 2.0.4`/`Runtime 2.4.0`/`DWrite 2.1.0`) + a denylist of 5 (`AI 2.4.4`/`ML 2.1.74`/`Search 2.4.4`/`Widgets 2.0.5`/`Windows.AI.MachineLearning 2.1.74`, all `ExcludeAssets="all"` to silence their buildTransitive copies).
-     - **Gotcha a (the anchor is required)**: the three CommunityToolkit packages transitively require `Microsoft.WindowsAppSDK >= 1.6.250108002` — a bare allowlist (no anchor) lets the old 1.x metapackage float up, whose embedded WinUI targets duplicate the import of `microsoft.windowsappsdk.winui` 2.3.6 (MSB4011 + MSIX `CustomBeforeMicrosoftCommonTargets` errors).
-     - **Gotcha b (MinVersion check)**: the `Microsoft.Windows.AI.MachineLearning` 2.1.74 targets enforce `SupportedOSPlatformVersion >= 18362` (the project min is 17763) — it must be denylisted; you cannot get around it by "not referencing" it (the transitive dependency is still in the graph).
-     - **Gotcha c (Pickers ownership)**: the winmd for `Microsoft.Windows.Storage.Pickers` (FileOpenPicker/FileSavePicker) is in the **Foundation** package — do not remove Foundation from the allowlist.
-     - **Side effect (the desktop pack disappears as well)**: the injection of the WindowsDesktop.App runtime pack (the full WPF/WinForms stack, ~50MB) is **coupled at build time to AI/ML asset import** (.NET 10 windows TFM framework `Microsoft.Windows.SDK.NET.Ref.Windows`; during evaluation there is no desktop FrameworkReference, so all WASDK package targets miss and the usual `FrameworkReference Remove` has nothing to target) — after the AI/ML denylist silences it, the desktop framework disappears from all three of the runtimeconfig `includedFrameworks`, deps.json, and the artifacts. Only a 16KB `WindowsBase.dll` remains (a trimmed empty shell; consistent with deps.json; harmless).
-     - **Update procedure (the versions differ from one another; you cannot just bump one number)**: (1) temporarily turn the anchor into a normal reference (or use an out-of-repo probe project) and restore, then read each subpackage's resolved version from lock.json; (2) align all 11 version numbers and restore the anchor to `ExcludeAssets="all"`; (3) diff lock.json — judge each newly added unknown metapackage subpackage individually (used → allowlist, unused → denylist); (4) `dotnet restore` to update the lock → the script's full `--locked-mode` flow; (5) artifact verification: probe publish diff shows no onnxruntime/DirectML/Search/Widgets/AI, the allowlist core is present, **runtimeconfig includedFrameworks contains only Microsoft.NETCore.App** (desktop pack returning = the injection mechanism changed, stop and investigate), FileOpenPicker/image verify/startup smoke test, and FDD passes the same.
-     - **Escape hatch**: reverting to the bare metapackage is one line → back to the ~250MB state, with no functional cost.
-     - Verification baseline: SCD startup smoke test ✅ / Worker command dispatch ✅ / FDD 79 files ✅.
+    
+    - **Structure**: metapackage anchor (`ExcludeAssets="all"`; participates only in version resolution) + an allowlist of 5 normal references (`WinUI 2.3.6`/`Foundation 2.3.9`/`Base 2.0.4`/`Runtime 2.4.0`/`DWrite 2.1.0`) + a denylist of 5 (`AI 2.4.4`/`ML 2.1.74`/`Search 2.4.4`/`Widgets 2.0.5`/`Windows.AI.MachineLearning 2.1.74`, all `ExcludeAssets="all"` to silence their buildTransitive copies).
+    - **Gotcha a (the anchor is required)**: the three CommunityToolkit packages transitively require `Microsoft.WindowsAppSDK >= 1.6.250108002` — a bare allowlist (no anchor) lets the old 1.x metapackage float up, whose embedded WinUI targets duplicate the import of `microsoft.windowsappsdk.winui` 2.3.6 (MSB4011 + MSIX `CustomBeforeMicrosoftCommonTargets` errors).
+    - **Gotcha b (MinVersion check)**: the `Microsoft.Windows.AI.MachineLearning` 2.1.74 targets enforce `SupportedOSPlatformVersion >= 18362` (the project min is 19041) — it must be denylisted; you cannot get around it by "not referencing" it (the transitive dependency is still in the graph).
+    - **Gotcha c (Pickers ownership)**: the winmd for `Microsoft.Windows.Storage.Pickers` (FileOpenPicker/FileSavePicker) is in the **Foundation** package — do not remove Foundation from the allowlist.
+    - **Side effect (the desktop pack disappears as well)**: the injection of the WindowsDesktop.App runtime pack (the full WPF/WinForms stack, ~50MB) is **coupled at build time to AI/ML asset import** (.NET 10 windows TFM framework `Microsoft.Windows.SDK.NET.Ref.Windows`; during evaluation there is no desktop FrameworkReference, so all WASDK package targets miss and the usual `FrameworkReference Remove` has nothing to target) — after the AI/ML denylist silences it, the desktop framework disappears from all three of the runtimeconfig `includedFrameworks`, deps.json, and the artifacts. Only a 16KB `WindowsBase.dll` remains (a trimmed empty shell; consistent with deps.json; harmless).
+    - **Update procedure (the versions differ from one another; you cannot just bump one number)**: (1) temporarily turn the anchor into a normal reference (or use an out-of-repo probe project) and restore, then read each subpackage's resolved version from lock.json; (2) align all 11 version numbers and restore the anchor to `ExcludeAssets="all"`; (3) diff lock.json — judge each newly added unknown metapackage subpackage individually (used → allowlist, unused → denylist); (4) `dotnet restore` to update the lock → the script's full `--locked-mode` flow; (5) artifact verification: probe publish diff shows no onnxruntime/DirectML/Search/Widgets/AI, the allowlist core is present, **runtimeconfig includedFrameworks contains only Microsoft.NETCore.App** (desktop pack returning = the injection mechanism changed, stop and investigate), FileOpenPicker/image verify/startup smoke test, and FDD passes the same.
+    - **Escape hatch**: reverting to the bare metapackage is one line → back to the ~250MB state, with no functional cost.
+    - Verification baseline: SCD startup smoke test ✅ / Worker command dispatch ✅ / FDD 79 files ✅.
 
 24. **No PDBs in Release (eliminated at the source)**: `src/Directory.Build.props` sets `DebugType=None` + `DebugSymbols=false` repo-wide for Release — pubxml properties are not global and are invisible to ProjectReference projects, so PDBs must be eliminated at the props layer (the 7za `-x!*.pdb`/ZipFile fallback exclusion in BuildArtifacts.ps1 is downgraded to a redundant safeguard). **Cost**: Release builds have no symbols and crash stacks have no line numbers; investigation requires a temporary local rebuild with symbols (remove that block or change to `DebugType=embedded`). The `PathMap` in the same file was once removed during a rewrite and later restored (applied unconditionally; Debug PDBs benefit too; the multi-mode obj exclusion in `DefaultItemExcludes` is covered by the SDK's default exclusion after the Profile transition to a single obj and remains removed — see Pitfall 20).
 
 25. **Artifact determinism (file-content level, 496/497 + Main.dll exemption)**: equal-input definition = same commit + SDK at the `global.json` baseline version (`rollForward: latestMinor`; this repo's baseline is 10.0.400, and the actual value may drift to 10.0.x — cross-machine comparison must use the actual `dotnet --version` recorded in the diagnostics log) + lock `--locked-mode` package graph + the same `-p:Version` (the script's default constant 1.0.0) + `Directory.Build.props`'s `PathMap` (source-path mapping; a defensive layer when Release has no PDBs). Verification conclusion (2026-08-28, local zh-CN vs GA en-US runner, SCD 497 files): **all files except `WTGWizard.Main.dll` have identical cross-machine SHA256**.
-     - **Main.dll exemption rationale (attributed; not an environment difference)**: the WinUI XAML compiler assigns globally increasing numbers to x:Bind binding classes (`{Page}_objN_Bindings`) in **parallel-processing completion order**; the numbers are non-deterministic → generated type names differ (measured: GA `DeployMethodPage_obj42` vs local `obj20`) → the CsWinRT source generator consequently produces different `VtableClasses`/`WinRTTypeDetails` → Main.dll metadata/IL/layout drifts. **Two Clean rebuilds on the same machine also yield different hashes** (`0D9D5FA5…` vs `49C60A12…`) — an intrinsic compiler non-determinism, not a locale/path/environment issue. Only the one XAML assembly is affected (the other 496 files confirm this). There is no known public compiler switch to fix the numbering; report an issue to microsoft-ui-xaml if an upstream fix is desired.
-     - **Misdiagnosis exclusion record (do not re-investigate)**: in the `-Diagnostics` MSBuild property snapshot, `ShouldComputeInputPris`/`EnableCoreMrtTooling`/`WindowsSdkBuildToolsVersion` are empty on the GA side but have values locally — this is a **collection-timing artifact** (`Collect-ProjectInfo` runs before restore; on a fresh GA checkout obj has no assets → package props are not imported) and is unrelated to the artifact difference (the Worker-side snapshot has zero differences and Worker.dll is identical).
-     - **Runbook (cross-build/cross-machine comparison)**: (1) `BuildArtifacts.ps1 -BuildType SCD -Diagnostics` (Clean + fixed Version by default; the manifest lands at `build/BuildDiagnostics/SCD-x64.csv` with an environment snapshot); (2) when comparing the two CSVs you **must project out the `LastWriteTimeUtc` column** (file timestamps always differ between builds, so a direct diff always reports differences) — after `Import-Csv`, compare only `RelativePath`+`SHA256` (`Length` optional); (3) attribution order for differing files: Main.dll (known exemption) → newly appearing files → the rest.
+    
+    - **Main.dll exemption rationale (attributed; not an environment difference)**: the WinUI XAML compiler assigns globally increasing numbers to x:Bind binding classes (`{Page}_objN_Bindings`) in **parallel-processing completion order**; the numbers are non-deterministic → generated type names differ (measured: GA `DeployMethodPage_obj42` vs local `obj20`) → the CsWinRT source generator consequently produces different `VtableClasses`/`WinRTTypeDetails` → Main.dll metadata/IL/layout drifts. **Two Clean rebuilds on the same machine also yield different hashes** (`0D9D5FA5…` vs `49C60A12…`) — an intrinsic compiler non-determinism, not a locale/path/environment issue. Only the one XAML assembly is affected (the other 496 files confirm this). There is no known public compiler switch to fix the numbering; report an issue to microsoft-ui-xaml if an upstream fix is desired.
+    - **Misdiagnosis exclusion record (do not re-investigate)**: in the `-Diagnostics` MSBuild property snapshot, `ShouldComputeInputPris`/`EnableCoreMrtTooling`/`WindowsSdkBuildToolsVersion` are empty on the GA side but have values locally — this is a **collection-timing artifact** (`Collect-ProjectInfo` runs before restore; on a fresh GA checkout obj has no assets → package props are not imported) and is unrelated to the artifact difference (the Worker-side snapshot has zero differences and Worker.dll is identical).
+    - **Runbook (cross-build/cross-machine comparison)**: (1) `BuildArtifacts.ps1 -BuildType SCD -Diagnostics` (Clean + fixed Version by default; the manifest lands at `build/BuildDiagnostics/SCD-x64.csv` by default, or `<OutputDir>\WTGWizard\BuildDiagnostics\SCD-x64.csv` when `-OutputDir` is set, with an environment snapshot); (2) when comparing the two CSVs you **must project out the `LastWriteTime` column** (it stores the UTC timestamp string; file timestamps always differ between builds, so a direct diff always reports differences) — after `Import-Csv`, compare only `RelativePath`+`SHA256` (`Length` optional); (3) attribution order for differing files: Main.dll (known exemption) → newly appearing files → the rest.
 
 26. **Launcher (native launcher) and release structure**: zip root = `WTGWizard.exe` (native C launcher) + `WTGWizard-v{version}\` (all Main artifacts); the launcher reads the numeric FileVersion fields from its own VERSIONINFO, composes `WTGWizard-v{a.b.c}` for an exact hit, and on failure falls back to searching first-level subdirectories that start with `WTGWizard` and contain `WTGWizard.Main.exe`; if there is still no hit, a MessageBox directs the user to GitHub Releases.
-     - **Why native C (vcxproj) instead of .NET**: when an FDD-style launcher sits at the zip root, the SCD package's .NET runtime is in a subdirectory and hostfxr does not resolve across directories → a root-level .NET launcher cannot start; a native exe has zero dependencies and `/subsystem:windows` naturally means no window. The vcxproj is **not in the slnx**; `BuildArtifacts.ps1` locates VS MSBuild via vswhere to build it (`dotnet msbuild` cannot build a vcxproj).
-     - **PlatformToolset must use `$(DefaultPlatformToolset)`**: hard-coding v143 gives MSB8020 on VS18 (v145), and hard-coding v145 blows up the same way on CI VS2022 (v143) — it is provided automatically by the Cpp targets of the VS actually used, adapting to local/CI.
-     - **Version injection must go through environment variables (cross-shell command-line quoting traps)**: a comma numeric value (`1,0,0,0`) must be quoted on the command line (a bare comma = MSB1006), but how quoted arguments are escaped differs across shells — pwsh 7 (the default GA Windows shell; `PSNativeCommandArgumentPassing` defaults to Standard, and `Windows` mode does not byte-for-byte replicate PS 5.1 either) escapes embedded quotes into a literal `\"` → CI once produced a cascade of MSB1008/RC1109. **Solution**: inject via `$env:WTGW_LAUNCHER_VER_NUM/STR` (the msbuild child process inherits environment variables, which automatically become MSBuild properties), keeping the msbuild arguments **free of any quote characters**; explicit `/p:` overrides still work. Diagnostic method: check whether `\"` appears in the Full command line of the MSBuild error.
-     - **Strict same-source version constraint**: the rc's `ProductVersion` (string) and the Main version share `$MainVer` (injected via the `LauncherVersionNumeric/String` properties) → the directory name `WTGWizard-v{ver}` and the launcher probe stay strictly consistent; for a prerelease (e.g. `1.0.0-preview1`) the FileVersion numeric fields do not include the suffix → the exact hit degrades to the fallback search (no functional loss).
-     - **UAC chain**: Main is `requireAdministrator` — the launcher must use `ShellExecuteExW` (`CreateProcess` reports `ERROR_ELEVATION_REQUIRED`); if the user declines UAC (`ERROR_CANCELLED`), it exits silently.
-     - **Attribution**: `WTGWizard.Launcher.cpp` contains adapted fragments from Starward.Launcher (MIT); the file header retains Scighost's copyright notice; THIRD-PARTY-NOTICES entry 12.
+    
+    - **Why native C (vcxproj) instead of .NET**: when an FDD-style launcher sits at the zip root, the SCD package's .NET runtime is in a subdirectory and hostfxr does not resolve across directories → a root-level .NET launcher cannot start; a native exe has zero dependencies and `/subsystem:windows` naturally means no window. The vcxproj is **not in the slnx**; `BuildArtifacts.ps1` locates VS MSBuild via vswhere to build it (`dotnet msbuild` cannot build a vcxproj). The launcher statically links the CRT via `/MT` (`RuntimeLibrary=MultiThreaded`), so it carries no host VC++ runtime DLL dependency.
+    - **PlatformToolset must use `$(DefaultPlatformToolset)`**: hard-coding v143 gives MSB8020 on VS18 (v145), and hard-coding v145 blows up the same way on CI VS2022 (v143) — it is provided automatically by the Cpp targets of the VS actually used, adapting to local/CI.
+    - **Version injection must go through environment variables (cross-shell command-line quoting traps)**: a comma numeric value (`1,0,0,0`) must be quoted on the command line (a bare comma = MSB1006), but how quoted arguments are escaped differs across shells — pwsh 7 (the default GA Windows shell; `PSNativeCommandArgumentPassing` defaults to Standard, and `Windows` mode does not byte-for-byte replicate PS 5.1 either) escapes embedded quotes into a literal `\"` → CI once produced a cascade of MSB1008/RC1109. **Solution**: inject via `$env:WTGW_LAUNCHER_VER_NUM/STR` (the msbuild child process inherits environment variables, which automatically become MSBuild properties), keeping the msbuild arguments **free of any quote characters**; explicit `/p:` overrides still work (in practice the numeric value travels via env while `LauncherVersionString` is additionally passed as `/p:LauncherVersionString=$MainVer`, which takes precedence per the vcxproj conditions). Diagnostic method: check whether `\"` appears in the Full command line of the MSBuild error.
+    - **Strict same-source version constraint**: the rc's `ProductVersion` (string) and the Main version share `$MainVer` (injected via the `LauncherVersionNumeric/String` properties) → the directory name `WTGWizard-v{ver}` and the launcher probe stay strictly consistent; for a prerelease (e.g. `1.0.0-preview1`) the FileVersion numeric fields do not include the suffix → the exact hit degrades to the fallback search (no functional loss). The same degradation applies to four-segment versions (e.g. `1.0.2.1` is probed as `1.0.2`, since `GetOwnVersion` only reads the first three fields).
+    - **UAC chain**: Main is `requireAdministrator` — the launcher must use `ShellExecuteExW` with `lpVerb=nullptr` (relying on Main's `requireAdministrator` manifest for elevation, not an explicit `runas`; `CreateProcess` would report `ERROR_ELEVATION_REQUIRED`); if the user declines UAC (`ERROR_CANCELLED`), it exits silently.
+    - **Attribution**: `WTGWizard.Launcher.cpp` contains adapted fragments from Starward.Launcher (MIT); the file header retains Scighost's copyright notice; THIRD-PARTY-NOTICES entry 12.
