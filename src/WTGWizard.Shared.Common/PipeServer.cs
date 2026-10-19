@@ -69,7 +69,10 @@ public sealed class PipeServer : IDisposable
 
         try
         {
-            await _pipeServer.WaitForConnectionAsync(cts.Token);
+            // ConfigureAwait(false)：连接就绪后的全部簿记（建读循环 + 发 ready）必须在连接完成的
+            // 那个线程上完成。若续体被 post 回 UI 线程，UI 一旦繁忙 ready 就会迟到，
+            // 而 Worker 的 WaitForReady 只有 15s 预算 —— 它会直接 Exit(-1) 放弃整条命令。
+            await _pipeServer.WaitForConnectionAsync(cts.Token).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
@@ -124,7 +127,9 @@ public sealed class PipeServer : IDisposable
     {
         // 信号在读循环启动时即已挂载，此处只负责等待
         // 即使 ack 早已到达（等待方被 UI 线程调度延迟数十毫秒），也会立即返回。
-        await _handshakeTcs.Task.WaitAsync(TimeSpan.FromMilliseconds(timeoutMs), cancellationToken);
+        // ConfigureAwait(false)：握手簿记不占用 UI 线程的排队名额。
+        await _handshakeTcs.Task.WaitAsync(TimeSpan.FromMilliseconds(timeoutMs), cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>

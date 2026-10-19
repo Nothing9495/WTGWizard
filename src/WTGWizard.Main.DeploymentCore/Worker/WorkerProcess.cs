@@ -136,11 +136,14 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            await pipeServer.WaitForConnectionAsync(PipeProtocol.ConnectTimeoutMs, cts.Token);
+            // 以下四处管道/进程簿记一律 ConfigureAwait(false)：UI 线程繁忙不应拖慢握手与终态等待。
+            // 方法体内只触及日志、Process、TCS 与 TerminalOutputBuffer（均线程安全），
+            // 不触碰任何 UI 对象；返回后的调用方（StepContext → Orchestrator）仍回到 UI 上下文。
+            await pipeServer.WaitForConnectionAsync(PipeProtocol.ConnectTimeoutMs, cts.Token).ConfigureAwait(false);
             _logger.Debug("WorkerMgr", "Pipe connected, read loop started: {Pipe}", pipeName);
 
             // 三次握手：等待 Worker 回报 ack（15s 超时）
-            await pipeServer.WaitHandshakeAsync(PipeProtocol.ConnectTimeoutMs, cts.Token);
+            await pipeServer.WaitHandshakeAsync(PipeProtocol.ConnectTimeoutMs, cts.Token).ConfigureAwait(false);
             _logger.Debug("WorkerMgr", "Handshake complete: {Pipe}", pipeName);
 
             // Worker 回报取消确认（task_cancelled 专用上报）→ 任务取消完成
@@ -150,10 +153,10 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
 
             // 无限等待 Worker 回报（正常完成/失败/取消/断开）——软取消时当前任务自然跑完。
             // 叠加「静默兜底」：Worker 长时间不再发任何消息时判定终态不可达，转为失败而非无限挂起。
-            var result = await AwaitReportAsync(tcs.Task);
+            var result = await AwaitReportAsync(tcs.Task).ConfigureAwait(false);
 
             if (!process.HasExited)
-                await processExitTask;
+                await processExitTask.ConfigureAwait(false);
 
             // 兜底：消息全丢的极端场景下按进程退出码裁定（消息与进程退出双通道交叉验证）
             if (!_ended)
@@ -245,7 +248,7 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         {
             try
             {
-                await tcs.Task.WaitAsync(TimeSpan.FromSeconds(15));
+                await tcs.Task.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(false);
             }
             catch (TimeoutException)
             {
