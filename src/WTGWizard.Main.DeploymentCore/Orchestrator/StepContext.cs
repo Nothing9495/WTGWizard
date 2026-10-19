@@ -13,11 +13,15 @@ namespace WTGWizard.Main.DeploymentCore.Orchestrator;
 public sealed class StepContext : IStepContext, IDisposable
 {
     private readonly Subject<TaskUpdate> _subject = new();
-    private bool _disposed;
+
+    // volatile：进度回调来自管道读循环 / Worker 回调线程，Publish 与 IsActive 都会被跨线程读
+    private volatile bool _disposed;
+
     public DeploymentConfig Config { get; }
     public ILoggerService Logger { get; }
     public WorkerCommandFactory Commands { get; }
     public IObservable<TaskUpdate> Progress => _subject;
+    public bool IsActive => !_disposed;
     private readonly IWorkerProcess _worker;
     private readonly TempFileManager _tempFiles;
 
@@ -51,6 +55,7 @@ public sealed class StepContext : IStepContext, IDisposable
 
     public void Dispose()
     {
+        // 先标记失效：让仍在路上的进度回调在投递之前就短路
         _disposed = true;
         _subject.OnCompleted();
         _subject.Dispose();

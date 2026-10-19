@@ -36,8 +36,12 @@ public sealed class ExtractStep : DeploymentStepBase
             string osTarget = osApplyDir.TrimEnd('\\');
             var cmd = new WorkerCommand("extract",
                 $"--wim \"{EscapeArg(ctx.Config.SrcImageFile)}\" --index {ctx.Config.ImageSelectedIndex} --target \"{EscapeArg(osTarget)}\"");
-            var result = await ctx.ExecuteWorkerAsync(cmd,
-                new Progress<double>(p => ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Running, p))), ct);
+            // IsActive 在 StepContext.Dispose 时失效（覆盖成功/失败/超时/取消全部路径），
+            // 用它把步骤结束后的迟到回调挡在 UI 线程队列之外。
+            var progress = new GatedProgress<double>(
+                new Progress<double>(p => ctx.Publish(new TaskUpdate(TaskId, DeployTaskStatus.Running, p))),
+                () => ctx.IsActive);
+            var result = await ctx.ExecuteWorkerAsync(cmd, progress, ct);
             if (!result.Success)
                 return StepResult.Fail(result.ErrorMessage ?? "Extract failed");
         }
