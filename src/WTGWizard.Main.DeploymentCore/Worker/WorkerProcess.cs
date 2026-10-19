@@ -222,10 +222,39 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         throw new FileNotFoundException("WTGWizard.Worker.exe not found");
     }
 
-    private static void KillProcessTree(Process? process)
+    /// <summary>
+    /// 终止 Worker 进程树。降级策略：整树 → 单进程 → 记录 Error 并输出 PID 供人工处置。
+    /// 原实现是 `catch { }` 完全静默，导致「超时后 Worker 仍在跑」这类问题在日志里毫无线索。
+    /// </summary>
+    private void KillProcessTree(Process? process)
     {
-        if (process is null || process.HasExited) return;
-        try { process.Kill(true); } catch { /* best effort */ }
+        if (process is null) return;
+
+        int pid = SafeGetPid(process);
+        try
+        {
+            if (process.HasExited) return;
+            _logger.Warn("WorkerMgr", "Killing Worker process tree, PID={Pid}", pid);
+            process.Kill(entireProcessTree: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("WorkerMgr", "Failed to kill Worker process tree, PID={Pid} ({Msg}) — falling back to single process.", pid, ex.Message);
+            try
+            {
+                if (!process.HasExited) process.Kill();
+            }
+            catch (Exception ex2)
+            {
+                _logger.Error("WorkerMgr", "Failed to kill Worker PID={Pid} ({Msg}). It may still be running; terminate it manually.", pid, ex2.Message);
+            }
+        }
+    }
+
+    private static int SafeGetPid(Process process)
+    {
+        try { return process.Id; }
+        catch { return -1; }
     }
 
     public void Dispose() { }
