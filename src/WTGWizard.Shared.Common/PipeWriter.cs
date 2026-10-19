@@ -22,16 +22,14 @@ public sealed class PipeWriter : IDisposable
     private bool _connected;
     private CancellationToken _ct = CancellationToken.None;
 
+    // 握手 ready 信号：与 OnAck 同样在 Connect() 的读循环接线处挂载，
+    // 避免 ready 因 WaitForReady 订阅过晚而丢失（PipeServer 侧的同源修复）。
+    private readonly ManualResetEventSlim _readySignal = new(false);
+
     public bool IsConnected => _connected && _pipe?.IsConnected == true;
 
     /// <summary>收到取消指令（主 → 子）。</summary>
     public event Action? OnCancelRequested;
-
-    /// <summary>收到握手 ready（主 → 子）。</summary>
-    public event Action? OnReady;
-
-    /// <summary>收到握手 ack（子 → 主，Main 侧经 PipeServer 桥接）。</summary>
-    public event Action? OnAck;
 
     /// <summary>
     /// 诊断日志回调（Worker 侧注入 WorkerDebug.Write，Shared.Common 保持无日志依赖）。
@@ -59,8 +57,7 @@ public sealed class PipeWriter : IDisposable
 
         _reader = new PipeReader(_pipe);
         _reader.OnCancelRequested += () => OnCancelRequested?.Invoke();
-        _reader.OnReady += () => OnReady?.Invoke();
-        _reader.OnAck += () => OnAck?.Invoke();
+        _reader.OnReady += () => _readySignal.Set();
         _reader.StartReading();
     }
 
@@ -84,19 +81,10 @@ public sealed class PipeWriter : IDisposable
     {
         if (!_connected) return false;
 
-        using var waitHandle = new ManualResetEventSlim(false);
-        void OnReadyHandler() => waitHandle.Set();
-        OnReady += OnReadyHandler;
-        using var cancelReg = _ct.Register(() => waitHandle.Set());
-        try
-        {
-            return waitHandle.Wait(TimeSpan.FromMilliseconds(timeoutMs))
-                && !_ct.IsCancellationRequested;
-        }
-        finally
-        {
-            OnReady -= OnReadyHandler;
-        }
+        // 信号由 Connect() 中的 OnReady 接线置位，与等待方是否已就绪无关。
+        using var cancelReg = _ct.Register(() => _readySignal.Set());
+        return _readySignal.Wait(TimeSpan.FromMilliseconds(timeoutMs))
+            && !_ct.IsCancellationRequested;
     }
 
     private void Send(string json)

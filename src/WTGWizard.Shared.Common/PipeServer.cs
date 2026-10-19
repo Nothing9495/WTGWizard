@@ -18,7 +18,11 @@ public sealed class PipeServer : IDisposable
     private NamedPipeServerStream? _pipeServer;
     private PipeReader? _reader;
     private readonly string _pipeName;
-    private bool _handshakeCompleted;
+
+    // 握手完成信号：在读循环接线处（StartReading 之前）即可被置位，
+    // 因此无论 Worker 的 ack 早到多久，都不会因“等待方尚未订阅”而丢失。
+    private readonly TaskCompletionSource _handshakeTcs =
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     /// <summary>任务开始事件。</summary>
     public event Action<string, string?>? OnRunning;
@@ -40,9 +44,6 @@ public sealed class PipeServer : IDisposable
 
     /// <summary>收到取消回报（Worker 专用上报 task_cancelled）。</summary>
     public event Action? OnCancelled;
-
-    /// <summary>握手完成（Worker 回报 ack）。</summary>
-    public event Action? OnHandshakeComplete;
 
     public PipeServer(string pipeName)
     {
@@ -84,7 +85,7 @@ public sealed class PipeServer : IDisposable
         _reader.OnDisconnected += () => OnDisconnected?.Invoke();
         _reader.OnCancelRequested += () => OnCancel?.Invoke();
         _reader.OnCancelled += () => OnCancelled?.Invoke();
-        _reader.OnAck += () => OnHandshakeComplete?.Invoke();
+        _reader.OnAck += () => _handshakeTcs.TrySetResult();
         _reader.StartReading();
 
         // 三次握手：发送 ready，等待 Worker 回报 ack（15s 超时）
@@ -121,19 +122,9 @@ public sealed class PipeServer : IDisposable
     /// <exception cref="TimeoutException">握手超时。</exception>
     public async Task WaitHandshakeAsync(int timeoutMs = PipeProtocol.ConnectTimeoutMs, CancellationToken cancellationToken = default)
     {
-        if (_handshakeCompleted) return;
-
-        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        void OnHandshakeHandler() { _handshakeCompleted = true; tcs.TrySetResult(); }
-        OnHandshakeComplete += OnHandshakeHandler;
-        try
-        {
-            await tcs.Task.WaitAsync(TimeSpan.FromMilliseconds(timeoutMs), cancellationToken);
-        }
-        finally
-        {
-            OnHandshakeComplete -= OnHandshakeHandler;
-        }
+        // 信号在读循环启动时即已挂载，此处只负责等待
+        // 即使 ack 早已到达（等待方被 UI 线程调度延迟数十毫秒），也会立即返回。
+        await _handshakeTcs.Task.WaitAsync(TimeSpan.FromMilliseconds(timeoutMs), cancellationToken);
     }
 
     /// <summary>
