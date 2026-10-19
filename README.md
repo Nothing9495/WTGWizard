@@ -55,7 +55,8 @@ WTGWizard-vX.Y.Z-x64-SCD.zip
     └── ...
 ```
 
-> **Warning**: Deployment erases the target disk or partition. Verify your selections carefully before starting.
+> [!WARNING]
+> Deployment erases the target disk or partition. Verify your selections carefully before starting.
 
 ## Build from Source
 
