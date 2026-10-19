@@ -23,7 +23,13 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
     private bool _cancelRequested;
     private bool _ended;
 
+    // 最后一次收到 Worker 消息的时间戳（Environment.TickCount64）——终态静默兜底的计时基准
+    private long _lastReportTimestamp;
+
     public WorkerProcess(ILoggerService logger) => _logger = logger;
+
+    /// <summary>刷新「Worker 仍在说话」的时间戳。ExecuteAsync 串行调用，无需额外同步。</summary>
+    private void MarkReportReceived() => Interlocked.Exchange(ref _lastReportTimestamp, Environment.TickCount64);
 
     public async Task<WorkerExecutionResult> ExecuteAsync(
         WorkerCommand command, IProgress<double>? progress = null, CancellationToken ct = default)
@@ -42,6 +48,7 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
 
         _cancelRequested = false;
         _ended = false;
+        MarkReportReceived();
 
         // 软取消（ct）：标记取消请求；执行阶段 Worker 自然跑完，结局由部署层判定
         using var cancelReg = ct.Register(() => _cancelRequested = true);
@@ -56,6 +63,7 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
 
         pipeServer.OnCompleted += (task, rc) =>
         {
+            MarkReportReceived();
             _logger.Debug("WorkerMgr", "Worker completed: {Task} exit={ExitCode}", task, rc);
             // 防御：completed 语义仅 rc==0；非 0 按失败处理
             Settle(rc == 0
@@ -64,11 +72,13 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         };
         pipeServer.OnFailed += (task, rc, msg) =>
         {
+            MarkReportReceived();
             _logger.Error("WorkerMgr", "Worker failed: {Task} exit={ExitCode} msg={Msg}", task, rc, msg);
             Settle(WorkerExecutionResult.Fail(rc, msg ?? $"Exit code: {rc}"));
         };
         pipeServer.OnCancelled += () =>
         {
+            MarkReportReceived();
             _logger.Debug("WorkerMgr", "Worker reported cancellation");
             Settle(WorkerExecutionResult.Cancelled());
         };
@@ -76,6 +86,7 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         {
             if (!tcs.Task.IsCompleted)
             {
+                MarkReportReceived();
                 // 取消请求后的断开视为取消（消除事件竞态）；否则为意外断开
                 _logger.Warn("WorkerMgr", "Pipe disconnected (cancelRequested={Cancel})", _cancelRequested);
                 Settle(_cancelRequested
@@ -83,7 +94,11 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
                     : WorkerExecutionResult.Fail(-1, "Pipe disconnected unexpectedly"));
             }
         };
-        pipeServer.OnProgress += (_, p) => progress?.Report(p);
+        pipeServer.OnProgress += (_, p) =>
+        {
+            MarkReportReceived();
+            progress?.Report(p);
+        };
 
         Process? process = null;
         try
@@ -133,8 +148,9 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
 
             var processExitTask = process.WaitForExitAsync();
 
-            // 无限等待 Worker 回报（正常完成/失败/取消/断开）——软取消时当前任务自然跑完
-            var result = await tcs.Task;
+            // 无限等待 Worker 回报（正常完成/失败/取消/断开）——软取消时当前任务自然跑完。
+            // 叠加「静默兜底」：Worker 长时间不再发任何消息时判定终态不可达，转为失败而非无限挂起。
+            var result = await AwaitReportAsync(tcs.Task);
 
             if (!process.HasExited)
                 await processExitTask;
@@ -164,8 +180,8 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         }
         catch (TimeoutException ex)
         {
-            // 连接与握手共用 PipeProtocol.ConnectTimeoutMs，两者都抛默认文案的 TimeoutException
-            _logger.Error("WorkerMgr", "Worker connect/handshake timeout: {Msg}", ex.ToString());
+            // 连接 / 握手 / 终态静默兜底三种超时共用同一失败路径；异常自带可读原因
+            _logger.Error("WorkerMgr", "Worker timeout: {Msg}", ex.ToString());
             KillProcessTree(process);
             return WorkerExecutionResult.Fail(-1, ex.Message);
         }
@@ -183,6 +199,33 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
             process?.Dispose();
             TerminalOutputBuffer.Shared.AppendBlankLine();
         }
+    }
+
+    /// <summary>
+    /// 等待 Worker 回报终态，并施加「静默兜底」：若 Worker 连续 <see cref="PipeProtocol.ReportIdleTimeoutMs"/>
+    /// 未再发送任何消息（管道写失败后 _connected=false、或进程假死），抛出 TimeoutException 走统一失败路径
+    /// （杀进程树 + 记日志 + 返回失败），而不是让部署无限挂起到用户手动关闭窗口。
+    /// 窗口由每一条来自 Worker 的消息刷新，因此长耗时任务（提取大镜像）不受影响。
+    /// </summary>
+    private async Task<WorkerExecutionResult> AwaitReportAsync(Task<WorkerExecutionResult> reportTask)
+    {
+        const int pollMs = 1000;
+
+        while (!reportTask.IsCompleted)
+        {
+            // ConfigureAwait(false)：这是纯等待循环，不应每秒往 UI 线程投递续体
+            await Task.Delay(pollMs).ConfigureAwait(false);
+            if (reportTask.IsCompleted) break;
+
+            long idleMs = Environment.TickCount64 - Volatile.Read(ref _lastReportTimestamp);
+            if (idleMs >= PipeProtocol.ReportIdleTimeoutMs)
+            {
+                throw new TimeoutException(
+                    $"Worker reported nothing for {idleMs / 1000}s (terminal message lost or Worker hung).");
+            }
+        }
+
+        return await reportTask.ConfigureAwait(false);
     }
 
     /// <summary>

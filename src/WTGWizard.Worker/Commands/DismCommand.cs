@@ -32,10 +32,9 @@ internal static class DismCommand
             int exitCode = ProcessRunner.Run("dism.exe", dismArgs, timeoutMs, ct);
 
             if (exitCode == 0)
-                pipe.WriteCompleted("dism", 0);
-            else
-                pipe.WriteFailed("dism", exitCode, $"DISM failed with exit code {exitCode}");
+                return PipeHelper.ReportSuccess(pipe, "dism");
 
+            pipe.WriteFailed("dism", exitCode, $"DISM failed with exit code {exitCode}");
             return exitCode;
         }
         catch (OperationCanceledException)

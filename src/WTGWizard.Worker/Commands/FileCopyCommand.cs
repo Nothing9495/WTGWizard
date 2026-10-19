@@ -49,8 +49,7 @@ internal static class FileCopyCommand
             ct.ThrowIfCancellationRequested();
             Console.WriteLine($"Copied: {src} -> {dst}");
 
-            pipe.WriteCompleted("filecopy", 0);
-            return 0;
+            return PipeHelper.ReportSuccess(pipe, "filecopy");
         }
         catch (OperationCanceledException)
         {

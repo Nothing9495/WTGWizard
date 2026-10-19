@@ -32,10 +32,9 @@ internal static class BcdbootCommand
             int exitCode = ProcessRunner.Run("bcdboot.exe", bcdbootArgs, timeoutMs, ct);
 
             if (exitCode == 0)
-                pipe.WriteCompleted("bcdboot", 0);
-            else
-                pipe.WriteFailed("bcdboot", exitCode, $"bcdboot failed with exit code {exitCode}");
+                return PipeHelper.ReportSuccess(pipe, "bcdboot");
 
+            pipe.WriteFailed("bcdboot", exitCode, $"bcdboot failed with exit code {exitCode}");
             return exitCode;
         }
         catch (OperationCanceledException)

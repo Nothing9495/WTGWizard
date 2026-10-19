@@ -61,16 +61,16 @@ public sealed class PipeWriter : IDisposable
         _reader.StartReading();
     }
 
-    public void WriteRunning(string task, string? description = null) => Send(PipeProtocol.BuildRunning(task, description));
-    public void WriteProgress(string task, double percent)
+    public bool WriteRunning(string task, string? description = null) => Send(PipeProtocol.BuildRunning(task, description));
+    public bool WriteProgress(string task, double percent)
         => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildProgress(task, percent) + PipeProtocol.NewLine), _ct, WriteTimeoutMs, "progress", throwOnTimeout: true, logDetail: false);
-    public void WriteCompleted(string task, int returnCode) => Send(PipeProtocol.BuildCompleted(task, returnCode));
-    public void WriteFailed(string task, int returnCode, string? message = null) => Send(PipeProtocol.BuildFailed(task, returnCode, message));
-    public void WriteCancelled(string task) => Send(PipeProtocol.BuildCancelled(task));
-    public void WriteCancel() => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildCancel() + PipeProtocol.NewLine),
+    public bool WriteCompleted(string task, int returnCode) => Send(PipeProtocol.BuildCompleted(task, returnCode));
+    public bool WriteFailed(string task, int returnCode, string? message = null) => Send(PipeProtocol.BuildFailed(task, returnCode, message));
+    public bool WriteCancelled(string task) => Send(PipeProtocol.BuildCancelled(task));
+    public bool WriteCancel() => Write(Encoding.UTF8.GetBytes(PipeProtocol.BuildCancel() + PipeProtocol.NewLine),
         CancellationToken.None, CancelAckTimeoutMs, "cancel ack", throwOnTimeout: false);
-    public void WriteReady() => Send(PipeProtocol.BuildReady());
-    public void WriteAck() => Send(PipeProtocol.BuildAck());
+    public bool WriteReady() => Send(PipeProtocol.BuildReady());
+    public bool WriteAck() => Send(PipeProtocol.BuildAck());
 
     /// <summary>
     /// 三次握手（Worker 侧）：等待 Main 的 ready，超时/取消则失败。
@@ -87,21 +87,22 @@ public sealed class PipeWriter : IDisposable
             && !_ct.IsCancellationRequested;
     }
 
-    private void Send(string json)
+    private bool Send(string json)
         => Write(Encoding.UTF8.GetBytes(json + PipeProtocol.NewLine), _ct, WriteTimeoutMs, "write", throwOnTimeout: true);
 
     /// <summary>
     /// 统一写入路径：可取消（任务消息）/ 不可取消（取消确认，token 已取消时仍须送达）。
     /// 超时/失败时 Dispose 中断 NtWriteFile 阻塞兜底。
-    /// logDetail=false 用于高频消息（如进度），跳过明细日志；异常路径日志始终保留。
+    /// logDetail=false 用于高频消息（如进度），跳过明细日志。
+    /// 返回值：消息是否**确实送达管道**；false 表示管道已不可用（已置 _connected=false）。
     /// </summary>
-    private void Write(byte[] bytes, CancellationToken ct, int timeoutMs, string tag, bool throwOnTimeout, bool logDetail = true)
+    private bool Write(byte[] bytes, CancellationToken ct, int timeoutMs, string tag, bool throwOnTimeout, bool logDetail = true)
     {
         lock (_lock)
         {
-            if (!_connected) return;
+            if (!_connected) return false;
             var pipe = _pipe;
-            if (pipe is null) return;
+            if (pipe is null) return false;
 
             try
             {
@@ -114,22 +115,26 @@ public sealed class PipeWriter : IDisposable
                     pipe.Dispose();
                     DebugLog?.Invoke($"Pipe: {tag} timed out, pipe disposed");
                     if (throwOnTimeout) throw new OperationCanceledException("Pipe write timed out");
-                    return;
+                    return false;
                 }
 
                 writeTask.GetAwaiter().GetResult();
                 pipe.Flush();
                 if (logDetail) DebugLog?.Invoke($"Pipe: {tag} completed");
+                return true;
             }
             catch (OperationCanceledException)
             {
                 _connected = false;
                 DebugLog?.Invoke($"Pipe: {tag} cancelled");
                 if (throwOnTimeout) throw;
+                return false;
             }
-            catch
+            catch (Exception ex)
             {
                 _connected = false;
+                DebugLog?.Invoke($"Pipe: {tag} failed ({ex.GetType().Name}: {ex.Message})");
+                return false;
             }
         }
     }

@@ -75,8 +75,7 @@ internal static class ExtractCommand
                         Console.WriteLine(msg);
                 }, ct).GetAwaiter().GetResult();
 
-            pipe.WriteCompleted("extract", 0);
-            return 0;
+            return PipeHelper.ReportSuccess(pipe, "extract");
         }
         catch (OperationCanceledException)
         {

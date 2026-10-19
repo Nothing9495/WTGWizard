@@ -45,4 +45,18 @@ internal static class PipeHelper
             throw;
         }
     }
+
+    /// <summary>
+    /// 回报「成功完成」终态。返回进程退出码：
+    /// 管道不可用导致终态消息无法送达时返回 **非 0** —— Main 侧收不到 completed/failed
+    /// 就只能退回进程退出码裁定，绝不能以 0 退出（否则会被误判为成功）。
+    /// </summary>
+    public static int ReportSuccess(PipeWriter pipe, string task)
+    {
+        if (pipe.WriteCompleted(task, 0))
+            return 0;
+
+        Console.Error.WriteLine($"Pipe: could not deliver '{task}' completion; exiting with code 1.");
+        return 1;
+    }
 }

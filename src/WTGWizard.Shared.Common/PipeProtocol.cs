@@ -12,6 +12,14 @@ public static class PipeProtocol
     public const int ConnectTimeoutMs = 15000;  // 子进程 15s 超时自动退出
     public const string NewLine = "\n";
 
+    /// <summary>
+    /// Worker 终态回报静默兜底：Main 等待「completed / failed / cancelled」的最长静默时间。
+    /// 任何来自 Worker 的消息（running / progress / 终态）都会刷新该窗口，
+    /// 因此它约束的是「Worker 存活却不再说话」（管道写失败、进程假死），而**不是任务耗时**
+    /// 只要进度消息仍在流动，提取数十 GB 镜像也不会触发。
+    /// </summary>
+    public const int ReportIdleTimeoutMs = 30 * 60 * 1000;
+
     // ── 消息类型常量 ──
     public const string TaskRunning = "task_running";
     public const string TaskProgress = "task_progress";

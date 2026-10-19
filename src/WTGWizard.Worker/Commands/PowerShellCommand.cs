@@ -44,10 +44,9 @@ internal static class PowerShellCommand
                 ct);
 
             if (exitCode == 0)
-                pipe.WriteCompleted("pwsh", 0);
-            else
-                pipe.WriteFailed("pwsh", exitCode, $"PowerShell script failed with exit code {exitCode}");
+                return PipeHelper.ReportSuccess(pipe, "pwsh");
 
+            pipe.WriteFailed("pwsh", exitCode, $"PowerShell script failed with exit code {exitCode}");
             return exitCode;
         }
         catch (OperationCanceledException)
