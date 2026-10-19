@@ -9,6 +9,7 @@
 		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 		<Platforms>x64</Platforms>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+		<Version>1.0.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
