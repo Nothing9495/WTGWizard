@@ -12,9 +12,6 @@
 .PARAMETER MainVer
     Main 应用版本（写入产物并决定 staging 子目录名 WTGWizard-v{版本}）。
 
-.PARAMETER WorkerVer
-    Worker 应用版本。
-
 .PARAMETER ZipTag
     分发包名称中的标签：WTGWizard-<ZipTag>-x64-<BuildType>.zip。
 
@@ -52,8 +49,6 @@ param(
     [string]$BuildType = "FDD",
 
     [string]$MainVer = "1.0.0",
-
-    [string]$WorkerVer = "1.0.0",
 
     [string]$ZipTag = "Build-Artifacts",
 
@@ -317,7 +312,6 @@ function Collect-EnvironmentInfo {
     Write-Log "Architecture: $Architecture"
     Write-Log "BuildType: $BuildType"
     Write-Log "MainVer: $MainVer"
-    Write-Log "WorkerVer: $WorkerVer"
     Write-Log "ZipTag: $ZipTag"
     Write-Log "Diagnostics: $Diagnostics"
     Write-Log "MinXbfCount: $MinXbfCount"
@@ -558,20 +552,18 @@ function Build-Worker {
         [string]$Output,
 
         [Parameter(Mandatory)]
-        [string]$PublishProfile,
-
-        [Parameter(Mandatory)]
-        [string]$Version
+        [string]$PublishProfile
     )
 
     Write-SubSection "Worker publish [$PublishProfile]"
 
+    # 刻意不传 -p:Version：Worker 版本由 Worker.csproj 的 <Version> 独立维护。
+    # 一旦传入，MSBuild 全局属性会盖掉 csproj 里的值（实测已验证），造成两个来源互相覆盖。
     $arguments = @(
         "publish",
         $WorkerProject,
         "-p:PublishProfile=$PublishProfile",
         "-p:PublishDir=$Output",
-        "-p:Version=$Version",
         "--no-restore"
     )
 
@@ -1238,8 +1230,7 @@ function Build-Variant {
     # 同时把 Worker 的 Build 输出（bin\x64\...）留下，供 Main publish 后的 copy target 注入
     Build-Worker `
         -Output $WorkerOutput `
-        -PublishProfile $PublishProfile `
-        -Version $WorkerVer
+        -PublishProfile $PublishProfile
 
     Build-Main `
         -Output $Output `

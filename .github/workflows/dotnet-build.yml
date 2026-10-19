@@ -16,9 +16,6 @@ on:
       main-version:
         type: string
         default: "1.0.0"
-      worker-version:
-        type: string
-        default: "1.0.0"
       architecture:
         type: string
         default: "x64"
@@ -58,7 +55,6 @@ jobs:
             BuildType    = "${{ inputs.build-mode }}"
             Architecture = "${{ inputs.architecture }}"
             MainVer      = $mainVer
-            WorkerVer    = "${{ inputs.worker-version }}"
             ZipTag       = "${{ env.UPLOAD_TAG }}"
           }
           if ("${{ inputs.diagnostics }}" -eq "true") {

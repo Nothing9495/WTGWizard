@@ -20,7 +20,6 @@ jobs:
       upload-artifact: true
       upload-tag: ${{ github.ref_name }}
       main-version: ${{ github.ref_name }}
-      worker-version: '1.0.0'
       diagnostics: false
 
   release:
