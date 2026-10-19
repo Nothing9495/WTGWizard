@@ -13,6 +13,7 @@ namespace WTGWizard.Main.DeploymentCore.Orchestrator;
 public sealed class StepContext : IStepContext, IDisposable
 {
     private readonly Subject<TaskUpdate> _subject = new();
+    private bool _disposed;
     public DeploymentConfig Config { get; }
     public ILoggerService Logger { get; }
     public WorkerCommandFactory Commands { get; }
@@ -30,7 +31,16 @@ public sealed class StepContext : IStepContext, IDisposable
         Logger = logger;
     }
 
-    public void Publish(TaskUpdate update) => _subject.OnNext(update);
+    /// <summary>
+    /// 发布进度更新。步骤已结束（Dispose 之后）时静默丢弃：
+    /// Worker 被中断/超时终止后仍可能有迟到回调，不应让 Rx 已释放的 Subject 抛异常。
+    /// Note: 静默丢弃可能会导致由此处代码引发的问题不可见。有待后续观察
+    /// </summary>
+    public void Publish(TaskUpdate update)
+    {
+        if (_disposed) return;
+        _subject.OnNext(update);
+    }
 
     public string SaveTempScript(string fileName, string content)
         => _tempFiles.SaveScript(fileName, content);
@@ -41,6 +51,7 @@ public sealed class StepContext : IStepContext, IDisposable
 
     public void Dispose()
     {
+        _disposed = true;
         _subject.OnCompleted();
         _subject.Dispose();
     }

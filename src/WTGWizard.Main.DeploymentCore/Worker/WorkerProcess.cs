@@ -164,7 +164,8 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
         }
         catch (TimeoutException ex)
         {
-            _logger.Error("WorkerMgr", "Connection timeout: {Msg}", ex.ToString());
+            // 连接与握手共用 PipeProtocol.ConnectTimeoutMs，两者都抛默认文案的 TimeoutException
+            _logger.Error("WorkerMgr", "Worker connect/handshake timeout: {Msg}", ex.ToString());
             KillProcessTree(process);
             return WorkerExecutionResult.Fail(-1, ex.Message);
         }
@@ -179,6 +180,7 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
             _activeProcess = null;
             _activeServer = null;
             _activeTcs = null;
+            process?.Dispose();
             TerminalOutputBuffer.Shared.AppendBlankLine();
         }
     }
