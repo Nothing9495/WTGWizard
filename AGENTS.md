@@ -57,32 +57,6 @@ Worker is NOT a project reference — MSBuild targets copy Worker output to Main
 
 ## Build & Run
 
-### Build Path Selection (Agent constraints)
-
-**Prefer the DevVM remote build.** Before building, check three conditions in order:
-
-1. The `devvm-remote-build` skill is installed (available in the skills list)
-2. The DevVM build environment is available (`ssh -o ConnectTimeout=8 devvm "dotnet --version"` succeeds)
-3. The project manifest `.devvm-build.json` exists (at the project root)
-
-| Result | Action |
-| --- | --- |
-| All three satisfied | **DevVM remote build** (below) |
-| Any not satisfied | **Fall back to local build** (below), and state the reason for the fallback in your reply |
-
-### Remote Build (preferred)
-
-```powershell
-# Any PowerShell on the Host (pwsh preferred; use powershell 5.1 when pwsh is absent — the script is 5.1-compatible)
-powershell -NoProfile -File "$env:USERPROFILE\.config\opencode\skills\devvm-remote-build\scripts\Remote-Build.ps1" -ProjectPath "E:\Development\Local_Projects\WTGWizard.AOT"
-```
-
-- Manifest command: `BuildArtifacts.ps1 -BuildType SCD -OutputDir {artifactDir}`, timeout 600s
-- Artifact retrieval: `E:\Development\BuildArtifacts\WTGWizard.AOT`
-- The bash tool timeout must be set to ≥ 1800000 ms
-
-### Local Build (fallback)
-
 ```powershell
 # Build
 dotnet build WTGWizard.slnx
