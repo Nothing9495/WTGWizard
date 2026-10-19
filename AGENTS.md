@@ -259,9 +259,12 @@ Newline-delimited JSON over Named Pipes — **every message must end with `PipeP
 ```
 
 - AOT-compatible (hand-rolled JSON, no System.Text.Json source generators)
-- Pipe naming: `WTGWizardWorker_{PID}`
+- Pipe naming: `WTGWizardWorker_{PID}` — the **same name is reused by every command of one Main instance**. This is safe only because of two guarantees: ① the orchestrator runs steps serially and `PipeServer` is `using`-disposed before `ExecuteAsync` returns, so no two server instances of that name ever coexist; ② `TaskPage` cannot start a new deployment until the previous `RunDeploymentAsync` has entered its `finally` (which clears `IsDeploying` and disposes the orchestrator) — the start button is disabled while `IsDeploying`. A different Main process has a different PID, and a dead process leaves no named-pipe instance behind (kernel object dies with the last handle). **If command concurrency or the dispose/IsDeploying ordering ever changes, this premise breaks and the name must become unique again.** Log lines already carry the full command line right before the pipe name, so no extra discriminator is needed for diagnostics
 - 15-second connection timeout
 - One-way (Worker → Main); task status via `task_running/progress/completed/failed`
+- **Terminal reports must never be silent**: `PipeWriter.Write*` return `bool` (delivered or not). A command that cannot deliver `task_completed` returns a non-zero exit code via `PipeHelper.ReportSuccess`, so Main's exit-code fallback judges it as failed instead of succeeding
+- **Report idle guard**: Main waits for the terminal report with a sliding window (`PipeProtocol.ReportIdleTimeoutMs`, 30 min) refreshed by *any* Worker message — it bounds "Worker alive but silent" (pipe write failed / process hung), not task duration, so long extractions are unaffected
+- **Handshake state must be recorded where the read loop is wired, never inside a later subscriber**: `PipeServer._handshakeTcs` / `PipeWriter._readySignal` are armed in `WaitForConnectionAsync` / `Connect` *before* `StartReading()`. Subscribing inside `WaitHandshakeAsync`/`WaitForReady` re-introduces a lost-signal race (see Pitfall 27)
 
 ### Terminal Output Pipeline (Worker stdout)
 
@@ -400,6 +403,34 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
 
 ---
 
+### Github Release Note
+When the user requests a Github Release note for new releases, you need to:
+1. Checkout all commits since last release. Checkout existed tag commit hashes  or commit with message like `v*.*.* Release` on master branch to limit commits to check.
+2. Sort all changes according to `Conventional Commits`, and list them by category.
+3. Shorten every commit message into precise, concise and simple message.
+4. Write release note in Github Release note style.
+
+For reference, here is the `v1.0.2 Release`'s Github Release Note.
+```markdown
+## What’s New
+
+### 🔧 Fixes & Improvements
+
+- **IMPORTANT: Ended support for outdated Windows** – We no longer support Windows before `10.0.19041.0`(2004) since `v1.0.2`. This helps avoid unexpected issues that could occur on outdated systems.
+- **Fixed blank OS size display** – The number box for operating system partition size might allow blank content. Now it always has a valid value to display.
+- **bcdboot Commands** – `/offline`  is no longer used when the host `bcdboot.exe` utility version is lower than `10.0.26100.0`.
+- **WTGWizard Launcher** – The launcher now statically links the C runtime (`/MT`), avoiding VCRUNTIME errors if the host system doesn't have `Microsoft Visual C++ v14 Redistributable x64` installed beforehand.
+### 📝 Other Updates
+
+- Improved localizations.
+- Added a new reference hyperlink on Settings page.
+
+---
+
+**Full Changelog**: https://github.com/Nothing9495/WTGWizard/compare/80e2624...v1.0.2
+```
+
+
 ## Current State & TODOs
 
 | Area | Status | Location |
@@ -524,3 +555,5 @@ _logger.Error("WimService", "Extract failed: {Error}", ex.Message);
     - **Strict same-source version constraint**: the rc's `ProductVersion` (string) and the Main version share `$MainVer` (injected via the `LauncherVersionNumeric/String` properties) → the directory name `WTGWizard-v{ver}` and the launcher probe stay strictly consistent; for a prerelease (e.g. `1.0.0-preview1`) the FileVersion numeric fields do not include the suffix → the exact hit degrades to the fallback search (no functional loss). The same degradation applies to four-segment versions (e.g. `1.0.2.1` is probed as `1.0.2`, since `GetOwnVersion` only reads the first three fields).
     - **UAC chain**: Main is `requireAdministrator` — the launcher must use `ShellExecuteExW` with `lpVerb=nullptr` (relying on Main's `requireAdministrator` manifest for elevation, not an explicit `runas`; `CreateProcess` would report `ERROR_ELEVATION_REQUIRED`); if the user declines UAC (`ERROR_CANCELLED`), it exits silently.
     - **Attribution**: `WTGWizard.Launcher.cpp` contains adapted fragments from Starward.Launcher (MIT); the file header retains Scighost's copyright notice; THIRD-PARTY-NOTICES entry 12.
+
+27. **Pipe handshake lost-signal race (handshake state must not live in a late subscriber)**: the three-way handshake (`ready` → `ack`) was introduced in `5253578` (2026-08-05) with `PipeServer._handshakeCompleted` set **only inside** `OnHandshakeHandler`, which was subscribed at the top of `WaitHandshakeAsync` — i.e. *after* `StartReading()` had already been running inside `WaitForConnectionAsync`. An `ack` arriving in that window was dispatched to an event with no subscriber and permanently dropped, so the wait always ran the full 15s → `TimeoutException: The operation has timed out.` (the only site in the codebase producing that default message is `PipeServer.WaitHandshakeAsync`'s `Task.WaitAsync`) → Main declared the step failed and killed a Worker that was executing correctly. Two amplifiers made the window milliseconds-wide instead of microseconds: (1) the deployment chain has **no `ConfigureAwait(false)`** anywhere in `Main`/`DeploymentCore`/`Shared.Common`, so every await continuation — including the "Pipe connected" log and the handshake subscription — is posted back to the UI thread via `DispatcherQueueSynchronizationContext` and competes with rendering/progress/timers; (2) a Serilog file write sits between connect and subscribe. **Fix**: `PipeServer._handshakeTcs` / `PipeWriter._readySignal` are armed where the reader events are wired (before `StartReading()`), so `WaitHandshakeAsync`/`WaitForReady` only *wait* on an already-armed signal; the unused forwarding events `PipeServer.OnHandshakeComplete` and `PipeWriter.OnReady`/`OnAck` were deleted so the trap cannot be re-introduced (`PipeReader.OnReady`/`OnAck` legitimately remain — they are the transport-level events that carry `ready`/`ack`, not the late-subscriber layer). **Symptom to recognise**: a step failing with `The operation has timed out.` while the Worker log shows the task actually started (`WimService: Initialized` / `ExtractImage:`) and the Main log later still shows progress callbacks — that combination means handshake, not the step's own `--timeout`. Note `extract` intentionally has no `--timeout` (`WorkerCommandFactory.BuildExtract`); its 15s budget was the connection/handshake timeout, and the log line was mislabeled `Connection timeout` (now `Worker timeout`, shared by the connect/handshake/report-idle paths).
