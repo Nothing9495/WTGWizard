@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using WTGWizard.Shared.Common;
 using WTGWizard.Shared.Services.Logger;
 
 namespace WTGWizard.Worker.Commands;
@@ -16,7 +17,7 @@ internal static class FileCopyCommand
     /// <param name="logger">日志服务（由 Program 传入，共享实例）。</param>
     /// <param name="ct">取消令牌（检查点式）。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args, ILoggerService logger, CancellationToken ct)
+    public static int Run(string[] args, ILoggerService logger, CancellationToken ct, int keepAliveMs = PipeProtocol.KeepAliveIntervalMs)
     {
         string src = CommandArgs.GetArg(args, "--src");
         string dst = CommandArgs.GetArg(args, "--dst");
@@ -24,7 +25,7 @@ internal static class FileCopyCommand
 
         WorkerDebug.Write($"FileCopy: src={src}, dst={dst}, pipe={pipeName}");
 
-        using var pipe = PipeHelper.Connect(pipeName);
+        using var pipe = PipeHelper.Connect(pipeName, keepAliveMs);
         pipe.WriteRunning("filecopy", $"Copying {src} -> {dst}");
 
         try

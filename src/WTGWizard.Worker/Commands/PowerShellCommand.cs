@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using WTGWizard.Shared.Common;
 using WTGWizard.Shared.Services.Logger;
 
 namespace WTGWizard.Worker.Commands;
@@ -16,7 +17,7 @@ internal static class PowerShellCommand
     /// <param name="logger">日志服务（由 Program 传入，共享实例）。</param>
     /// <param name="ct">取消令牌。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args, ILoggerService logger, CancellationToken ct)
+    public static int Run(string[] args, ILoggerService logger, CancellationToken ct, int keepAliveMs = PipeProtocol.KeepAliveIntervalMs)
     {
         string scriptPath = CommandArgs.GetArg(args, "--script");
         string pipeName = CommandArgs.GetArg(args, "--pipe");
@@ -24,7 +25,7 @@ internal static class PowerShellCommand
 
         WorkerDebug.Write($"PowerShell: script={scriptPath}, pipe={pipeName}, timeout={timeoutMs}ms");
 
-        using var pipe = PipeHelper.Connect(pipeName);
+        using var pipe = PipeHelper.Connect(pipeName, keepAliveMs);
 
         // 文件检查并入统一连接：缺失时仍须连接并回报失败（否则 Main 等待超时）
         if (!System.IO.File.Exists(scriptPath))

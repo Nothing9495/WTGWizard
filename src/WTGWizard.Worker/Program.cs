@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using WTGWizard.Shared.Common;
 using WTGWizard.Shared.Services.Logger;
 using WTGWizard.Worker.Commands;
 
@@ -52,16 +53,21 @@ static class Program
             return 1;
         }
 
+        // 心跳间隔：默认取协议常量；可用 --keepalive <ms> 覆盖（<=0 关闭，用于诊断）
+        int keepAliveMs = int.TryParse(CommandArgs.TryGetArg(args, "--keepalive"), out var ka)
+            ? ka
+            : PipeProtocol.KeepAliveIntervalMs;
+
         int exitCode;
         try
         {
             exitCode = args[0].ToLowerInvariant() switch
             {
-                "extract" => ExtractCommand.Run(args[1..], logService, WorkerCancellation.Token),
-                "pwsh" => PowerShellCommand.Run(args[1..], logService, WorkerCancellation.Token),
-                "dism" => DismCommand.Run(args[1..], logService, WorkerCancellation.Token),
-                "bcdboot" => BcdbootCommand.Run(args[1..], logService, WorkerCancellation.Token),
-                "filecopy" => FileCopyCommand.Run(args[1..], logService, WorkerCancellation.Token),
+                "extract" => ExtractCommand.Run(args[1..], logService, WorkerCancellation.Token, keepAliveMs),
+                "pwsh" => PowerShellCommand.Run(args[1..], logService, WorkerCancellation.Token, keepAliveMs),
+                "dism" => DismCommand.Run(args[1..], logService, WorkerCancellation.Token, keepAliveMs),
+                "bcdboot" => BcdbootCommand.Run(args[1..], logService, WorkerCancellation.Token, keepAliveMs),
+                "filecopy" => FileCopyCommand.Run(args[1..], logService, WorkerCancellation.Token, keepAliveMs),
                 _ => throw new ArgumentException($"Unknown command: {args[0]}")
             };
         }

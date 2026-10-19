@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using WTGWizard.Shared.Common;
 using WTGWizard.Shared.Services.Logger;
 using WTGWizard.Shared.Services.WimService;
 
@@ -28,7 +29,7 @@ internal static class ExtractCommand
     /// <param name="logger">日志服务（由 Program 传入，共享实例）。</param>
     /// <param name="ct">取消令牌（wimlib 回调 Abort 优雅中止）。</param>
     /// <returns>退出码。</returns>
-    public static int Run(string[] args, ILoggerService logger, CancellationToken ct)
+    public static int Run(string[] args, ILoggerService logger, CancellationToken ct, int keepAliveMs = PipeProtocol.KeepAliveIntervalMs)
     {
         string wimPath = CommandArgs.GetArg(args, "--wim");
         int index = int.Parse(CommandArgs.GetArg(args, "--index"));
@@ -37,7 +38,7 @@ internal static class ExtractCommand
 
         WorkerDebug.Write($"Extract: wim={wimPath}, index={index}, target={targetDir}, pipe={pipeName}");
 
-        using var pipe = PipeHelper.Connect(pipeName);
+        using var pipe = PipeHelper.Connect(pipeName, keepAliveMs);
         pipe.WriteRunning("extract", $"Extracting {wimPath} #{index} -> {targetDir}");
 
         try
