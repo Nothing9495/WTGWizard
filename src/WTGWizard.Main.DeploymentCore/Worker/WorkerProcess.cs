@@ -100,6 +100,10 @@ public sealed class WorkerProcess : IWorkerProcess, IDisposable
             progress?.Report(p);
         };
 
+        // 心跳：Worker 存活信号，同样刷新静默兜底窗口
+        // （dism /Apply-Image 这类全程无进度消息的路径靠它避免被误判为假死）
+        pipeServer.OnKeepAlive += () => MarkReportReceived();
+
         Process? process = null;
         try
         {
