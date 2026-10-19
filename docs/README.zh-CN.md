@@ -27,7 +27,7 @@
 - 系统：Windows 10 2004（Build 19041）或更高版本，**x64**。在 **Windows 11** 上使用以获得最佳体验。
 - 运行时: 
   - 对于 `-SCD` 版本: 包含了所有必要运行时，你不需要额外安装任何运行时或框架。
-  - 对于 `-FDD` 版本: 需要提前安装[.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) 和 [Windows App SDK 2.4.0 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) 
+  - 对于 `-FDD` 版本: 需要提前安装[.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) 和 [Windows App SDK 2.5.1 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) 
 - **管理员权限**：应用会请求获取管理员权限以便进行磁盘操作、DISM 等。
 - 需要一个外接硬盘或 USB 驱动器。
 
@@ -68,9 +68,11 @@ dotnet build WTGWizard.slnx
 发布发布版构建：
 
 ```powershell
-./BuildArtifacts.ps1 -BuildType FDD -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
-./BuildArtifacts.ps1 -BuildType SCD -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
+./BuildArtifacts.ps1 -BuildType FDD -MainVer 1.0.0 -ZipTag v1.0.0
+./BuildArtifacts.ps1 -BuildType SCD -MainVer 1.0.0 -ZipTag v1.0.0
 ```
+
+Worker 版本不是脚本参数——它在 `src/WTGWizard.Worker/WTGWizard.Worker.csproj` 的 `<Version>` 中独立维护。脚本刻意不为 Worker 传 `-p:Version`，因为 MSBuild 全局属性会覆盖 csproj 中的值。
 
 或直接使用 PublishProfile（发布参数唯一来源为 `Properties/PublishProfiles/*.pubxml`）：
 

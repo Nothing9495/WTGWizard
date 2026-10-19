@@ -31,7 +31,7 @@
 - System: Windows 10 version 2004 (Build 19041) or later, **x64**. Best experience on **Windows 11**.
 - Runtimes: 
   - For `-SCD` version: All required runtimes and frameworks are bundled; nothing extra needs to be installed.
-  - For `-FDD` version: Both [.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) and [Windows App SDK 2.4.0 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) is reqiured to be installed beforehand.
+  - For `-FDD` version: Both [.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) and [Windows App SDK 2.5.1 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) is reqiured to be installed beforehand.
 - **Elevated privilege**: The app requests elevation for disk operations, DISM operations, etc.
 - An external hard drive or a USB drive is needed.
 
@@ -73,9 +73,11 @@ Publish a release build:
 
 ```powershell
 # Single mode per run (FDD or SCD); the CI/Release pipeline builds both via GitHub Actions matrix
-./BuildArtifacts.ps1 -BuildType FDD -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
-./BuildArtifacts.ps1 -BuildType SCD -MainVer 1.0.0 -WorkerVer 1.0.0 -ZipTag v1.0.0
+./BuildArtifacts.ps1 -BuildType FDD -MainVer 1.0.0 -ZipTag v1.0.0
+./BuildArtifacts.ps1 -BuildType SCD -MainVer 1.0.0 -ZipTag v1.0.0
 ```
+
+The Worker version is not a script parameter — it is maintained independently in `src/WTGWizard.Worker/WTGWizard.Worker.csproj` (`<Version>`). The script deliberately does not pass `-p:Version` for the Worker, because an MSBuild global property would override the csproj value.
 
 Or use the PublishProfile directly (the single source of publish parameters is `Properties/PublishProfiles/*.pubxml`):
 
