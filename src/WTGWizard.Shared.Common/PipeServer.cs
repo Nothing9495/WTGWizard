@@ -45,6 +45,9 @@ public sealed class PipeServer : IDisposable
     /// <summary>收到取消回报（Worker 专用上报 task_cancelled）。</summary>
     public event Action? OnCancelled;
 
+    /// <summary>收到心跳（Worker 仍存活，刷新静默兜底窗口）。</summary>
+    public event Action? OnKeepAlive;
+
     public PipeServer(string pipeName)
     {
         _pipeName = pipeName;
@@ -89,6 +92,7 @@ public sealed class PipeServer : IDisposable
         _reader.OnCancelRequested += () => OnCancel?.Invoke();
         _reader.OnCancelled += () => OnCancelled?.Invoke();
         _reader.OnAck += () => _handshakeTcs.TrySetResult();
+        _reader.OnKeepAlive += () => OnKeepAlive?.Invoke();
         _reader.StartReading();
 
         // 三次握手：发送 ready，等待 Worker 回报 ack（15s 超时）

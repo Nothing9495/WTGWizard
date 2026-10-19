@@ -13,15 +13,16 @@ internal static class PipeHelper
     /// 握手流程：等待 Main 的 ready → 回报 ack → 返回（任务消息通道就绪）。
     /// </summary>
     /// <param name="pipeName">Pipe 名称。</param>
+    /// <param name="keepAliveIntervalMs">心跳间隔（毫秒）；&lt;= 0 表示不启用心跳。</param>
     /// <returns>PipeWriter 实例。</returns>
-    public static PipeWriter Connect(string pipeName)
+    public static PipeWriter Connect(string pipeName, int keepAliveIntervalMs = PipeProtocol.KeepAliveIntervalMs)
     {
         var pipe = new PipeWriter();
         try
         {
-            WorkerDebug.Write($"Pipe: connecting to {pipeName}");
+            WorkerDebug.Write($"Pipe: connecting to {pipeName} (keepAlive={keepAliveIntervalMs}ms)");
             pipe.DebugLog = WorkerDebug.Write;
-            pipe.Connect(pipeName, timeoutMs: PipeProtocol.ConnectTimeoutMs);
+            pipe.Connect(pipeName, timeoutMs: PipeProtocol.ConnectTimeoutMs, keepAliveIntervalMs: keepAliveIntervalMs);
 
             // 写入取消令牌（阻塞 Write 可被取消中断）+ 主进程取消指令接线
             pipe.SetCancellationToken(WorkerCancellation.Token);

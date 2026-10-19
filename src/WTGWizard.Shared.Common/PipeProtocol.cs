@@ -20,6 +20,16 @@ public static class PipeProtocol
     /// </summary>
     public const int ReportIdleTimeoutMs = 30 * 60 * 1000;
 
+    /// <summary>
+    /// Worker 心跳间隔：命令执行期间由 <c>PipeWriter</c> 定时发送 <see cref="KeepAlive"/>。
+    /// 必须显著小于 <see cref="ReportIdleTimeoutMs"/>（约 1/30），使静默兜底只在真正假死时触发。
+    /// </summary>
+    /// <remarks>
+    /// 并非每条命令都会持续上报进度。比如DISM方式的映像部署全程不发任何进度消息。
+    /// 没有心跳时，一个正常推进但长时间无消息的长任务会被静默兜底误判为假死。
+    /// </remarks>
+    public const int KeepAliveIntervalMs = 60_000;
+
     // ── 消息类型常量 ──
     public const string TaskRunning = "task_running";
     public const string TaskProgress = "task_progress";
@@ -27,6 +37,9 @@ public static class PipeProtocol
     public const string TaskFailed = "task_failed";
     public const string TaskCancel = "task_cancel";
     public const string TaskCancelled = "task_cancelled";
+
+    /// <summary>心跳 —— Worker 存活信号，不携带业务语义，仅用于刷新 Main 侧的静默兜底窗口。</summary>
+    public const string KeepAlive = "keepalive";
 
     // ── 握手消息类型（Main → Worker 三次握手中的控制消息）──
     public const string HandshakeReady = "ready";
@@ -64,6 +77,10 @@ public static class PipeProtocol
     /// <summary>Worker 回报任务已取消（与指令 task_cancel 分离的专用上报）。</summary>
     public static string BuildCancelled(string task)
         => $"{{\"type\":\"{TaskCancelled}\",\"task\":\"{task}\"}}";
+
+    /// <summary>心跳消息（Worker → Main）。</summary>
+    public static string BuildKeepAlive()
+        => $"{{\"type\":\"{KeepAlive}\"}}";
 
     public static string BuildReady()
         => $"{{\"type\":\"{HandshakeReady}\"}}";

@@ -41,6 +41,9 @@ public sealed class PipeReader : IDisposable
     /// <summary>收到握手 ack（子 → 主）。</summary>
     public event Action? OnAck;
 
+    /// <summary>收到心跳（子 → 主，仅表示 Worker 仍存活）。</summary>
+    public event Action? OnKeepAlive;
+
     public PipeReader(PipeStream pipe)
     {
         _pipe = pipe;
@@ -133,6 +136,10 @@ public sealed class PipeReader : IDisposable
 
                 case PipeProtocol.HandshakeAck:
                     OnAck?.Invoke();
+                    break;
+
+                case PipeProtocol.KeepAlive:
+                    OnKeepAlive?.Invoke();
                     break;
             }
         }

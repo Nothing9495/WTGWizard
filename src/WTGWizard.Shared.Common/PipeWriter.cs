@@ -26,6 +26,11 @@ public sealed class PipeWriter : IDisposable
     // 避免 ready 因 WaitForReady 订阅过晚而丢失（PipeServer 侧的同源修复）。
     private readonly ManualResetEventSlim _readySignal = new(false);
 
+    // 心跳定时器：连接期间周期发送 keepalive，让 Main 的静默兜底窗口持续刷新。
+    // 并非每条命令都持续上报进度（dism /Apply-Image 全程无消息），没有心跳时
+    // 正常推进的长任务会被误判为假死。
+    private Timer? _keepAliveTimer;
+
     public bool IsConnected => _connected && _pipe?.IsConnected == true;
 
     /// <summary>收到取消指令（主 → 子）。</summary>
@@ -46,7 +51,9 @@ public sealed class PipeWriter : IDisposable
     /// </summary>
     /// <param name="pipeName">Pipe 名称。</param>
     /// <param name="timeoutMs">连接超时（毫秒），默认 15 秒。</param>
-    public void Connect(string pipeName, int timeoutMs = PipeProtocol.ConnectTimeoutMs)
+    /// <param name="keepAliveIntervalMs">心跳间隔（毫秒）；&lt;= 0 表示不启用心跳。</param>
+    public void Connect(string pipeName, int timeoutMs = PipeProtocol.ConnectTimeoutMs,
+        int keepAliveIntervalMs = PipeProtocol.KeepAliveIntervalMs)
     {
         // Asynchronous：WriteAsync 使用重叠 I/O，取消可通过 CancelIoEx 中断 NtWriteFile 阻塞
         _pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
@@ -59,6 +66,18 @@ public sealed class PipeWriter : IDisposable
         _reader.OnCancelRequested += () => OnCancelRequested?.Invoke();
         _reader.OnReady += () => _readySignal.Set();
         _reader.StartReading();
+
+        StartKeepAlive(keepAliveIntervalMs);
+    }
+
+    private void StartKeepAlive(int intervalMs)
+    {
+        if (intervalMs <= 0) return;
+        _keepAliveTimer = new Timer(_ =>
+        {
+            // 管道已断时 Write 内部直接返回 false，不抛异常
+            WriteKeepAlive();
+        }, null, intervalMs, intervalMs);
     }
 
     public bool WriteRunning(string task, string? description = null) => Send(PipeProtocol.BuildRunning(task, description));
@@ -71,6 +90,7 @@ public sealed class PipeWriter : IDisposable
         CancellationToken.None, CancelAckTimeoutMs, "cancel ack", throwOnTimeout: false);
     public bool WriteReady() => Send(PipeProtocol.BuildReady());
     public bool WriteAck() => Send(PipeProtocol.BuildAck());
+    public bool WriteKeepAlive() => Send(PipeProtocol.BuildKeepAlive());
 
     /// <summary>
     /// 三次握手（Worker 侧）：等待 Main 的 ready，超时/取消则失败。
@@ -141,6 +161,8 @@ public sealed class PipeWriter : IDisposable
 
     public void Dispose()
     {
+        _keepAliveTimer?.Dispose();
+        _keepAliveTimer = null;
         _reader?.Dispose();
         _reader = null;
         _pipe?.Dispose();
