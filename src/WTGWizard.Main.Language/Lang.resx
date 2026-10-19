@@ -243,11 +243,8 @@
   <data name="Page.WizStep.DeployMethod.PartInstall" xml:space="preserve">
     <value>Partition Install</value>
   </data>
-  <data name="Page.WizStep.DeployMethod.PartConfig.Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployMethod.ConfigDskLayout.Header" xml:space="preserve">
     <value>Configure Disk Layout</value>
-  </data>
-  <data name="Page.WizStep.DeployMethod.PartConfig.Desc" xml:space="preserve">
-    <value>Configure the disk layout and partition sizes for clean installation.</value>
   </data>
   <data name="Page.WizStep.DeployMethod.EspSize.Header" xml:space="preserve">
     <value>ESP Partition Capacity</value>
@@ -271,10 +268,13 @@
     <value>Reserved Partition Label</value>
   </data>
   <data name="Page.WizStep.DeployMethod.SelPart.Header" xml:space="preserve">
-    <value>Install to Partition</value>
+    <value>Select Target Partition</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ConfigPartToInst.Header" xml:space="preserve">
+    <value>Configure Partition</value>
   </data>
   <data name="Page.WizStep.DeployMethod.SelPart.Desc" xml:space="preserve">
-    <value>Select the partition to deploy Windows To Go. All the data on the selected partition will be erased.</value>
+    <value>Select the partition to deploy Windows To Go. All the data on the selected partition will be wiped out.</value>
   </data>
   <data name="Page.WizStep.DeployMethod.SelPart.Placeholder" xml:space="preserve">
     <value>Select a partition</value>

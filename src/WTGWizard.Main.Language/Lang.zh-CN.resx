@@ -243,11 +243,8 @@
   <data name="Page.WizStep.DeployMethod.PartInstall" xml:space="preserve">
     <value>分区安装</value>
   </data>
-  <data name="Page.WizStep.DeployMethod.PartConfig.Header" xml:space="preserve">
+  <data name="Page.WizStep.DeployMethod.ConfigDskLayout.Header" xml:space="preserve">
     <value>配置磁盘分区</value>
-  </data>
-  <data name="Page.WizStep.DeployMethod.PartConfig.Desc" xml:space="preserve">
-    <value>配置全新安装时的分区大小及布局</value>
   </data>
   <data name="Page.WizStep.DeployMethod.EspSize.Header" xml:space="preserve">
     <value>引导分区容量</value>
@@ -271,7 +268,10 @@
     <value>保留分区卷标</value>
   </data>
   <data name="Page.WizStep.DeployMethod.SelPart.Header" xml:space="preserve">
-    <value>安装到分区</value>
+    <value>选择安装分区</value>
+  </data>
+  <data name="Page.WizStep.DeployMethod.ConfigPartToInst.Header" xml:space="preserve">
+    <value>配置安装分区</value>
   </data>
   <data name="Page.WizStep.DeployMethod.SelPart.Desc" xml:space="preserve">
     <value>选择要部署 Windows To Go 的磁盘分区，所选分区数据将被清空</value>

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunityToolkit.WinUI.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -131,7 +132,7 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
             ReservedFsComboBox.SelectedIndex = 0;
 
             // 默认选中全新安装
-            MethodRadioButtons.SelectedIndex = 0;
+            MethodSegmented.SelectedIndex = 0;
 
             // 加载分区列表
             await LoadPartitionsAsync(disk.Index);
@@ -158,14 +159,11 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
 
     private void DeployMethod_MethodSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var rb = (RadioButtons)sender;
-        if (rb.SelectedItem is null) return;
+        var segmented = (Segmented)sender;
+        if (segmented.SelectedItem is null) return;
 
-        var index = rb.Items.IndexOf(rb.SelectedItem);
-        if (index == 0)
-            VM.Method.IsCleanInstall = true;
-        else
-            VM.Method.IsCleanInstall = false;
+        // Segmented 项顺序：0 = 全新安装，1 = 安装到分区
+        VM.Method.IsCleanInstall = segmented.SelectedIndex == 0;
     }
 
     // ══════════════════════════════════════════════════════
@@ -278,7 +276,7 @@ public sealed partial class DeployMethodPage : Page, ITabActivatable
 
     private void ResetToInitialState()
     {
-        MethodRadioButtons.SelectedIndex = -1;
+        MethodSegmented.SelectedIndex = -1;
         VM.Method.Partitions.Clear();
     }
 

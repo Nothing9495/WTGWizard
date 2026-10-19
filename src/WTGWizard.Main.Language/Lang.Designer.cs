@@ -1490,6 +1490,24 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
+        ///   查找类似 Configure Disk Layout 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_ConfigDskLayout_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.ConfigDskLayout.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Configure Partition 的本地化字符串。
+        /// </summary>
+        public static string Page_WizStep_DeployMethod_ConfigPartToInst_Header {
+            get {
+                return ResourceManager.GetString("Page.WizStep.DeployMethod.ConfigPartToInst.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Select a disk and installation method. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployMethod_Desc {
@@ -1568,24 +1586,6 @@ namespace WTGWizard.Main.Language {
         public static string Page_WizStep_DeployMethod_OsSize_Header {
             get {
                 return ResourceManager.GetString("Page.WizStep.DeployMethod.OsSize.Header", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Configure the disk layout and partition sizes for clean installation. 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_DeployMethod_PartConfig_Desc {
-            get {
-                return ResourceManager.GetString("Page.WizStep.DeployMethod.PartConfig.Desc", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Configure Disk Layout 的本地化字符串。
-        /// </summary>
-        public static string Page_WizStep_DeployMethod_PartConfig_Header {
-            get {
-                return ResourceManager.GetString("Page.WizStep.DeployMethod.PartConfig.Header", resourceCulture);
             }
         }
         
@@ -1725,7 +1725,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Select the partition to deploy Windows To Go. All the data on the selected partition will be erased. 的本地化字符串。
+        ///   查找类似 Select the partition to deploy Windows To Go. All the data on the selected partition will be wiped out. 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployMethod_SelPart_Desc {
             get {
@@ -1734,7 +1734,7 @@ namespace WTGWizard.Main.Language {
         }
         
         /// <summary>
-        ///   查找类似 Install to Partition 的本地化字符串。
+        ///   查找类似 Select Target Partition 的本地化字符串。
         /// </summary>
         public static string Page_WizStep_DeployMethod_SelPart_Header {
             get {
