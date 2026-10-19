@@ -286,7 +286,7 @@
     <value>数据安全警告</value>
   </data>
   <data name="InfoBar.DataSecurity.Message" xml:space="preserve">
-    <value>请确保你选择了正确的待部署磁盘，避免以外的数据丢失！</value>
+    <value>请确保你选择了正确的待部署磁盘，避免意外的数据丢失！</value>
   </data>
   <data name="InfoBar.NoEsp.Title" xml:space="preserve">
     <value>无 ESP 分区</value>
