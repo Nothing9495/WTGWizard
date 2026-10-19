@@ -414,22 +414,37 @@ When the user requests a Github Release note for new releases, you need to:
 
 For reference, here is the `v1.0.2 Release`'s Github Release Note.
 ```markdown
-## What’s New
+## What's New
+
+### ⚠️ Requirements
+
+- **The `-FDD` build now requires Windows App SDK 2.5.1** (previously 2.4.0). If you use the `-FDD` package, install the matching runtime before launching. The `-SCD` package bundles everything and needs no extra install.
+
+### ✨ New
+
+- **Segmented control in Deploy Method**: Clean Install / Install to partition is now a segmented selector, and the disk layout and partition sections switch along with it for a more consistent look.
+- **The wizard now stays responsive throughout a deployment**: The deployment engine no longer runs on the UI thread, so long image extractions and DISM operations no longer freeze the interface.
 
 ### 🔧 Fixes & Improvements
 
-- **IMPORTANT: Ended support for outdated Windows** – We no longer support Windows before `10.0.19041.0`(2004) since `v1.0.2`. This helps avoid unexpected issues that could occur on outdated systems.
-- **Fixed blank OS size display** – The number box for operating system partition size might allow blank content. Now it always has a valid value to display.
-- **bcdboot Commands** – `/offline`  is no longer used when the host `bcdboot.exe` utility version is lower than `10.0.26100.0`.
-- **WTGWizard Launcher** – The launcher now statically links the C runtime (`/MT`), avoiding VCRUNTIME errors if the host system doesn't have `Microsoft Visual C++ v14 Redistributable x64` installed beforehand.
+- **Fixed deployments failing with `The operation has timed out.`**: The Main-Worker handshake could silently drop its acknowledgement, aborting a step that was actually running correctly.
+- **UI threads no longer stall the Worker handshake**: Handshake bookkeeping moved off the UI thread, so it can no longer miss the Worker's 15-second window.
+- **Heartbeat pipe protocol**: Introduced a periodic heartbeat between the Worker and the wizard, so long-running operations that report no progress are no longer mistaken as hung.
+- **A lost Worker report won't hang the wizard**: Terminal status that cannot be delivered is now reported through the exit code. A crashed or hung Worker can no longer block a deployment indefinitely.
+- **Worker termination is now traceable**: Killing a stuck Worker logs its PID and falls back to terminating the single process instead of failing silently.
+- **No more UI-thread exceptions after a step ends**: Late progress callbacks are discarded once a step has finished.
+- **Fixed a Chinese Simplified text error.**
+
 ### 📝 Other Updates
 
-- Improved localizations.
-- Added a new reference hyperlink on Settings page.
+- Upgraded the Windows App SDK to 2.5.1.
+- Build script: added `-OutputDir`, added `-Help`/`-h`/`-?`, and forced UTF-8 output to avoid garbled text.
+- The SDK now rolls forward to the latest .NET 10 minor version.
+- Improved localizations and documentation.
 
 ---
 
-**Full Changelog**: https://github.com/Nothing9495/WTGWizard/compare/80e2624...v1.0.2
+**Full Changelog**: https://github.com/Nothing9495/WTGWizard/compare/v1.0.2...v1.1.0
 ```
 
 
