@@ -100,7 +100,7 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
         // ── 新的 orchestrator：完全重置 ──
         HasDeployment = true;
         PrepareNewDeployment(incoming);
-        _deploymentTask = RunDeploymentAsync();
+        _deploymentTask = Task.Run(() => RunDeploymentAsync());
         VM.StopDeploymentForClose = StopForAppCloseAsync;
     }
 
@@ -139,37 +139,60 @@ public sealed partial class TaskPage : Page, ITabActivatable, INotifyPropertyCha
         {
             var result = await _orchestrator!.StartAsync(_cts!.Token);
 
-            // 结局 → 任务栏指示（单一数据源：DeploymentResult.Outcome）
-            ShowTaskbarOutcome(result.Outcome);
+            // 结局 → 任务栏指示（WinRT：TaskbarProgressHelper / WindowNative.GetWindowHandle，必须回 UI 线程）
+            await RunOnUiThreadAsync(() => ShowTaskbarOutcome(result.Outcome));
         }
         catch (OperationCanceledException)
         {
-            ShowTaskbarOutcome(TaskOutcome.Cancelled);
+            await RunOnUiThreadAsync(() => ShowTaskbarOutcome(TaskOutcome.Cancelled));
         }
         catch (Exception)
         {
             /* 已由 DeploymentOrchestrator 记录 */
-            ShowTaskbarOutcome(TaskOutcome.Failed);
+            await RunOnUiThreadAsync(() => ShowTaskbarOutcome(TaskOutcome.Failed));
         }
         finally
         {
-            FlushPendingOutput(null, EventArgs.Empty);
-            StopDiskMonitor();
-            DisconnectUI();
-            _cts?.Dispose();
-            _cts = null;
-            VM.IsDeploying = false;
-            VM.StopDeploymentForClose = null;
-            _orchestrator?.Dispose();
-            _deploymentTask = null;
-
-            // 结局已显示则交给闪烁定时器清除；否则兜底清除
-            if (!_completionPending)
+            // 收尾整段都触碰 UI（FlushPendingOutput → TaskbarProgressHelper → WindowNative、
+            // DispatcherTimer、任务列表集合），统一回 UI 线程执行
+            await RunOnUiThreadAsync(() =>
             {
-                _completionClearTimer?.Stop();
-                TaskbarProgressHelper.Clear(App.MainWindow);
-            }
+                FlushPendingOutput(null, EventArgs.Empty);
+                StopDiskMonitor();
+                DisconnectUI();
+                _cts?.Dispose();
+                _cts = null;
+                VM.IsDeploying = false;
+                VM.StopDeploymentForClose = null;
+                _orchestrator?.Dispose();
+                _deploymentTask = null;
+
+                // 结局已显示则交给闪烁定时器清除；否则兜底清除
+                if (!_completionPending)
+                {
+                    _completionClearTimer?.Stop();
+                    TaskbarProgressHelper.Clear(App.MainWindow);
+                }
+            });
         }
+    }
+
+    /// <summary>
+    /// 把一段 UI 工作投递到 UI 线程并等待其完成（保序）。
+    /// 投递失败（UI 线程已关闭、应用正在退出）时静默放行 —— 收尾不应因窗口已关而挂起。
+    /// </summary>
+    private Task RunOnUiThreadAsync(Action action)
+    {
+        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        if (!DispatcherQueue.TryEnqueue(() =>
+            {
+                try { action(); }
+                finally { tcs.TrySetResult(); }
+            }))
+        {
+            tcs.TrySetResult();
+        }
+        return tcs.Task;
     }
 
     /// <summary>

@@ -23,6 +23,9 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
     private readonly WorkerCommandFactory _commands;
     private readonly TempFileManager _tempFiles;
     private readonly ObservableCollection<DeployTaskItem> _tasks;
+
+    /// <summary>任务列表写入器（负责 UI 线程归并）。构造期根据是否注入 IUiDispatcher 决定。</summary>
+    private readonly TaskListUpdater _taskList;
     private readonly Subject<TaskUpdate> _subject = new();
     private DeploymentConfig _currentConfig;
 
@@ -45,7 +48,7 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
         IDeploymentPipeline pipeline, DeploymentConfig config,
         IDriveLetterService driveLetter, ILoggerService logger,
         IWorkerProcess worker, WorkerCommandFactory commands,
-        TempFileManager tempFiles)
+        TempFileManager tempFiles, IUiDispatcher? uiDispatcher = null)
     {
         _pipeline = pipeline;
         _currentConfig = config;
@@ -70,11 +73,29 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
         _logger.Debug("Orchestrator", "Pipeline: {Steps}",
             string.Join(" → ", _tasks.Select(t => t.Id)));
         LogDeploymentConfig();
+
+        // UI 边界：编排器可在后台线程运行，但 DeployTaskItem 的属性写入必须回到 UI 线程。
+        // 未注入时退化为同步执行 —— 仅供无 UI 场景（测试/工具）使用，生产路径必须注入。
+        if (uiDispatcher is null)
+        {
+            _logger.Warn("Orchestrator",
+                "No IUiDispatcher supplied — task status will be mutated on the calling thread. " +
+                "This is only safe when there is no UI bound to the task list.");
+            _taskList = new TaskListUpdater(_tasks, new InlineUiDispatcher());
+        }
+        else
+        {
+            _taskList = new TaskListUpdater(_tasks, uiDispatcher);
+        }
     }
 
     public async Task<DeploymentResult> StartAsync(CancellationToken ct = default)
     {
         _logger.Info("Orchestrator", "Deployment started, total tasks: {Count}", _tasks.Count);
+        // 诊断锚点：状态机若已被移出 UI 线程，这里会显示 ctx=(none) 且线程号与 UI 线程不同
+        _logger.Debug("Orchestrator", "StartAsync on thread {Tid}, syncContext={Ctx}",
+            Environment.CurrentManagedThreadId,
+            SynchronizationContext.Current?.GetType().Name ?? "(none)");
         var sw = System.Diagnostics.Stopwatch.StartNew();
 
         try
@@ -105,13 +126,9 @@ public sealed class DeploymentOrchestrator : IDeploymentOrchestrator
                 using var _ = ctx.Progress
                     .Subscribe(u =>
                     {
+                        // Rx 分发留在生产者线程；只有触碰 UI 绑定对象的写入需要归线程
                         _subject.OnNext(u);
-                        var task = _tasks.FirstOrDefault(t => t.Id == u.TaskId.Value);
-                        if (task is not null)
-                        {
-                            task.Status = u.Status;
-                            task.ProgressValue = u.Progress;
-                        }
+                        _taskList.Apply(u);
                     });
 
                 var result = await step.ExecuteAsync(ctx, ct);

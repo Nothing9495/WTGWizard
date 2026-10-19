@@ -132,6 +132,12 @@ public partial class App : Application
         // 5. ViewModel
         services.AddSingleton<WizardViewModel>();
 
+        // 6. UI 线程投递器 —— 部署状态机在后台线程运行时，触碰 UI 的写入经它回 UI 线程。
+        //    在此（App.OnLaunched，UI 线程）就地捕获 DispatcherQueue，避免首次解析发生在后台线程。
+        var uiQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        services.AddSingleton<WTGWizard.Main.DeploymentCore.Contracts.IUiDispatcher>(
+            new WTGWizard.Helpers.DispatcherQueueUiDispatcher(uiQueue));
+
         return services.BuildServiceProvider();
     }
 }

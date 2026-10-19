@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using WTGWizard.Main.DeploymentCore.Builders;
+using WTGWizard.Main.DeploymentCore.Contracts;
 using WTGWizard.Main.DeploymentCore.Models;
 using WTGWizard.Main.DeploymentCore.Orchestrator;
 using WTGWizard.Main.DeploymentCore.Steps;
@@ -54,6 +55,7 @@ public sealed partial class WizardViewModel : ObservableObject
 
     private readonly IDriveLetterService _driveLetterService;
     private readonly ILoggerService _logger;
+    private readonly IUiDispatcher _uiDispatcher;
 
     // ═══ 部署状态 ═══
 
@@ -61,10 +63,12 @@ public sealed partial class WizardViewModel : ObservableObject
 
     // ═══ 构造函数 ═══
 
-    public WizardViewModel(IDriveLetterService driveLetterService, ILoggerService logger)
+    public WizardViewModel(IDriveLetterService driveLetterService, ILoggerService logger,
+        IUiDispatcher uiDispatcher)
     {
         _driveLetterService = driveLetterService;
         _logger = logger;
+        _uiDispatcher = uiDispatcher;
 
         Method = new DeployMethodVM();
         Image.PropertyChanged += OnSubPropertyChanged;
@@ -157,7 +161,7 @@ public sealed partial class WizardViewModel : ObservableObject
         var tempFiles = new TempFileManager();
 
         Orchestrator = new DeploymentOrchestrator(pipeline, config, _driveLetterService, _logger,
-            worker, commands, tempFiles);
+            worker, commands, tempFiles, _uiDispatcher);
         IsDeploying = true;
         WeakReferenceMessenger.Default.Send(new NavigateToPageMessage("TaskPage"));
     }
