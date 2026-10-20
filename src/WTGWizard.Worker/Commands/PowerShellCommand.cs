@@ -23,7 +23,7 @@ internal static class PowerShellCommand
         string pipeName = CommandArgs.GetArg(args, "--pipe");
         int timeoutMs = int.TryParse(CommandArgs.TryGetArg(args, "--timeout"), out var t) ? t : 0;
 
-        WorkerDebug.Write($"PowerShell: script={scriptPath}, pipe={pipeName}, timeout={timeoutMs}ms");
+        WorkerDebug.Write($"PowerShell: script={scriptPath}, pipe={pipeName}, timeout={WorkerDebug.TimeoutLabel(timeoutMs)}");
 
         using var pipe = PipeHelper.Connect(pipeName, keepAliveMs);
 

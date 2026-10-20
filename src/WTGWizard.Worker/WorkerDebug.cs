@@ -26,4 +26,9 @@ internal static class WorkerDebug
         if (!Enabled) return;
         Console.WriteLine($"[DBG] {message}");
     }
+
+    /// <summary>
+    /// 超时值的日志文本：&lt;= 0 表示不设超时，显示 "none"（而不是容易被读成"瞬间超时"的 "0ms"）。
+    /// </summary>
+    public static string TimeoutLabel(int timeoutMs) => timeoutMs > 0 ? $"{timeoutMs}ms" : "none";
 }

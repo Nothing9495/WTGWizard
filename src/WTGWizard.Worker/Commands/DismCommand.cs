@@ -23,7 +23,7 @@ internal static class DismCommand
         string pipeName = CommandArgs.GetArg(args, "--pipe");
         int timeoutMs = int.TryParse(CommandArgs.TryGetArg(args, "--timeout"), out var t) ? t : 0;
 
-        WorkerDebug.Write($"DISM: args={dismArgs}, pipe={pipeName}, timeout={timeoutMs}ms");
+        WorkerDebug.Write($"DISM: args={dismArgs}, pipe={pipeName}, timeout={WorkerDebug.TimeoutLabel(timeoutMs)}");
 
         using var pipe = PipeHelper.Connect(pipeName, keepAliveMs);
         pipe.WriteRunning("dism", $"Executing DISM: {dismArgs}");
