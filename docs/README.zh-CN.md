@@ -27,7 +27,9 @@
 - 系统：Windows 10 2004（Build 19041）或更高版本，**x64**。在 **Windows 11** 上使用以获得最佳体验。
 - 运行时: 
   - 对于 `-SCD` 版本: 包含了所有必要运行时，你不需要额外安装任何运行时或框架。
-  - 对于 `-FDD` 版本: 需要提前安装[.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) 和 [Windows App SDK 2.5.1 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) 
+  - 对于 `-FDD` 版本: 需要提前安装 **.NET 10.0 桌面运行时 x64** 以及 **Windows App Runtime 2.5.1 x64** 或更高版本。
+    - 下载最新的 .NET 10.0 桌面运行时 x64: [点击前往](https://dotnet.microsoft.com/download/dotnet/10.0) 
+    - 下载 Windows App Runtime 2.5.1 或更高版本: [点击前往](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads)
 - **管理员权限**：应用会请求获取管理员权限以便进行磁盘操作、DISM 等。
 - 需要一个外接硬盘或 USB 驱动器。
 

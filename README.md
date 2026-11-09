@@ -28,10 +28,12 @@
 
 ## Requirements
 
-- System: Windows 10 version 2004 (Build 19041) or later, **x64**. Best experience on **Windows 11**.
+- System: Windows 10 version 2004 (Build 19041) or newer, **x64**. Best experience on **Windows 11**.
 - Runtimes: 
   - For `-SCD` version: All required runtimes and frameworks are bundled; nothing extra needs to be installed.
-  - For `-FDD` version: Both [.NET 10.0 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-10.0.10-windows-x64-installer?cid=getdotnetcore) and [Windows App SDK 2.5.1 x64](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) is reqiured to be installed beforehand.
+  - For `-FDD` version: Both **.NET 10.0 Desktop Runtime x64** and **Windows App Runtime 2.5.1 x64** or higher is reqiured to be installed beforehand.
+    - Download the latest .NET 10.0 Desktop Runtime x64: [Download](https://dotnet.microsoft.com/download/dotnet/10.0) 
+    - Download Windows App Runtime 2.5.1 or higher: [Download](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads)
 - **Elevated privilege**: The app requests elevation for disk operations, DISM operations, etc.
 - An external hard drive or a USB drive is needed.
 
