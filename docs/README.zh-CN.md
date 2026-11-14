@@ -1,7 +1,7 @@
 # WTGWizard
 
 <p align="center">
-  <img src="../assets/app.png" alt="WTGWizard" width="96" />
+  <img src="../assets/app.png" alt="WTGWizard" width="196" />
 </p>
 
 <p align="center">
