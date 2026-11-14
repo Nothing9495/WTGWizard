@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  一个基于 <strong>WinUI</strong> 开发的现代化 <strong>Windows To Go</strong> 部署工具
+  一个使用 <strong>WinUI</strong> 开发的现代化 Windows To Go 部署工具
 </p>
 
 ---

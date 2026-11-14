@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  A modern <strong>Windows To Go</strong> deployment wizard built with <strong>WinUI</strong>.
+  A modern Windows To Go deployment wizard built with <strong>WinUI</strong>.
   Guides you step by step through creating a portable Windows workspace on an external drive.
 </p>
 
