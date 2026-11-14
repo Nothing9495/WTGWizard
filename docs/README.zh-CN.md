@@ -10,7 +10,7 @@
 
 ---
 
-![WTGWizard](../assets/screenshot-1.png)
+![WTGWizard](../assets/screenshot-1.zh-cn.png)
 
 ## 功能特性
 
